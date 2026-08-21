@@ -51,8 +51,8 @@ async function processFiling(entry: FeedEntry) {
   const rows = [];
   for (const owner of ceoOwners) {
     for (const tx of parsed.transactions) {
-      const shares = tx.shares;
-      const pricePerShare = tx.pricePerShare;
+      // total_value is a generated column in Postgres (exact decimal math from
+      // shares * price_per_share) — it must NOT be included in the insert payload.
       rows.push({
         source_country: "US",
         accession_number: entry.accessionNumber,
@@ -65,9 +65,8 @@ async function processFiling(entry: FeedEntry) {
         is_ceo: true,
         transaction_date: tx.date,
         transaction_code: tx.code,
-        shares,
-        price_per_share: pricePerShare,
-        total_value: shares !== null && pricePerShare !== null ? shares * pricePerShare : null,
+        shares: tx.shares,
+        price_per_share: tx.pricePerShare,
         shares_owned_after: tx.sharesOwnedAfter,
         filing_url: filingIndexUrl,
         filed_at: entry.filedAt || null,

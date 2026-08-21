@@ -20,7 +20,9 @@ create table if not exists transactions (
   transaction_code text not null,
   shares numeric,
   price_per_share numeric,
-  total_value numeric,
+  -- Computed by Postgres (exact decimal math) rather than in application code,
+  -- to avoid floating-point rounding artifacts (e.g. 15794.999999999998).
+  total_value numeric generated always as (shares * price_per_share) stored,
   shares_owned_after numeric,
 
   -- Provenance
