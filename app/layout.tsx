@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TradeInsides — CEO Insider Purchases",
+  title: "TradeInsider — CEO Insider Purchases",
   description: "Track open-market stock purchases by CEOs, sourced from official SEC EDGAR filings.",
 };
 

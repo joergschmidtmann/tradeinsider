@@ -1,6 +1,7 @@
-export function SearchBar({ initialQuery }: { initialQuery: string }) {
+export function SearchBar({ initialQuery, type }: { initialQuery: string; type: string }) {
   return (
     <form action="/" method="get" className="mb-6">
+      <input type="hidden" name="type" value={type} />
       <input
         type="text"
         name="q"

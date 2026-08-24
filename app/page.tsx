@@ -1,19 +1,31 @@
 import Link from "next/link";
 import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { SearchBar } from "@/components/SearchBar";
+import { TypeToggle } from "@/components/TypeToggle";
 import { TransactionsTable, type TransactionRow } from "@/components/TransactionsTable";
 import { Footer } from "@/components/Footer";
 
 const PAGE_SIZE = 50;
 
+const TRANSACTION_TYPES = {
+  P: { label: "Purchases", heading: "CEO Insider Purchases", description: "Open-market stock purchases reported by company CEOs, sourced from SEC Form 4 filings." },
+  S: { label: "Sales", heading: "CEO Insider Sales", description: "Open-market stock sales reported by company CEOs, sourced from SEC Form 4 filings." },
+} as const;
+type TransactionType = keyof typeof TRANSACTION_TYPES;
+
+function isTransactionType(value: string): value is TransactionType {
+  return value === "P" || value === "S";
+}
+
 interface HomeProps {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; type?: string }>;
 }
 
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
   const q = (params.q ?? "").trim().slice(0, 100);
   const page = Math.max(1, Number(params.page) || 1);
+  const type: TransactionType = isTransactionType(params.type ?? "") ? (params.type as TransactionType) : "P";
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
@@ -25,7 +37,7 @@ export default async function Home({ searchParams }: HomeProps) {
       { count: "exact" }
     )
     .eq("is_ceo", true)
-    .eq("transaction_code", "P")
+    .eq("transaction_code", type)
     .order("transaction_date", { ascending: false })
     .range(from, to);
 
@@ -43,13 +55,14 @@ export default async function Home({ searchParams }: HomeProps) {
   return (
     <div className="flex min-h-full flex-col">
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">
-        <h1 className="text-2xl font-semibold">CEO Insider Purchases</h1>
-        <p className="mt-1 text-sm text-black/60 dark:text-white/60">
-          Open-market stock purchases reported by company CEOs, sourced from SEC Form 4 filings.
-        </p>
+        <h1 className="text-2xl font-semibold">{TRANSACTION_TYPES[type].heading}</h1>
+        <p className="mt-1 text-sm text-black/60 dark:text-white/60">{TRANSACTION_TYPES[type].description}</p>
 
         <div className="mt-6">
-          <SearchBar initialQuery={q} />
+          <TypeToggle activeCode={type} q={q} />
+        </div>
+        <div className="mt-4">
+          <SearchBar initialQuery={q} type={type} />
         </div>
 
         {error ? (
@@ -62,7 +75,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <div className="mt-6 flex items-center justify-between text-sm">
               {page > 1 ? (
                 <Link
-                  href={{ pathname: "/", query: { ...(q ? { q } : {}), page: page - 1 } }}
+                  href={{ pathname: "/", query: { ...(q ? { q } : {}), type, page: page - 1 } }}
                   className="underline hover:no-underline"
                 >
                   ← Previous
@@ -72,7 +85,7 @@ export default async function Home({ searchParams }: HomeProps) {
               )}
               {hasNextPage && (
                 <Link
-                  href={{ pathname: "/", query: { ...(q ? { q } : {}), page: page + 1 } }}
+                  href={{ pathname: "/", query: { ...(q ? { q } : {}), type, page: page + 1 } }}
                   className="underline hover:no-underline"
                 >
                   Next →

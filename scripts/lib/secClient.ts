@@ -9,7 +9,7 @@ if (!CONTACT_EMAIL) {
     "SEC_CONTACT_EMAIL environment variable is required (SEC requires a contact email in the User-Agent header)."
   );
 }
-const USER_AGENT = `TradeInsides.com ${CONTACT_EMAIL}`;
+const USER_AGENT = `TradeInsider.io ${CONTACT_EMAIL}`;
 
 const MIN_DELAY_MS = 150;
 let lastRequestAt = 0;
