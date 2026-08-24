@@ -22,7 +22,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-black/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex shrink-0 items-center" onClick={() => setMenuOpen(false)}>
-          <Image src="/logo.png" alt="TradeInsider" width={140} height={109} priority className="h-9 w-auto" />
+          <Image src="/logo.png" alt="TradeInsider" width={140} height={109} priority className="h-12 w-auto" />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
