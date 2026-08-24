@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Insider Käufe" },
+  { href: "/insider-kaeufe", label: "Insider Käufe" },
   { href: "/aktienanalyse", label: "Aktienanalyse" },
   { href: "/trading-academy", label: "Trading Academy" },
   { href: "/saisonalitaeten", label: "Saisonalitäten" },
@@ -27,7 +27,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-1 lg:flex">
           {NAV_ITEMS.map((item) => {
-            const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const isActive = pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
@@ -63,7 +63,7 @@ export function Header() {
       {menuOpen && (
         <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 lg:hidden">
           {NAV_ITEMS.map((item) => {
-            const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const isActive = pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}

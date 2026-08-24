@@ -1,6 +1,6 @@
 export function SearchBar({ initialQuery, type }: { initialQuery: string; type: string }) {
   return (
-    <form action="/" method="get" className="mb-8">
+    <form action="/insider-kaeufe" method="get" className="mb-8">
       <input type="hidden" name="type" value={type} />
       <div className="relative max-w-md">
         <svg

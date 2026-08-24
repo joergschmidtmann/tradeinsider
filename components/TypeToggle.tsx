@@ -13,7 +13,7 @@ export function TypeToggle({ activeCode, q }: { activeCode: string; q: string })
         return (
           <Link
             key={tab.code}
-            href={{ pathname: "/", query: { ...(q ? { q } : {}), type: tab.code } }}
+            href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), type: tab.code } }}
             className={
               isActive
                 ? "rounded-full bg-gradient-accent px-4 py-1.5 font-medium text-white"

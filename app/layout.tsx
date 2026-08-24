@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TradeInsider — Insider-Käufe von CEOs",
-  description: "Insider-Käufe von CEOs in Echtzeit, auf Basis offizieller SEC-EDGAR-Meldungen.",
+  title: "TradeInsider — Willkommen",
+  description: "Deine Plattform für Insider-Käufe, Aktienanalysen und alles rund ums Trading.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
