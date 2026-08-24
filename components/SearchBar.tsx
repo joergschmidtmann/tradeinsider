@@ -1,14 +1,26 @@
 export function SearchBar({ initialQuery, type }: { initialQuery: string; type: string }) {
   return (
-    <form action="/" method="get" className="mb-6">
+    <form action="/" method="get" className="mb-8">
       <input type="hidden" name="type" value={type} />
-      <input
-        type="text"
-        name="q"
-        defaultValue={initialQuery}
-        placeholder="Search by company name or ticker…"
-        className="w-full max-w-md rounded-md border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black/40 dark:border-white/15 dark:bg-black dark:focus:border-white/40"
-      />
+      <div className="relative max-w-md">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-muted"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path strokeLinecap="round" d="m20 20-3.5-3.5" />
+        </svg>
+        <input
+          type="text"
+          name="q"
+          defaultValue={initialQuery}
+          placeholder="Firma oder Ticker suchen…"
+          className="w-full rounded-full border border-border bg-surface py-2.5 pr-4 pl-10 text-sm text-foreground placeholder:text-muted outline-none focus:border-white/25"
+        />
+      </div>
     </form>
   );
 }

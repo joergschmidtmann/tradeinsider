@@ -1,13 +1,13 @@
 import Link from "next/link";
 
 const TABS = [
-  { code: "P", label: "Purchases" },
-  { code: "S", label: "Sales" },
+  { code: "P", label: "Käufe" },
+  { code: "S", label: "Verkäufe" },
 ] as const;
 
 export function TypeToggle({ activeCode, q }: { activeCode: string; q: string }) {
   return (
-    <div className="inline-flex rounded-md border border-black/15 p-0.5 text-sm dark:border-white/15">
+    <div className="inline-flex rounded-full border border-border bg-surface p-1 text-sm">
       {TABS.map((tab) => {
         const isActive = tab.code === activeCode;
         return (
@@ -16,8 +16,8 @@ export function TypeToggle({ activeCode, q }: { activeCode: string; q: string })
             href={{ pathname: "/", query: { ...(q ? { q } : {}), type: tab.code } }}
             className={
               isActive
-                ? "rounded px-3 py-1 bg-black text-white dark:bg-white dark:text-black"
-                : "rounded px-3 py-1 text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                ? "rounded-full bg-gradient-accent px-4 py-1.5 font-medium text-white"
+                : "rounded-full px-4 py-1.5 text-muted transition-colors hover:text-foreground"
             }
           >
             {tab.label}

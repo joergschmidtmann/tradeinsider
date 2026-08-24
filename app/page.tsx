@@ -3,13 +3,24 @@ import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { SearchBar } from "@/components/SearchBar";
 import { TypeToggle } from "@/components/TypeToggle";
 import { TransactionsTable, type TransactionRow } from "@/components/TransactionsTable";
-import { Footer } from "@/components/Footer";
 
 const PAGE_SIZE = 50;
 
 const TRANSACTION_TYPES = {
-  P: { label: "Purchases", heading: "CEO Insider Purchases", description: "Open-market stock purchases reported by company CEOs, sourced from SEC Form 4 filings." },
-  S: { label: "Sales", heading: "CEO Insider Sales", description: "Open-market stock sales reported by company CEOs, sourced from SEC Form 4 filings." },
+  P: {
+    eyebrow: "Live-Daten von SEC EDGAR",
+    heading: "Insider-Käufe",
+    highlight: "von CEOs.",
+    description: "Wenn Vorstandschefs eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.",
+    sectionLabel: "Aktuelle Käufe",
+  },
+  S: {
+    eyebrow: "Live-Daten von SEC EDGAR",
+    heading: "Insider-Verkäufe",
+    highlight: "von CEOs.",
+    description: "Alle am offenen Markt gemeldeten Verkäufe von Vorstandschefs im Überblick.",
+    sectionLabel: "Aktuelle Verkäufe",
+  },
 } as const;
 type TransactionType = keyof typeof TRANSACTION_TYPES;
 
@@ -28,6 +39,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const type: TransactionType = isTransactionType(params.type ?? "") ? (params.type as TransactionType) : "P";
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
+  const copy = TRANSACTION_TYPES[type];
 
   const supabase = createSupabaseReadClient();
   let query = supabase
@@ -53,22 +65,29 @@ export default async function Home({ searchParams }: HomeProps) {
   const hasNextPage = count !== null && to + 1 < count;
 
   return (
-    <div className="flex min-h-full flex-col">
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">
-        <h1 className="text-2xl font-semibold">{TRANSACTION_TYPES[type].heading}</h1>
-        <p className="mt-1 text-sm text-black/60 dark:text-white/60">{TRANSACTION_TYPES[type].description}</p>
+    <main className="flex-1">
+      <section className="mx-auto max-w-4xl px-4 pt-20 pb-12 text-center sm:px-6 sm:pt-28">
+        <span className="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
+          {copy.eyebrow}
+        </span>
+        <h1 className="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
+          {copy.heading} <span className="text-gradient">{copy.highlight}</span>
+        </h1>
+        <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">{copy.description}</p>
+      </section>
 
-        <div className="mt-6">
+      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
+          <h2 className="text-xl font-semibold">{copy.sectionLabel}</h2>
           <TypeToggle activeCode={type} q={q} />
         </div>
-        <div className="mt-4">
+
+        <div className="mt-6">
           <SearchBar initialQuery={q} type={type} />
         </div>
 
         {error ? (
-          <p className="text-sm text-red-600 dark:text-red-400">
-            Could not load data right now. Please try again shortly.
-          </p>
+          <p className="text-sm text-red-400">Daten konnten gerade nicht geladen werden. Bitte gleich nochmal versuchen.</p>
         ) : (
           <>
             <TransactionsTable rows={rows} />
@@ -76,9 +95,9 @@ export default async function Home({ searchParams }: HomeProps) {
               {page > 1 ? (
                 <Link
                   href={{ pathname: "/", query: { ...(q ? { q } : {}), type, page: page - 1 } }}
-                  className="underline hover:no-underline"
+                  className="text-muted hover:text-foreground"
                 >
-                  ← Previous
+                  ← Zurück
                 </Link>
               ) : (
                 <span />
@@ -86,16 +105,15 @@ export default async function Home({ searchParams }: HomeProps) {
               {hasNextPage && (
                 <Link
                   href={{ pathname: "/", query: { ...(q ? { q } : {}), type, page: page + 1 } }}
-                  className="underline hover:no-underline"
+                  className="text-muted hover:text-foreground"
                 >
-                  Next →
+                  Weiter →
                 </Link>
               )}
             </div>
           </>
         )}
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </main>
   );
 }
