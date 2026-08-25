@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { SearchBar } from "@/components/SearchBar";
 import { TypeToggle } from "@/components/TypeToggle";
+import { RegionToggle } from "@/components/RegionToggle";
 import { TransactionsTable, type TransactionRow } from "@/components/TransactionsTable";
 
 export const metadata: Metadata = {
@@ -34,8 +35,15 @@ function isTransactionType(value: string): value is TransactionType {
   return value === "P" || value === "S";
 }
 
+const REGIONS = ["US", "EU"] as const;
+type Region = (typeof REGIONS)[number];
+
+function isRegion(value: string): value is Region {
+  return (REGIONS as readonly string[]).includes(value);
+}
+
 interface PageProps {
-  searchParams: Promise<{ q?: string; page?: string; type?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; type?: string; region?: string }>;
 }
 
 export default async function InsiderKaeufePage({ searchParams }: PageProps) {
@@ -43,9 +51,45 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
   const q = (params.q ?? "").trim().slice(0, 100);
   const page = Math.max(1, Number(params.page) || 1);
   const type: TransactionType = isTransactionType(params.type ?? "") ? (params.type as TransactionType) : "P";
+  const region: Region = isRegion(params.region ?? "") ? (params.region as Region) : "US";
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   const copy = TRANSACTION_TYPES[type];
+
+  const hero = (
+    <section className="mx-auto max-w-4xl px-4 pt-20 pb-12 text-center sm:px-6 sm:pt-28">
+      {region === "US" && (
+        <span className="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
+          {copy.eyebrow}
+        </span>
+      )}
+      <h1 className="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
+        {copy.heading} <span className="text-gradient">{copy.highlight}</span>
+      </h1>
+      <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">{copy.description}</p>
+      <div className="mt-8 flex justify-center">
+        <RegionToggle activeCode={region} type={type} q={q} />
+      </div>
+    </section>
+  );
+
+  if (region === "EU") {
+    return (
+      <main className="flex-1">
+        {hero}
+        <section className="mx-auto max-w-2xl px-4 pb-32 text-center sm:px-6">
+          <span className="rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
+            Bald verfügbar
+          </span>
+          <h2 className="mt-6 text-2xl font-semibold">Europa folgt in Kürze</h2>
+          <p className="mt-4 text-muted">
+            Für Europa gibt es keine zentrale Meldestelle wie die SEC — jedes Land hat seine eigene
+            Aufsichtsbehörde. Wir bauen das Land für Land an, angefangen mit den größten Märkten.
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   const supabase = createSupabaseReadClient();
   let query = supabase
@@ -56,6 +100,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
     )
     .eq("is_ceo", true)
     .eq("transaction_code", type)
+    .eq("source_country", region)
     .order("transaction_date", { ascending: false })
     .range(from, to);
 
@@ -72,24 +117,16 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
 
   return (
     <main className="flex-1">
-      <section className="mx-auto max-w-4xl px-4 pt-20 pb-12 text-center sm:px-6 sm:pt-28">
-        <span className="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
-          {copy.eyebrow}
-        </span>
-        <h1 className="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
-          {copy.heading} <span className="text-gradient">{copy.highlight}</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">{copy.description}</p>
-      </section>
+      {hero}
 
       <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
           <h2 className="text-xl font-semibold">{copy.sectionLabel}</h2>
-          <TypeToggle activeCode={type} q={q} />
+          <TypeToggle activeCode={type} region={region} q={q} />
         </div>
 
         <div className="mt-6">
-          <SearchBar initialQuery={q} type={type} />
+          <SearchBar initialQuery={q} region={region} type={type} />
         </div>
 
         {error ? (
@@ -100,7 +137,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
             <div className="mt-6 flex items-center justify-between text-sm">
               {page > 1 ? (
                 <Link
-                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), type, page: page - 1 } }}
+                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), region, type, page: page - 1 } }}
                   className="text-muted hover:text-foreground"
                 >
                   ← Zurück
@@ -110,7 +147,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
               )}
               {hasNextPage && (
                 <Link
-                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), type, page: page + 1 } }}
+                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), region, type, page: page + 1 } }}
                   className="text-muted hover:text-foreground"
                 >
                   Weiter →
