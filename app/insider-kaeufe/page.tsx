@@ -21,12 +21,14 @@ const EU_COUNTRIES = ["DE"];
 const TRANSACTION_TYPES = {
   P: {
     heading: "Insider-Käufe",
-    description: (subject: string) => `Wenn ${subject} eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.`,
+    description: ({ nominative }: { nominative: string; dative: string }) =>
+      `Wenn ${nominative} eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.`,
     sectionLabel: "Aktuelle Käufe",
   },
   S: {
     heading: "Insider-Verkäufe",
-    description: (subject: string) => `Alle am offenen Markt gemeldeten Verkäufe von ${subject} im Überblick.`,
+    description: ({ dative }: { nominative: string; dative: string }) =>
+      `Alle am offenen Markt gemeldeten Verkäufe von ${dative} im Überblick.`,
     sectionLabel: "Aktuelle Verkäufe",
   },
 } as const;
@@ -44,8 +46,13 @@ function isRegion(value: string): value is Region {
 }
 
 const REGION_COPY = {
-  US: { eyebrow: "Live-Daten von SEC EDGAR", highlight: "von CEOs.", subject: "CEOs" },
-  EU: { eyebrow: "Live-Daten von EQS News", highlight: "von Vorständen.", subject: "Vorständen" },
+  US: { eyebrow: "Live-Daten von SEC EDGAR", highlight: "von CEOs.", subjectNominative: "CEOs", subjectDative: "CEOs" },
+  EU: {
+    eyebrow: "Live-Daten von EQS News",
+    highlight: "von Vorständen.",
+    subjectNominative: "Vorstände",
+    subjectDative: "Vorständen",
+  },
 } as const;
 
 interface PageProps {
@@ -97,7 +104,9 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
         <h1 className="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
           {copy.heading} <span className="text-gradient">{regionCopy.highlight}</span>
         </h1>
-        <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">{copy.description(regionCopy.subject)}</p>
+        <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">
+          {copy.description({ nominative: regionCopy.subjectNominative, dative: regionCopy.subjectDative })}
+        </p>
         <div className="mt-8 flex flex-col items-center gap-2">
           <RegionToggle activeCode={region} type={type} q={q} />
           {region === "EU" && <p className="text-xs text-muted">Aktuell: Deutschland — weitere Länder folgen</p>}
