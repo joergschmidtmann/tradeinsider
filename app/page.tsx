@@ -4,7 +4,7 @@ const SECTIONS = [
   {
     href: "/insider-kaeufe",
     title: "Insider Käufe",
-    description: "Insider-Käufe und -Verkäufe von CEOs in Echtzeit, direkt von der SEC.",
+    description: "Insider-Käufe und -Verkäufe von Vorständen in Echtzeit — USA (SEC) und Deutschland.",
     available: true,
   },
   {

@@ -67,6 +67,7 @@ async function processFiling(entry: FeedEntry) {
         transaction_code: tx.code,
         shares: tx.shares,
         price_per_share: tx.pricePerShare,
+        currency: "USD",
         shares_owned_after: tx.sharesOwnedAfter,
         filing_url: filingIndexUrl,
         filed_at: entry.filedAt || null,

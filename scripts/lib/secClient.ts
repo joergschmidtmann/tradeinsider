@@ -3,10 +3,10 @@
  * (app name + contact email) on every request, and asks for a reasonable
  * request rate (well under 10 req/sec). See https://www.sec.gov/os/webmaster-faq#developers
  */
-const CONTACT_EMAIL = process.env.SEC_CONTACT_EMAIL;
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL;
 if (!CONTACT_EMAIL) {
   throw new Error(
-    "SEC_CONTACT_EMAIL environment variable is required (SEC requires a contact email in the User-Agent header)."
+    "CONTACT_EMAIL environment variable is required (SEC requires a contact email in the User-Agent header)."
   );
 }
 const USER_AGENT = `TradeInsider.io ${CONTACT_EMAIL}`;

@@ -1,8 +1,9 @@
-name: Ingest SEC Form 4 filings
+name: Ingest insider transaction filings
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/15 * * * *" # US (SEC EDGAR)
+    - cron: "0 * * * *" # Germany (EQS News) — deliberately less frequent, see scripts/lib/eqsClient.ts
   workflow_dispatch: {}
 
 jobs:
@@ -18,8 +19,18 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run ingest
+      - name: Ingest US (SEC EDGAR)
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/15 * * * *'
+        run: npm run ingest
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          SEC_CONTACT_EMAIL: ${{ secrets.SEC_CONTACT_EMAIL }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+
+      - name: Ingest Germany (EQS News)
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 * * * *'
+        run: npm run ingest:de
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}

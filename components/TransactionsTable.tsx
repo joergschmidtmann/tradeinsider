@@ -8,12 +8,19 @@ export interface TransactionRow {
   shares: number | null;
   price_per_share: number | null;
   total_value: number | null;
+  currency: string;
   filing_url: string;
 }
 
 const dateFormatter = new Intl.DateTimeFormat("de-DE", { year: "numeric", month: "short", day: "numeric" });
 const numberFormatter = new Intl.NumberFormat("de-DE");
-const currencyFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+
+// USD amounts read naturally in en-US formatting ($1,234.56); everything else
+// (currently just EUR) reads naturally in de-DE formatting (1.234,56 €).
+function formatCurrency(value: number, currency: string): string {
+  const locale = currency === "USD" ? "en-US" : "de-DE";
+  return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
+}
 
 export function TransactionsTable({ rows }: { rows: TransactionRow[] }) {
   if (rows.length === 0) {
@@ -57,10 +64,10 @@ export function TransactionsTable({ rows }: { rows: TransactionRow[] }) {
                   {row.shares !== null ? numberFormatter.format(row.shares) : "—"}
                 </td>
                 <td className="px-5 py-3.5 text-right whitespace-nowrap text-foreground">
-                  {row.price_per_share !== null ? currencyFormatter.format(row.price_per_share) : "—"}
+                  {row.price_per_share !== null ? formatCurrency(row.price_per_share, row.currency) : "—"}
                 </td>
                 <td className="px-5 py-3.5 text-right whitespace-nowrap font-medium text-foreground">
-                  {row.total_value !== null ? currencyFormatter.format(row.total_value) : "—"}
+                  {row.total_value !== null ? formatCurrency(row.total_value, row.currency) : "—"}
                 </td>
                 <td className="px-5 py-3.5 whitespace-nowrap">
                   <a
