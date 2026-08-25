@@ -1,15 +1,11 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
-import { secFetchText, secFetchJson } from "./lib/secClient";
+import { secFetchText } from "./lib/secClient";
 import { parseFeed, type FeedEntry } from "./lib/parseFeed";
 import { parseForm4 } from "./lib/parseForm4";
 
 const FEED_URL =
   "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=4&company=&dateb=&owner=include&count=100&output=atom";
-
-interface DirectoryListing {
-  directory: { item: { name: string }[] };
-}
 
 function supabaseAdmin() {
   const url = process.env.SUPABASE_URL;
@@ -20,27 +16,53 @@ function supabaseAdmin() {
   return createClient(url, serviceRoleKey);
 }
 
-/** Finds the primary ownership XML document inside a filing's folder.
- * Filenames aren't standardized across filers (seen so far: "ownership.xml",
- * "wk-form4_....xml"), so the heuristic is: any ".xml" file in the folder.
- * If more than one is found, the last one is used and a warning is logged —
- * revisit this if that turns out to happen often in practice. */
-async function findPrimaryXmlUrl(cik: string, accessionNoDashes: string): Promise<string> {
-  const folderUrl = `https://www.sec.gov/Archives/edgar/data/${cik}/${accessionNoDashes}`;
-  const listing = await secFetchJson<DirectoryListing>(`${folderUrl}/index.json`);
-  const xmlFiles = listing.directory.item.filter((item) => item.name.toLowerCase().endsWith(".xml"));
-  if (xmlFiles.length === 0) {
-    throw new Error(`No .xml file found in filing folder ${folderUrl}`);
+/** Finds the primary ownership XML document for a filing by parsing the
+ * "Document Format Files" table on its `-index.htm` page (entry.filingIndexUrl).
+ *
+ * Earlier this used each filer CIK's `index.json` directory listing instead,
+ * but that turned out to be unreliable: at least one real filing's index.json
+ * omitted the primary XML file entirely (under every associated CIK) even
+ * though the file existed and was directly fetchable — and even linked, with
+ * a correct absolute URL, from that same filing's own index.htm table. So
+ * index.htm's document table is the more trustworthy source here.
+ *
+ * Every Form 4 filing lists its primary document twice in that table: once
+ * as an XSLT-rendered HTML view under an `xslF345X0N/` subfolder (labeled
+ * e.g. "form4.html" even though the link itself ends in ".xml"), and once
+ * as the real raw XML at the top level. Rows are Type "4"; the HTML view is
+ * excluded by filtering out any href containing "/xsl". */
+async function findPrimaryXmlUrl(filingIndexUrl: string): Promise<string> {
+  const html = await secFetchText(filingIndexUrl);
+  const tableMatch = html.match(/Document Format Files[\s\S]*?<table[^>]*>([\s\S]*?)<\/table>/i);
+  if (!tableMatch) {
+    throw new Error(`No "Document Format Files" table found on ${filingIndexUrl}`);
   }
-  if (xmlFiles.length > 1) {
-    console.warn(`Warning: multiple .xml files in ${folderUrl}, using the last one: ${xmlFiles.map((f) => f.name).join(", ")}`);
+
+  const rows = tableMatch[1].match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) ?? [];
+  const candidates: string[] = [];
+  for (const row of rows) {
+    const cells = row.match(/<td[^>]*>([\s\S]*?)<\/td>/gi) ?? [];
+    if (cells.length < 4) continue;
+    const type = cells[3].replace(/<[^>]*>/g, "").trim();
+    if (type !== "4") continue;
+    const hrefMatch = cells[2].match(/href="([^"]+)"/i);
+    if (!hrefMatch) continue;
+    const href = hrefMatch[1];
+    if (href.toLowerCase().includes("/xsl")) continue; // the human-readable rendered view, not the raw XML
+    candidates.push(href.startsWith("http") ? href : `https://www.sec.gov${href}`);
   }
-  return `${folderUrl}/${xmlFiles[xmlFiles.length - 1].name}`;
+
+  if (candidates.length === 0) {
+    throw new Error(`No raw Form 4 XML document found in the document table on ${filingIndexUrl}`);
+  }
+  if (candidates.length > 1) {
+    console.warn(`Warning: multiple candidate XML documents on ${filingIndexUrl}, using the last one: ${candidates.join(", ")}`);
+  }
+  return candidates[candidates.length - 1];
 }
 
 async function processFiling(entry: FeedEntry) {
-  const accessionNoDashes = entry.accessionNumber.replace(/-/g, "");
-  const xmlUrl = await findPrimaryXmlUrl(entry.cik, accessionNoDashes);
+  const xmlUrl = await findPrimaryXmlUrl(entry.filingIndexUrl);
   const xml = await secFetchText(xmlUrl);
   const parsed = parseForm4(xml);
 

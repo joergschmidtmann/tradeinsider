@@ -8,9 +8,6 @@ const parser = new XMLParser({
 
 export interface FeedEntry {
   accessionNumber: string;
-  /** CIK found in this entry's filing URL (issuer or reporting owner — either
-   * one works to locate the filing folder on EDGAR). */
-  cik: string;
   filingIndexUrl: string;
   filedAt: string;
 }
@@ -43,12 +40,10 @@ export function parseFeed(atomXml: string): FeedEntry[] {
     if (byAccession.has(accessionNumber)) continue;
 
     const href: string = entry.link?.href ?? "";
-    const cikMatch = href.match(/\/Archives\/edgar\/data\/(\d+)\//);
-    if (!cikMatch) continue;
+    if (!/\/Archives\/edgar\/data\/\d+\//.test(href)) continue;
 
     byAccession.set(accessionNumber, {
       accessionNumber,
-      cik: cikMatch[1],
       filingIndexUrl: href,
       filedAt: entry.updated ?? "",
     });
