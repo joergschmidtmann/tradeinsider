@@ -35,6 +35,8 @@ export async function fetchGermanDirectorsDealingsPage(page: number, perPage = 1
   return data.records.filter((item) => item.categoryCode === "dd" && GERMAN_INDEX_ISINS.has(item.isin));
 }
 
+export type EqsRole = "management_board" | "supervisory_board";
+
 export interface ParsedEqsTransaction {
   issuerName: string;
   issuerLei: string;
@@ -46,12 +48,14 @@ export interface ParsedEqsTransaction {
   price: number;
   volumeEur: number;
   shareUrl: string;
+  role: EqsRole;
 }
 
 /** Fetches full detail for one notification and returns a normalized
  * transaction, or null if it doesn't pass our scope filters:
- *  - reason.position.boardofdirectors === 1 (Vorstand/management board;
- *    excludes Aufsichtsrat/supervisory board and other PDMR categories)
+ *  - reason.position.boardofdirectors or .supervisoryboard === 1 (excludes
+ *    other PDMR categories, e.g. closely-associated-person gift transactions
+ *    where the position is nested under closerelationship.trigger instead)
  *  - typeOfTrade is exactly buy or sell (excludes grants, tender rights, etc.)
  *  - financialInstrument.identifier === "1" (ordinary share; excludes
  *    derivatives, matching the SEC pipeline's non-derivative-only scope) */
@@ -63,7 +67,12 @@ export async function fetchEqsTransaction(id: string): Promise<ParsedEqsTransact
   const shareUrl: string | undefined = data.records?.share_url;
   if (!trading || !shareUrl) return null;
 
-  if (trading.reason?.position?.boardofdirectors !== 1) return null;
+  const position = trading.reason?.position;
+  let role: EqsRole;
+  if (position?.boardofdirectors === 1) role = "management_board";
+  else if (position?.supervisoryboard === 1) role = "supervisory_board";
+  else return null;
+
   if (trading.financialInstrument?.identifier !== "1") return null;
 
   let code: "P" | "S";
@@ -86,5 +95,6 @@ export async function fetchEqsTransaction(id: string): Promise<ParsedEqsTransact
     price,
     volumeEur,
     shareUrl,
+    role,
   };
 }

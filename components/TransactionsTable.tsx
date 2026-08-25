@@ -8,6 +8,7 @@ export interface TransactionRow {
   shares: number | null;
   price_per_share: number | null;
   total_value: number | null;
+  amount_range: string | null;
   currency: string;
   filing_url: string;
 }
@@ -67,7 +68,9 @@ export function TransactionsTable({ rows }: { rows: TransactionRow[] }) {
                   {row.price_per_share !== null ? formatCurrency(row.price_per_share, row.currency) : "—"}
                 </td>
                 <td className="px-5 py-3.5 text-right whitespace-nowrap font-medium text-foreground">
-                  {row.total_value !== null ? formatCurrency(row.total_value, row.currency) : "—"}
+                  {row.total_value !== null
+                    ? formatCurrency(row.total_value, row.currency)
+                    : (row.amount_range ?? "—")}
                 </td>
                 <td className="px-5 py-3.5 whitespace-nowrap">
                   <a

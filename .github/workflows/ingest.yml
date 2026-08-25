@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: "*/15 * * * *" # US (SEC EDGAR)
     - cron: "0 * * * *" # Germany (EQS News) — deliberately less frequent, see scripts/lib/eqsClient.ts
+    - cron: "0 */6 * * *" # US politicians (House Stock Watcher) — PTRs lag transactions by up to 45 days anyway
   workflow_dispatch: {}
 
 jobs:
@@ -34,3 +35,10 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+
+      - name: Ingest US politicians (House Stock Watcher)
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 */6 * * *'
+        run: npm run ingest:us-politicians
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

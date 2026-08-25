@@ -1,6 +1,17 @@
-export function SearchBar({ initialQuery, region, type }: { initialQuery: string; region: string; type: string }) {
+export function SearchBar({
+  initialQuery,
+  role,
+  region,
+  type,
+}: {
+  initialQuery: string;
+  role: string;
+  region: string;
+  type: string;
+}) {
   return (
     <form action="/insider-kaeufe" method="get" className="mb-8">
+      <input type="hidden" name="role" value={role} />
       <input type="hidden" name="region" value={region} />
       <input type="hidden" name="type" value={type} />
       <div className="relative max-w-md">

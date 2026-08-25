@@ -31,12 +31,18 @@ export interface ParsedTransaction {
   sharesOwnedAfter: number | null;
 }
 
+export type OwnerRole = "management_board" | "supervisory_board";
+
 export interface ParsedOwner {
   ownerCik: string;
   ownerName: string;
   isOfficer: boolean;
   officerTitle: string | null;
   isCeo: boolean;
+  /** management_board = CEO (isCeoTitle); supervisory_board = a director who
+   * is not also an officer (SEC's isDirector, isOfficer=false); null = neither
+   * (e.g. a 10%-owner filer with no board role) — callers should skip null. */
+  role: OwnerRole | null;
 }
 
 export interface ParsedForm4 {
@@ -69,13 +75,17 @@ export function parseForm4(xml: string): ParsedForm4 {
     const ownerName = String(owner?.reportingOwnerId?.rptOwnerName ?? "").trim();
     const relationship = owner?.reportingOwnerRelationship ?? {};
     const isOfficer = String(relationship.isOfficer ?? "").toLowerCase() === "true";
+    const isDirector = String(relationship.isDirector ?? "").toLowerCase() === "true";
     const officerTitle = relationship.officerTitle ? String(relationship.officerTitle).trim() || null : null;
+    const isCeo = isCeoTitle(isOfficer, officerTitle);
+    const role: OwnerRole | null = isCeo ? "management_board" : isDirector && !isOfficer ? "supervisory_board" : null;
     return {
       ownerCik,
       ownerName,
       isOfficer,
       officerTitle,
-      isCeo: isCeoTitle(isOfficer, officerTitle),
+      isCeo,
+      role,
     };
   });
 

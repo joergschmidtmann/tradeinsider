@@ -4,11 +4,12 @@ import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { SearchBar } from "@/components/SearchBar";
 import { TypeToggle } from "@/components/TypeToggle";
 import { RegionToggle } from "@/components/RegionToggle";
+import { RoleToggle } from "@/components/RoleToggle";
 import { TransactionsTable, type TransactionRow } from "@/components/TransactionsTable";
 
 export const metadata: Metadata = {
   title: "Insider-Käufe — TradeInsider",
-  description: "Insider-Käufe und -Verkäufe von Vorständen in Echtzeit, auf Basis offizieller Meldungen.",
+  description: "Insider-Käufe und -Verkäufe von Vorständen, Aufsichtsräten und Politikern in Echtzeit, auf Basis offizieller Meldungen.",
 };
 
 const PAGE_SIZE = 50;
@@ -45,18 +46,37 @@ function isRegion(value: string): value is Region {
   return (REGIONS as readonly string[]).includes(value);
 }
 
-const REGION_COPY = {
-  US: { eyebrow: "Live-Daten von SEC EDGAR", highlight: "von CEOs.", subjectNominative: "CEOs", subjectDative: "CEOs" },
-  EU: {
-    eyebrow: "Live-Daten von EQS News",
-    highlight: "von Vorständen.",
-    subjectNominative: "Vorstände",
-    subjectDative: "Vorständen",
-  },
-} as const;
+const ROLES = ["management_board", "supervisory_board", "politician"] as const;
+type Role = (typeof ROLES)[number];
+
+function isRole(value: string): value is Role {
+  return (ROLES as readonly string[]).includes(value);
+}
+
+/** Eyebrow/highlight/subject copy depends on both role and region (e.g. a US
+ * CEO reads naturally as "CEOs" while a German board member reads as
+ * "Vorstände") — computed here rather than a flat lookup table, since most
+ * of the 3 roles × 2 regions combinations share wording. */
+function roleCopy(role: Role, region: Region) {
+  if (role === "politician") {
+    return {
+      eyebrow: "Live-Daten von House Stock Watcher (US-Kongress)",
+      highlight: "von US-Politikern.",
+      subjectNominative: "US-Politiker",
+      subjectDative: "US-Politikern",
+    };
+  }
+  const eyebrow = region === "US" ? "Live-Daten von SEC EDGAR" : "Live-Daten von EQS News";
+  if (role === "supervisory_board") {
+    return { eyebrow, highlight: "von Aufsichtsräten.", subjectNominative: "Aufsichtsräte", subjectDative: "Aufsichtsräten" };
+  }
+  return region === "US"
+    ? { eyebrow, highlight: "von CEOs.", subjectNominative: "CEOs", subjectDative: "CEOs" }
+    : { eyebrow, highlight: "von Vorständen.", subjectNominative: "Vorstände", subjectDative: "Vorständen" };
+}
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; page?: string; type?: string; region?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; type?: string; region?: string; role?: string }>;
 }
 
 export default async function InsiderKaeufePage({ searchParams }: PageProps) {
@@ -64,20 +84,23 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
   const q = (params.q ?? "").trim().slice(0, 100);
   const page = Math.max(1, Number(params.page) || 1);
   const type: TransactionType = isTransactionType(params.type ?? "") ? (params.type as TransactionType) : "P";
-  const region: Region = isRegion(params.region ?? "") ? (params.region as Region) : "US";
+  const role: Role = isRole(params.role ?? "") ? (params.role as Role) : "management_board";
+  // Politician data only exists for the US — pin the region regardless of
+  // what's in the URL so a stale role=politician&region=EU link still works.
+  const region: Region = role === "politician" ? "US" : isRegion(params.region ?? "") ? (params.region as Region) : "US";
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   const copy = TRANSACTION_TYPES[type];
-  const regionCopy = REGION_COPY[region];
+  const heroCopy = roleCopy(role, region);
 
   const supabase = createSupabaseReadClient();
   let query = supabase
     .from("transactions")
     .select(
-      "id, issuer_name, issuer_ticker, owner_name, owner_title, transaction_date, shares, price_per_share, total_value, currency, filing_url",
+      "id, issuer_name, issuer_ticker, owner_name, owner_title, transaction_date, shares, price_per_share, total_value, amount_range, currency, filing_url",
       { count: "exact" }
     )
-    .eq("is_ceo", true)
+    .eq("role", role)
     .eq("transaction_code", type)
     .order("transaction_date", { ascending: false })
     .range(from, to);
@@ -99,28 +122,33 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
     <main className="flex-1">
       <section className="mx-auto max-w-4xl px-4 pt-20 pb-12 text-center sm:px-6 sm:pt-28">
         <span className="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
-          {regionCopy.eyebrow}
+          {heroCopy.eyebrow}
         </span>
         <h1 className="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
-          {copy.heading} <span className="text-gradient">{regionCopy.highlight}</span>
+          {copy.heading} <span className="text-gradient">{heroCopy.highlight}</span>
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">
-          {copy.description({ nominative: regionCopy.subjectNominative, dative: regionCopy.subjectDative })}
+          {copy.description({ nominative: heroCopy.subjectNominative, dative: heroCopy.subjectDative })}
         </p>
-        <div className="mt-8 flex flex-col items-center gap-2">
-          <RegionToggle activeCode={region} type={type} q={q} />
-          {region === "EU" && <p className="text-xs text-muted">Aktuell: Deutschland — weitere Länder folgen</p>}
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <RoleToggle activeCode={role} region={region} type={type} q={q} />
+          {role !== "politician" && (
+            <>
+              <RegionToggle activeCode={region} role={role} type={type} q={q} />
+              {region === "EU" && <p className="text-xs text-muted">Aktuell: Deutschland — weitere Länder folgen</p>}
+            </>
+          )}
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
           <h2 className="text-xl font-semibold">{copy.sectionLabel}</h2>
-          <TypeToggle activeCode={type} region={region} q={q} />
+          <TypeToggle activeCode={type} role={role} region={region} q={q} />
         </div>
 
         <div className="mt-6">
-          <SearchBar initialQuery={q} region={region} type={type} />
+          <SearchBar initialQuery={q} role={role} region={region} type={type} />
         </div>
 
         {error ? (
@@ -131,7 +159,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
             <div className="mt-6 flex items-center justify-between text-sm">
               {page > 1 ? (
                 <Link
-                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), region, type, page: page - 1 } }}
+                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), role, region, type, page: page - 1 } }}
                   className="text-muted hover:text-foreground"
                 >
                   ← Zurück
@@ -141,7 +169,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
               )}
               {hasNextPage && (
                 <Link
-                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), region, type, page: page + 1 } }}
+                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), role, region, type, page: page + 1 } }}
                   className="text-muted hover:text-foreground"
                 >
                   Weiter →

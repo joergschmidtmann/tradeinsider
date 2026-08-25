@@ -14,6 +14,8 @@ create table if not exists transactions (
   owner_name text not null,
   owner_title text,
   is_ceo boolean not null default false,
+  -- 'management_board' (Vorstand/CEO) | 'supervisory_board' (Aufsichtsrat) | 'politician'
+  role text not null default 'management_board',
 
   -- Transaction details
   transaction_date date not null,
@@ -24,6 +26,10 @@ create table if not exists transactions (
   -- Computed by Postgres (exact decimal math) rather than in application code,
   -- to avoid floating-point rounding artifacts (e.g. 15794.999999999998).
   total_value numeric generated always as (shares * price_per_share) stored,
+  -- Fallback display value for sources that only disclose a dollar range
+  -- (e.g. US congressional PTRs), where shares/price_per_share are null
+  -- and so total_value is null too.
+  amount_range text,
   shares_owned_after numeric,
 
   -- Provenance
@@ -40,6 +46,7 @@ create extension if not exists pg_trgm;
 
 create index if not exists transactions_transaction_date_idx on transactions (transaction_date desc);
 create index if not exists transactions_is_ceo_code_idx on transactions (is_ceo, transaction_code);
+create index if not exists transactions_role_idx on transactions (role, source_country, transaction_code);
 create index if not exists transactions_issuer_name_idx on transactions using gin (issuer_name gin_trgm_ops);
 create index if not exists transactions_issuer_ticker_idx on transactions (issuer_ticker);
 

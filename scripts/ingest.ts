@@ -66,12 +66,12 @@ async function processFiling(entry: FeedEntry) {
   const xml = await secFetchText(xmlUrl);
   const parsed = parseForm4(xml);
 
-  const ceoOwners = parsed.owners.filter((owner) => owner.isCeo);
-  if (ceoOwners.length === 0) return [];
+  const trackedOwners = parsed.owners.filter((owner) => owner.role !== null);
+  if (trackedOwners.length === 0) return [];
 
   const filingIndexUrl = entry.filingIndexUrl;
   const rows = [];
-  for (const owner of ceoOwners) {
+  for (const owner of trackedOwners) {
     for (const tx of parsed.transactions) {
       // total_value is a generated column in Postgres (exact decimal math from
       // shares * price_per_share) — it must NOT be included in the insert payload.
@@ -83,8 +83,9 @@ async function processFiling(entry: FeedEntry) {
         issuer_ticker: parsed.issuerTicker,
         owner_cik: owner.ownerCik,
         owner_name: owner.ownerName,
-        owner_title: owner.officerTitle,
-        is_ceo: true,
+        owner_title: owner.officerTitle ?? "Director",
+        is_ceo: owner.isCeo,
+        role: owner.role,
         transaction_date: tx.date,
         transaction_code: tx.code,
         shares: tx.shares,
@@ -122,12 +123,12 @@ async function main() {
   console.log(`${newEntries.length} filings are new (not yet in the database).`);
 
   let insertedRows = 0;
-  let ceoFilings = 0;
+  let matchingFilings = 0;
   for (const entry of newEntries) {
     try {
       const rows = await processFiling(entry);
       if (rows.length === 0) continue;
-      ceoFilings++;
+      matchingFilings++;
 
       const { error } = await supabase.from("transactions").upsert(rows, {
         onConflict: "dedupe_key",
@@ -140,7 +141,7 @@ async function main() {
     }
   }
 
-  console.log(`Done. ${ceoFilings} filing(s) had a CEO transaction, ${insertedRows} row(s) upserted.`);
+  console.log(`Done. ${matchingFilings} filing(s) had a management/supervisory board transaction, ${insertedRows} row(s) upserted.`);
 }
 
 main().catch((err) => {
