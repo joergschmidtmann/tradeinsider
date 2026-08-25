@@ -1,4 +1,5 @@
 import { eqsFetchJson } from "./eqsClient";
+import { GERMAN_INDEX_ISINS } from "./germanIndices";
 
 const NEWS_URL = "https://www.eqs-news.com/wp-json/eqsnews/v1/news";
 const DETAIL_URL = "https://www.eqs-news.com/wp-json/eqsnews/v1/newsdetail";
@@ -17,16 +18,21 @@ interface EqsListResponse {
   records: EqsListItem[];
 }
 
-/** Fetches one page of the general EQS News feed and returns only the German
- * "Directors' Dealings" items. The API's `category` query param doesn't
- * actually filter server-side (verified empirically), so — much like SEC
- * EDGAR's `type=4` prefix-matching quirk (see parseFeed.ts) — filtering
- * happens client-side: categoryCode === "dd" and an ISIN starting with "DE"
- * (EQS also carries French/UK/other regulatory news in the same feed). */
+/** Fetches one page of the general EQS News feed and returns only
+ * "Directors' Dealings" items for DAX/MDAX/SDAX constituents. The API's
+ * `category` query param doesn't actually filter server-side (verified
+ * empirically), so — much like SEC EDGAR's `type=4` prefix-matching quirk
+ * (see parseFeed.ts) — filtering happens client-side: categoryCode === "dd".
+ *
+ * Scoping to GERMAN_INDEX_ISINS (rather than `isin.startsWith("DE")`)
+ * matters because real index constituents are sometimes domiciled abroad —
+ * e.g. Airbus and Qiagen (DAX) have Dutch ISINs, Redcare Pharmacy (SDAX)
+ * has a Dutch ISIN — and a plain "DE" prefix check would silently exclude
+ * them even though EQS covers them like any other constituent. */
 export async function fetchGermanDirectorsDealingsPage(page: number, perPage = 100): Promise<EqsListItem[]> {
   const url = `${NEWS_URL}?per_page=${perPage}&page=${page}`;
   const data = await eqsFetchJson<EqsListResponse>(url);
-  return data.records.filter((item) => item.categoryCode === "dd" && item.isin.startsWith("DE"));
+  return data.records.filter((item) => item.categoryCode === "dd" && GERMAN_INDEX_ISINS.has(item.isin));
 }
 
 export interface ParsedEqsTransaction {
