@@ -1,7 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface BaseTransactionFilters {
-  role: string;
+  // Array rather than a single value because "Vorstand" in the UI covers both
+  // role="management_board" and role="supervisory_board" rows underneath —
+  // see the `roles` expansion in app/insider-kaeufe/page.tsx.
+  roles: string[];
   region: string;
   euCountries: string[];
   type: string;
@@ -14,7 +17,7 @@ export interface BaseTransactionFilters {
  * sync with what the table itself would show for the same filter state. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase's query builder type changes shape with each chained call
 export function applyBaseFilters(query: any, filters: BaseTransactionFilters) {
-  query = query.eq("role", filters.role).eq("transaction_code", filters.type);
+  query = query.in("role", filters.roles).eq("transaction_code", filters.type);
   query = filters.region === "US" ? query.eq("source_country", "US") : query.in("source_country", filters.euCountries);
 
   // Postgrest's .or() mini-language uses "," and "(" ")" as structural characters,

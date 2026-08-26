@@ -47,7 +47,7 @@ function isRegion(value: string): value is Region {
   return (REGIONS as readonly string[]).includes(value);
 }
 
-const ROLES = ["management_board", "supervisory_board", "politician", "hedge_fund"] as const;
+const ROLES = ["management_board", "politician", "hedge_fund"] as const;
 type Role = (typeof ROLES)[number];
 
 function isRole(value: string): value is Role {
@@ -76,9 +76,6 @@ function roleCopy(role: Role, region: Region) {
     };
   }
   const eyebrow = region === "US" ? "Live-Daten von SEC EDGAR" : "Live-Daten von EQS News";
-  if (role === "supervisory_board") {
-    return { eyebrow, highlight: "von Aufsichtsräten.", subjectNominative: "Aufsichtsräte", subjectDative: "Aufsichtsräten" };
-  }
   return region === "US"
     ? { eyebrow, highlight: "von CEOs.", subjectNominative: "CEOs", subjectDative: "CEOs" }
     : { eyebrow, highlight: "von Vorständen.", subjectNominative: "Vorstände", subjectDative: "Vorständen" };
@@ -113,7 +110,12 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
   const to = from + PAGE_SIZE - 1;
   const copy = TRANSACTION_TYPES[type];
   const heroCopy = roleCopy(role, region);
-  const baseFilters = { role, region, euCountries: EU_COUNTRIES, type, q };
+  // "Vorstand" in the UI covers both management_board and supervisory_board
+  // rows — Germany/Austria's two-tier board structure doesn't cleanly map to
+  // a single "insider" category otherwise, and per-row owner_title still
+  // shows which one a given transaction actually was.
+  const roles = role === "management_board" ? ["management_board", "supervisory_board"] : [role];
+  const baseFilters = { roles, region, euCountries: EU_COUNTRIES, type, q };
 
   const supabase = createSupabaseReadClient();
   let query = applyBaseFilters(

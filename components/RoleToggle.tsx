@@ -1,8 +1,10 @@
 import Link from "next/link";
 
+// "Vorstand" also covers supervisory-board rows (role="supervisory_board")
+// under the hood — see the `roles` expansion in app/insider-kaeufe/page.tsx.
+// Per-row owner_title still shows which one a given transaction actually was.
 const ROLES = [
   { code: "management_board", label: "Vorstand" },
-  { code: "supervisory_board", label: "Aufsichtsrat" },
   { code: "politician", label: "Politiker" },
   { code: "hedge_fund", label: "Hedgefonds" },
 ] as const;
