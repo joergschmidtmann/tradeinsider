@@ -34,8 +34,8 @@ const SECTIONS = [
   {
     href: "/wirtschaftsnews",
     title: "Wirtschaftsnews",
-    description: "Aktuelle Wirtschaftsnachrichten im Überblick.",
-    available: false,
+    description: "Zinsentscheidungen, Konjunkturdaten und Unternehmensnews von EZB, Destatis und Unternehmen.",
+    available: true,
   },
 ];
 

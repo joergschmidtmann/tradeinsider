@@ -5,6 +5,7 @@ on:
     - cron: "*/15 * * * *" # US (SEC EDGAR)
     - cron: "0 * * * *" # Germany (EQS News) — deliberately less frequent, see scripts/lib/eqsClient.ts
     - cron: "0 */6 * * *" # US politicians (House Stock Watcher) — PTRs lag transactions by up to 45 days anyway
+    - cron: "0 */2 * * *" # Wirtschaftsnews (ECB, Destatis, EQS Corporate) — press releases, not minute-by-minute
   workflow_dispatch: {}
 
 jobs:
@@ -42,3 +43,11 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Ingest news (ECB, Destatis, EQS Corporate)
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 */2 * * *'
+        run: npm run ingest:news
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}

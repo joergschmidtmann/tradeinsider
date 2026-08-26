@@ -58,3 +58,25 @@ alter table transactions enable row level security;
 create policy "Public can read transactions"
   on transactions for select
   using (true);
+
+-- Wirtschaftsnews: a separate, much simpler table — general news items don't
+-- fit the transactions shape (no shares/price/role), and `url` alone is a
+-- natural unique dedupe key (unlike transactions, which need a composite key).
+create table if not exists news_items (
+  id bigserial primary key,
+  source text not null, -- 'ecb' | 'destatis' | 'eqs_corporate'
+  headline text not null,
+  summary text,
+  url text not null unique,
+  published_at timestamptz not null,
+  ingested_at timestamptz not null default now()
+);
+
+create index if not exists news_items_published_at_idx on news_items (published_at desc);
+create index if not exists news_items_source_idx on news_items (source);
+
+alter table news_items enable row level security;
+
+create policy "Public can read news_items"
+  on news_items for select
+  using (true);
