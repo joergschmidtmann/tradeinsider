@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
 
@@ -13,18 +16,34 @@ interface ColumnFilterDropdownProps {
   insider?: string;
 }
 
-/** Column-header filter, styled as a native <details>/<summary> disclosure
- * rather than a positioned overlay — the table sits inside two nested
- * overflow containers (see TransactionsTable.tsx), so an absolutely
- * positioned dropdown risks getting clipped. Flowing normally instead means
- * opening it just grows the header row, which is simpler and always visible. */
+/** Column-header filter, styled as a <details>/<summary> disclosure rather
+ * than a positioned overlay — the table sits inside two nested overflow
+ * containers (see TransactionsTable.tsx), so an absolutely positioned
+ * dropdown risks getting clipped. Flowing normally instead means opening it
+ * just grows the header row, which is simpler and always visible.
+ *
+ * This is the one client component on an otherwise all-server-component page
+ * (RoleToggle/RegionToggle/TypeToggle/SearchBar are plain links/forms) —
+ * needed only for the click-outside-to-close behavior below, which native
+ * <details> doesn't provide (it only closes on a second click on <summary>). */
 export function ColumnFilterDropdown({ label, paramName, values, role, region, type, q, company, insider }: ColumnFilterDropdownProps) {
   const activeValue = paramName === "company" ? company : insider;
   const otherFilter = paramName === "company" ? (insider ? { insider } : {}) : company ? { company } : {};
   const baseQuery = { ...(q ? { q } : {}), role, region, type, ...otherFilter };
 
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (detailsRef.current?.open && !detailsRef.current.contains(event.target as Node)) {
+        detailsRef.current.open = false;
+      }
+    }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   return (
-    <details className="inline-block">
+    <details ref={detailsRef} className="inline-block">
       <summary className="cursor-pointer list-none font-medium select-none">
         {label}
         {activeValue && <span className="text-gradient"> · {activeValue}</span>}
