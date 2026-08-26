@@ -1,8 +1,16 @@
 import { eqsFetchJson } from "./eqsClient";
 import { GERMAN_INDEX_ISINS } from "./germanIndices";
+import { AUSTRIAN_INDEX_ISINS } from "./austrianIndices";
 
 const NEWS_URL = "https://www.eqs-news.com/wp-json/eqsnews/v1/news";
 const DETAIL_URL = "https://www.eqs-news.com/wp-json/eqsnews/v1/newsdetail";
+
+// EQS is primarily used by German and Austrian issuers as their disclosure
+// distribution channel — companies from other countries appear only sporadically
+// (verified by sampling the feed), so it isn't a viable path to broader European
+// coverage. Each additional country covered this way still gets its own curated
+// index-membership list, same as GERMAN_INDEX_ISINS/AUSTRIAN_INDEX_ISINS.
+const TRACKED_ISINS = new Set([...GERMAN_INDEX_ISINS, ...AUSTRIAN_INDEX_ISINS]);
 
 interface EqsListItem {
   id: string; // UUID with a "_en"/"_de" locale suffix
@@ -19,20 +27,32 @@ interface EqsListResponse {
 }
 
 /** Fetches one page of the general EQS News feed and returns only
- * "Directors' Dealings" items for DAX/MDAX/SDAX constituents. The API's
+ * "Directors' Dealings" items for tracked DE/AT index constituents. The API's
  * `category` query param doesn't actually filter server-side (verified
  * empirically), so — much like SEC EDGAR's `type=4` prefix-matching quirk
  * (see parseFeed.ts) — filtering happens client-side: categoryCode === "dd".
  *
- * Scoping to GERMAN_INDEX_ISINS (rather than `isin.startsWith("DE")`)
+ * Scoping to TRACKED_ISINS (rather than `isin.startsWith("DE"/"AT")`)
  * matters because real index constituents are sometimes domiciled abroad —
  * e.g. Airbus and Qiagen (DAX) have Dutch ISINs, Redcare Pharmacy (SDAX)
- * has a Dutch ISIN — and a plain "DE" prefix check would silently exclude
- * them even though EQS covers them like any other constituent. */
-export async function fetchGermanDirectorsDealingsPage(page: number, perPage = 100): Promise<EqsListItem[]> {
+ * and RHI Magnesita (WBI) have Dutch ISINs — and a plain prefix check would
+ * silently exclude them even though EQS covers them like any other
+ * constituent. */
+export async function fetchEqsDirectorsDealingsPage(page: number, perPage = 100): Promise<EqsListItem[]> {
   const url = `${NEWS_URL}?per_page=${perPage}&page=${page}`;
   const data = await eqsFetchJson<EqsListResponse>(url);
-  return data.records.filter((item) => item.categoryCode === "dd" && GERMAN_INDEX_ISINS.has(item.isin));
+  return data.records.filter((item) => item.categoryCode === "dd" && TRACKED_ISINS.has(item.isin));
+}
+
+/** Resolves an ISIN to the tracked country it was scoped under — DE or AT
+ * index membership, never the ISIN's own country prefix, since some real
+ * constituents are domiciled abroad (see the comment on fetchEqsDirectorsDealingsPage).
+ * Only ever called on an ISIN that already passed the TRACKED_ISINS filter
+ * above, so one of the two branches always matches. */
+export function resolveTrackedCountry(isin: string): "DE" | "AT" {
+  if (GERMAN_INDEX_ISINS.has(isin)) return "DE";
+  if (AUSTRIAN_INDEX_ISINS.has(isin)) return "AT";
+  throw new Error(`ISIN ${isin} is not in a tracked index — resolveTrackedCountry() should only be called on already-filtered items.`);
 }
 
 export type EqsRole = "management_board" | "supervisory_board";

@@ -17,7 +17,7 @@ const PAGE_SIZE = 50;
 // Countries currently covered under the "Europa" region tab. Grows as more
 // countries are added — the query below and the rest of the page don't need
 // to change when that happens.
-const EU_COUNTRIES = ["DE"];
+const EU_COUNTRIES = ["DE", "AT"];
 
 const TRANSACTION_TYPES = {
   P: {
@@ -145,7 +145,9 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
           {role !== "politician" && role !== "hedge_fund" && (
             <>
               <RegionToggle activeCode={region} role={role} type={type} q={q} />
-              {region === "EU" && <p className="text-xs text-muted">Aktuell: Deutschland — weitere Länder folgen</p>}
+              {region === "EU" && (
+                <p className="text-xs text-muted">Aktuell: Deutschland, Österreich — weitere Länder folgen</p>
+              )}
             </>
           )}
           {role === "hedge_fund" && (

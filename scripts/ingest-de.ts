@@ -1,8 +1,8 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
-import { fetchGermanDirectorsDealingsPage, fetchEqsTransaction } from "./lib/parseEqs";
+import { fetchEqsDirectorsDealingsPage, fetchEqsTransaction, resolveTrackedCountry } from "./lib/parseEqs";
 
-const PAGES_TO_SCAN = 2; // ~200 recent items across all EQS categories, filtered down to DE Directors' Dealings
+const PAGES_TO_SCAN = 2; // ~200 recent items across all EQS categories, filtered down to tracked DE/AT Directors' Dealings
 
 function supabaseAdmin() {
   const url = process.env.SUPABASE_URL;
@@ -19,11 +19,13 @@ async function main() {
   console.log("Fetching recent EQS News items...");
   const items = [];
   for (let page = 1; page <= PAGES_TO_SCAN; page++) {
-    items.push(...(await fetchGermanDirectorsDealingsPage(page)));
+    items.push(...(await fetchEqsDirectorsDealingsPage(page)));
   }
-  console.log(`Found ${items.length} German Directors' Dealings items across ${PAGES_TO_SCAN} page(s).`);
+  console.log(`Found ${items.length} tracked Directors' Dealings items across ${PAGES_TO_SCAN} page(s).`);
 
-  const accessionNumbers = items.map((item) => `DE-${item.id}`);
+  // resolveTrackedCountry() looks up index membership (DE or AT), not the
+  // ISIN's own prefix, since real constituents are sometimes domiciled abroad.
+  const accessionNumbers = items.map((item) => `${resolveTrackedCountry(item.isin)}-${item.id}`);
   const { data: known, error: knownError } = await supabase
     .from("transactions")
     .select("accession_number")
@@ -31,7 +33,7 @@ async function main() {
   if (knownError) throw knownError;
   const knownAccessions = new Set((known ?? []).map((row) => row.accession_number));
 
-  const newItems = items.filter((item) => !knownAccessions.has(`DE-${item.id}`));
+  const newItems = items.filter((item) => !knownAccessions.has(`${resolveTrackedCountry(item.isin)}-${item.id}`));
   console.log(`${newItems.length} items are new (not yet in the database).`);
 
   let insertedRows = 0;
@@ -42,11 +44,17 @@ async function main() {
       if (!tx) continue;
       boardTransactions++;
 
-      const accessionNumber = `DE-${item.id}`;
+      // Derived from item.isin (the company-level ISIN already confirmed tracked
+      // above), not tx.isin — a company can have multiple share classes with
+      // different ISINs (e.g. Sixt's ordinary vs. preferred shares), and an
+      // insider's actual trade may be in a class that was never itself curated
+      // into germanIndices.ts/austrianIndices.ts, even though the company is.
+      const sourceCountry = resolveTrackedCountry(item.isin);
+      const accessionNumber = `${sourceCountry}-${item.id}`;
       const shares = Math.round(tx.volumeEur / tx.price);
       const { error } = await supabase.from("transactions").upsert(
         {
-          source_country: "DE",
+          source_country: sourceCountry,
           accession_number: accessionNumber,
           issuer_cik: tx.issuerLei,
           issuer_name: tx.issuerName,
