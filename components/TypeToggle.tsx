@@ -10,11 +10,15 @@ export function TypeToggle({
   role,
   region,
   q,
+  company,
+  insider,
 }: {
   activeCode: string;
   role: string;
   region: string;
   q: string;
+  company?: string;
+  insider?: string;
 }) {
   return (
     <div className="inline-flex rounded-full border border-border bg-surface p-1 text-sm">
@@ -23,7 +27,17 @@ export function TypeToggle({
         return (
           <Link
             key={tab.code}
-            href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), role, region, type: tab.code } }}
+            href={{
+              pathname: "/insider-kaeufe",
+              query: {
+                ...(q ? { q } : {}),
+                role,
+                region,
+                type: tab.code,
+                ...(company ? { company } : {}),
+                ...(insider ? { insider } : {}),
+              },
+            }}
             className={
               isActive
                 ? "rounded-full bg-gradient-accent px-4 py-1.5 font-medium text-white"

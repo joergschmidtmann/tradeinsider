@@ -3,17 +3,23 @@ export function SearchBar({
   role,
   region,
   type,
+  company,
+  insider,
 }: {
   initialQuery: string;
   role: string;
   region: string;
   type: string;
+  company?: string;
+  insider?: string;
 }) {
   return (
     <form action="/insider-kaeufe" method="get" className="mb-8">
       <input type="hidden" name="role" value={role} />
       <input type="hidden" name="region" value={region} />
       <input type="hidden" name="type" value={type} />
+      {company && <input type="hidden" name="company" value={company} />}
+      {insider && <input type="hidden" name="insider" value={insider} />}
       <div className="relative max-w-md">
         <svg
           viewBox="0 0 24 24"

@@ -1,3 +1,6 @@
+import { ColumnFilterDropdown } from "./ColumnFilterDropdown";
+import type { ColumnFilterOption } from "@/lib/columnFilters";
+
 export interface TransactionRow {
   id: number;
   issuer_name: string;
@@ -23,7 +26,29 @@ function formatCurrency(value: number, currency: string): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
 }
 
-export function TransactionsTable({ rows }: { rows: TransactionRow[] }) {
+interface TransactionsTableProps {
+  rows: TransactionRow[];
+  companyOptions: ColumnFilterOption[];
+  insiderOptions: ColumnFilterOption[];
+  role: string;
+  region: string;
+  type: string;
+  q: string;
+  company?: string;
+  insider?: string;
+}
+
+export function TransactionsTable({
+  rows,
+  companyOptions,
+  insiderOptions,
+  role,
+  region,
+  type,
+  q,
+  company,
+  insider,
+}: TransactionsTableProps) {
   if (rows.length === 0) {
     return (
       <div className="rounded-2xl border border-border bg-surface px-6 py-16 text-center text-sm text-muted">
@@ -38,8 +63,32 @@ export function TransactionsTable({ rows }: { rows: TransactionRow[] }) {
         <table className="w-full min-w-[760px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs tracking-wide text-muted uppercase">
-              <th className="px-5 py-3.5 font-medium">Unternehmen</th>
-              <th className="px-5 py-3.5 font-medium">Insider</th>
+              <th className="px-5 py-3.5 font-medium">
+                <ColumnFilterDropdown
+                  label="Unternehmen"
+                  paramName="company"
+                  values={companyOptions}
+                  role={role}
+                  region={region}
+                  type={type}
+                  q={q}
+                  company={company}
+                  insider={insider}
+                />
+              </th>
+              <th className="px-5 py-3.5 font-medium">
+                <ColumnFilterDropdown
+                  label="Insider"
+                  paramName="insider"
+                  values={insiderOptions}
+                  role={role}
+                  region={region}
+                  type={type}
+                  q={q}
+                  company={company}
+                  insider={insider}
+                />
+              </th>
               <th className="px-5 py-3.5 font-medium">Datum</th>
               <th className="px-5 py-3.5 text-right font-medium">Aktien</th>
               <th className="px-5 py-3.5 text-right font-medium">Preis</th>

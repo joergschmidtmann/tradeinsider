@@ -6,6 +6,7 @@ import { TypeToggle } from "@/components/TypeToggle";
 import { RegionToggle } from "@/components/RegionToggle";
 import { RoleToggle } from "@/components/RoleToggle";
 import { TransactionsTable, type TransactionRow } from "@/components/TransactionsTable";
+import { applyBaseFilters, fetchDistinctValues } from "@/lib/columnFilters";
 
 export const metadata: Metadata = {
   title: "Insider-Käufe — TradeInsider",
@@ -84,7 +85,15 @@ function roleCopy(role: Role, region: Region) {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; page?: string; type?: string; region?: string; role?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    page?: string;
+    type?: string;
+    region?: string;
+    role?: string;
+    company?: string;
+    insider?: string;
+  }>;
 }
 
 export default async function InsiderKaeufePage({ searchParams }: PageProps) {
@@ -98,33 +107,35 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
   // link still works.
   const region: Region =
     role === "politician" || role === "hedge_fund" ? "US" : isRegion(params.region ?? "") ? (params.region as Region) : "US";
+  const company = (params.company ?? "").trim().slice(0, 200) || undefined;
+  const insider = (params.insider ?? "").trim().slice(0, 200) || undefined;
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   const copy = TRANSACTION_TYPES[type];
   const heroCopy = roleCopy(role, region);
+  const baseFilters = { role, region, euCountries: EU_COUNTRIES, type, q };
 
   const supabase = createSupabaseReadClient();
-  let query = supabase
-    .from("transactions")
-    .select(
-      "id, issuer_name, issuer_ticker, owner_name, owner_title, transaction_date, shares, price_per_share, total_value, amount_range, currency, filing_url",
-      { count: "exact" }
-    )
-    .eq("role", role)
-    .eq("transaction_code", type)
+  let query = applyBaseFilters(
+    supabase
+      .from("transactions")
+      .select(
+        "id, issuer_name, issuer_ticker, owner_name, owner_title, transaction_date, shares, price_per_share, total_value, amount_range, currency, filing_url",
+        { count: "exact" }
+      ),
+    baseFilters
+  )
     .order("transaction_date", { ascending: false })
     .range(from, to);
 
-  query = region === "US" ? query.eq("source_country", "US") : query.in("source_country", EU_COUNTRIES);
+  if (company) query = query.eq("issuer_name", company);
+  if (insider) query = query.eq("owner_name", insider);
 
-  // Postgrest's .or() mini-language uses "," and "(" ")" as structural characters,
-  // so strip them from user input before building the filter string.
-  const safeQuery = q.replace(/[,()]/g, "");
-  if (safeQuery) {
-    query = query.or(`issuer_name.ilike.%${safeQuery}%,issuer_ticker.ilike.%${safeQuery}%`);
-  }
-
-  const { data, error, count } = await query;
+  const [{ data, error, count }, companyOptions, insiderOptions] = await Promise.all([
+    query,
+    fetchDistinctValues(supabase, "issuer_name", baseFilters),
+    fetchDistinctValues(supabase, "owner_name", baseFilters),
+  ]);
   const rows = (data ?? []) as TransactionRow[];
   const hasNextPage = count !== null && to + 1 < count;
 
@@ -162,22 +173,35 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
       <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
           <h2 className="text-xl font-semibold">{copy.sectionLabel}</h2>
-          <TypeToggle activeCode={type} role={role} region={region} q={q} />
+          <TypeToggle activeCode={type} role={role} region={region} q={q} company={company} insider={insider} />
         </div>
 
         <div className="mt-6">
-          <SearchBar initialQuery={q} role={role} region={region} type={type} />
+          <SearchBar initialQuery={q} role={role} region={region} type={type} company={company} insider={insider} />
         </div>
 
         {error ? (
           <p className="text-sm text-red-400">Daten konnten gerade nicht geladen werden. Bitte gleich nochmal versuchen.</p>
         ) : (
           <>
-            <TransactionsTable rows={rows} />
+            <TransactionsTable
+              rows={rows}
+              companyOptions={companyOptions}
+              insiderOptions={insiderOptions}
+              role={role}
+              region={region}
+              type={type}
+              q={q}
+              company={company}
+              insider={insider}
+            />
             <div className="mt-6 flex items-center justify-between text-sm">
               {page > 1 ? (
                 <Link
-                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), role, region, type, page: page - 1 } }}
+                  href={{
+                    pathname: "/insider-kaeufe",
+                    query: { ...(q ? { q } : {}), role, region, type, ...(company ? { company } : {}), ...(insider ? { insider } : {}), page: page - 1 },
+                  }}
                   className="text-muted hover:text-foreground"
                 >
                   ← Zurück
@@ -187,7 +211,10 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
               )}
               {hasNextPage && (
                 <Link
-                  href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), role, region, type, page: page + 1 } }}
+                  href={{
+                    pathname: "/insider-kaeufe",
+                    query: { ...(q ? { q } : {}), role, region, type, ...(company ? { company } : {}), ...(insider ? { insider } : {}), page: page + 1 },
+                  }}
                   className="text-muted hover:text-foreground"
                 >
                   Weiter →
