@@ -10,7 +10,8 @@
     "ingest": "tsx scripts/ingest.ts",
     "ingest:de": "tsx scripts/ingest-de.ts",
     "ingest:us-politicians": "tsx scripts/ingest-us-politicians.ts",
-    "ingest:news": "tsx scripts/ingest-news.ts"
+    "ingest:news": "tsx scripts/ingest-news.ts",
+    "ingest:hedge-funds": "tsx scripts/ingest-hedge-funds.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",

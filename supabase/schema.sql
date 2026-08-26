@@ -80,3 +80,29 @@ alter table news_items enable row level security;
 create policy "Public can read news_items"
   on news_items for select
   using (true);
+
+-- Hedgefonds (SEC Form 13F): quarterly holdings snapshots per (manager, security).
+-- Buy/sell signals aren't reported directly — they're derived at ingest time by
+-- diffing a new quarter's holdings against the previous one, then written as
+-- normal role='hedge_fund' rows in `transactions`. This table is purely the
+-- internal state needed to compute that diff; the frontend never reads it
+-- directly, so — unlike every other table here — it deliberately has RLS
+-- enabled with NO select policy, meaning only the service role key can access it.
+create table if not exists institutional_holdings (
+  id bigserial primary key,
+  manager_cik text not null,
+  manager_name text not null,
+  cusip text not null,
+  issuer_name text not null,
+  period_of_report date not null,
+  shares numeric not null,
+  value_usd numeric not null,
+  filing_url text not null,
+  ingested_at timestamptz not null default now(),
+  unique (manager_cik, cusip, period_of_report)
+);
+
+create index if not exists institutional_holdings_lookup_idx
+  on institutional_holdings (manager_cik, cusip, period_of_report desc);
+
+alter table institutional_holdings enable row level security;

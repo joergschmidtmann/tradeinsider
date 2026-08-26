@@ -46,7 +46,7 @@ function isRegion(value: string): value is Region {
   return (REGIONS as readonly string[]).includes(value);
 }
 
-const ROLES = ["management_board", "supervisory_board", "politician"] as const;
+const ROLES = ["management_board", "supervisory_board", "politician", "hedge_fund"] as const;
 type Role = (typeof ROLES)[number];
 
 function isRole(value: string): value is Role {
@@ -64,6 +64,14 @@ function roleCopy(role: Role, region: Region) {
       highlight: "von US-Politikern.",
       subjectNominative: "US-Politiker",
       subjectDative: "US-Politikern",
+    };
+  }
+  if (role === "hedge_fund") {
+    return {
+      eyebrow: "Live-Daten von SEC EDGAR (13F, vierteljährlich)",
+      highlight: "von Hedgefonds.",
+      subjectNominative: "Hedgefonds",
+      subjectDative: "Hedgefonds",
     };
   }
   const eyebrow = region === "US" ? "Live-Daten von SEC EDGAR" : "Live-Daten von EQS News";
@@ -85,9 +93,11 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
   const page = Math.max(1, Number(params.page) || 1);
   const type: TransactionType = isTransactionType(params.type ?? "") ? (params.type as TransactionType) : "P";
   const role: Role = isRole(params.role ?? "") ? (params.role as Role) : "management_board";
-  // Politician data only exists for the US — pin the region regardless of
-  // what's in the URL so a stale role=politician&region=EU link still works.
-  const region: Region = role === "politician" ? "US" : isRegion(params.region ?? "") ? (params.region as Region) : "US";
+  // Politician and hedge fund data only exist for the US — pin the region
+  // regardless of what's in the URL so a stale role=politician&region=EU
+  // link still works.
+  const region: Region =
+    role === "politician" || role === "hedge_fund" ? "US" : isRegion(params.region ?? "") ? (params.region as Region) : "US";
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   const copy = TRANSACTION_TYPES[type];
@@ -132,11 +142,17 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
         </p>
         <div className="mt-8 flex flex-col items-center gap-3">
           <RoleToggle activeCode={role} region={region} type={type} q={q} />
-          {role !== "politician" && (
+          {role !== "politician" && role !== "hedge_fund" && (
             <>
               <RegionToggle activeCode={region} role={role} type={type} q={q} />
               {region === "EU" && <p className="text-xs text-muted">Aktuell: Deutschland — weitere Länder folgen</p>}
             </>
+          )}
+          {role === "hedge_fund" && (
+            <p className="max-w-md text-xs text-muted">
+              Basiert auf vierteljährlichen SEC-13F-Meldungen (bis zu 45 Tage verzögert). Preis ist eine Schätzung zum
+              Quartalsende, kein tatsächlicher Kaufpreis.
+            </p>
           )}
         </div>
       </section>

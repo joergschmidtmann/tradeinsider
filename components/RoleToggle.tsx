@@ -4,6 +4,7 @@ const ROLES = [
   { code: "management_board", label: "Vorstand" },
   { code: "supervisory_board", label: "Aufsichtsrat" },
   { code: "politician", label: "Politiker" },
+  { code: "hedge_fund", label: "Hedgefonds" },
 ] as const;
 
 export function RoleToggle({
@@ -21,8 +22,8 @@ export function RoleToggle({
     <div className="inline-flex rounded-full border border-border bg-surface p-1 text-sm">
       {ROLES.map((role) => {
         const isActive = role.code === activeCode;
-        // Politician data only exists for the US, so switching to it pins the region.
-        const targetRegion = role.code === "politician" ? "US" : region;
+        // Politician and hedge fund data only exist for the US, so switching to either pins the region.
+        const targetRegion = role.code === "politician" || role.code === "hedge_fund" ? "US" : region;
         return (
           <Link
             key={role.code}
