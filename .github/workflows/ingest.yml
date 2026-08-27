@@ -7,6 +7,7 @@ on:
     - cron: "0 */6 * * *" # US politicians (House Stock Watcher) — PTRs lag transactions by up to 45 days anyway
     - cron: "0 */2 * * *" # Wirtschaftsnews (ECB, Destatis, EQS Corporate) — press releases, not minute-by-minute
     - cron: "0 6 * * *" # Hedgefonds (SEC 13F) — quarterly filings, daily poll is more than enough
+    - cron: "30 * * * *" # Spain (CNMV) — similar volume to Germany, offset by 30min to spread load
   workflow_dispatch: {}
 
 jobs:
@@ -56,6 +57,14 @@ jobs:
       - name: Ingest hedge funds (SEC 13F)
         if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 6 * * *'
         run: npm run ingest:hedge-funds
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+
+      - name: Ingest Spain (CNMV)
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 * * * *'
+        run: npm run ingest:es
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

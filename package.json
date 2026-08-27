@@ -11,12 +11,14 @@
     "ingest:de": "tsx scripts/ingest-de.ts",
     "ingest:us-politicians": "tsx scripts/ingest-us-politicians.ts",
     "ingest:news": "tsx scripts/ingest-news.ts",
-    "ingest:hedge-funds": "tsx scripts/ingest-hedge-funds.ts"
+    "ingest:hedge-funds": "tsx scripts/ingest-hedge-funds.ts",
+    "ingest:es": "tsx scripts/ingest-es.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
     "fast-xml-parser": "^5.11.0",
     "next": "16.3.2",
+    "pdf-parse": "^2.4.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
