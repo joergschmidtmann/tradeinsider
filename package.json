@@ -12,7 +12,8 @@
     "ingest:us-politicians": "tsx scripts/ingest-us-politicians.ts",
     "ingest:news": "tsx scripts/ingest-news.ts",
     "ingest:hedge-funds": "tsx scripts/ingest-hedge-funds.ts",
-    "ingest:es": "tsx scripts/ingest-es.ts"
+    "ingest:es": "tsx scripts/ingest-es.ts",
+    "ingest:se": "tsx scripts/ingest-se.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",

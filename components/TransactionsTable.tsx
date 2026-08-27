@@ -19,10 +19,12 @@ export interface TransactionRow {
 const dateFormatter = new Intl.DateTimeFormat("de-DE", { year: "numeric", month: "short", day: "numeric" });
 const numberFormatter = new Intl.NumberFormat("de-DE");
 
-// USD amounts read naturally in en-US formatting ($1,234.56); everything else
-// (currently just EUR) reads naturally in de-DE formatting (1.234,56 €).
+// Each currency reads naturally in its own locale ($1,234.56 / 1.234,56 € /
+// 1 234,56 kr); NOK falls back to sv-SE too since we don't otherwise source
+// Norwegian data — its number formatting is close enough to Swedish.
+const CURRENCY_LOCALES: Record<string, string> = { USD: "en-US", SEK: "sv-SE", NOK: "sv-SE" };
 function formatCurrency(value: number, currency: string): string {
-  const locale = currency === "USD" ? "en-US" : "de-DE";
+  const locale = CURRENCY_LOCALES[currency] ?? "de-DE";
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
 }
 
