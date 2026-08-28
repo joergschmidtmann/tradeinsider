@@ -14,7 +14,8 @@
     "ingest:hedge-funds": "tsx scripts/ingest-hedge-funds.ts",
     "ingest:es": "tsx scripts/ingest-es.ts",
     "ingest:se": "tsx scripts/ingest-se.ts",
-    "ingest:nl": "tsx scripts/ingest-nl.ts"
+    "ingest:nl": "tsx scripts/ingest-nl.ts",
+    "ingest:be": "tsx scripts/ingest-be.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",

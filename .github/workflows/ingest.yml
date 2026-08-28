@@ -10,6 +10,7 @@ on:
     - cron: "30 * * * *" # Spain (CNMV) — similar volume to Germany, offset by 30min to spread load
     - cron: "45 * * * *" # Sweden (Finansinspektionen) — similar volume to Germany/Spain, offset by 45min to spread load
     - cron: "10 * * * *" # Netherlands (AFM) — low volume, one bulk export request per run, offset by 10min to spread load (avoids the US run's :00/:15/:30/:45 slots)
+    - cron: "20 * * * *" # Belgium (FSMA) — low volume, but throttled at 30s/request (robots.txt Crawl-delay), offset by 20min to spread load
   workflow_dispatch: {}
 
 jobs:
@@ -83,6 +84,14 @@ jobs:
       - name: Ingest Netherlands (AFM)
         if: always() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '10 * * * *')
         run: npm run ingest:nl
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+
+      - name: Ingest Belgium (FSMA)
+        if: always() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '20 * * * *')
+        run: npm run ingest:be
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
