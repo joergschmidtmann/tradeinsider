@@ -21,8 +21,17 @@ const numberFormatter = new Intl.NumberFormat("de-DE");
 
 // Each currency reads naturally in its own locale ($1,234.56 / 1.234,56 € /
 // 1 234,56 kr); NOK falls back to sv-SE too since we don't otherwise source
-// Norwegian data — its number formatting is close enough to Swedish.
-const CURRENCY_LOCALES: Record<string, string> = { USD: "en-US", SEK: "sv-SE", NOK: "sv-SE" };
+// Norwegian data — its number formatting is close enough to Swedish. GBP/PLN/
+// ZAR/CZK show up on foreign-listed issuers in the Dutch AFM feed.
+const CURRENCY_LOCALES: Record<string, string> = {
+  USD: "en-US",
+  SEK: "sv-SE",
+  NOK: "sv-SE",
+  GBP: "en-GB",
+  PLN: "pl-PL",
+  ZAR: "en-ZA",
+  CZK: "cs-CZ",
+};
 function formatCurrency(value: number, currency: string): string {
   const locale = CURRENCY_LOCALES[currency] ?? "de-DE";
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);

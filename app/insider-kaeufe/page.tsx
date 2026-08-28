@@ -18,7 +18,7 @@ const PAGE_SIZE = 50;
 // Countries currently covered under the "Europa" region tab. Grows as more
 // countries are added — the query below and the rest of the page don't need
 // to change when that happens.
-const EU_COUNTRIES = ["DE", "AT", "ES", "SE"];
+const EU_COUNTRIES = ["DE", "AT", "ES", "SE", "NL"];
 
 const TRANSACTION_TYPES = {
   P: {
@@ -159,7 +159,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
             <>
               <RegionToggle activeCode={region} role={role} type={type} q={q} />
               {region === "EU" && (
-                <p className="text-xs text-muted">Aktuell: Deutschland, Österreich, Spanien, Schweden — weitere Länder folgen</p>
+                <p className="text-xs text-muted">Aktuell: Deutschland, Österreich, Spanien, Schweden, Niederlande — weitere Länder folgen</p>
               )}
             </>
           )}
