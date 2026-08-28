@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { fetchAllTransactions } from "./lib/parseAfm";
+import { computeInsiderScore } from "./lib/insiderScore";
 
 // AFM's copyright notice (afm.nl/nl-nl/over-de-afm/over-deze-website) permits
 // reproducing and distributing this data as long as the AFM is credited as
@@ -41,35 +42,49 @@ async function main() {
     if (!page || page.length < PAGE_SIZE) break;
   }
 
-  const rows = transactions
-    .map((tx) => {
-      const dedupeKey = `NL-${tx.meldingId}-${tx.index}`;
-      if (knownDedupeKeys.has(dedupeKey)) return null;
-      return {
-        source_country: "NL",
-        accession_number: dedupeKey,
-        // No ISIN/LEI in AFM's export (unlike every other European source
-        // here) — fall back to the issuer name, same as owner_cik below.
-        issuer_cik: tx.issuerName,
-        issuer_name: tx.issuerName,
-        issuer_ticker: null,
-        owner_cik: tx.ownerName,
-        owner_name: tx.ownerName,
-        owner_title: null,
-        is_ceo: false,
-        role: "management_board",
-        transaction_date: tx.transactionDate,
-        transaction_code: tx.shares > 0 ? "P" : "S",
-        shares: Math.abs(tx.shares),
-        price_per_share: tx.pricePerShare,
-        currency: tx.currency,
-        shares_owned_after: tx.sharesOwnedAfter,
-        filing_url: `https://www.afm.nl/en/sector/registers/meldingenregisters/bestuurders-commissarissen/details?id=${tx.meldingId}`,
-        filed_at: tx.transactionDate,
-        dedupe_key: dedupeKey,
-      };
-    })
-    .filter((row) => row !== null);
+  const rows = [];
+  for (const tx of transactions) {
+    const dedupeKey = `NL-${tx.meldingId}-${tx.index}`;
+    if (knownDedupeKeys.has(dedupeKey)) continue;
+    const transactionCode = tx.shares > 0 ? "P" : "S";
+    const shares = Math.abs(tx.shares);
+    const insiderScore =
+      transactionCode === "P"
+        ? await computeInsiderScore(supabase, {
+            ownerTitle: null,
+            shares,
+            sharesOwnedAfter: tx.sharesOwnedAfter,
+            totalValue: shares * tx.pricePerShare,
+            currency: tx.currency,
+            issuerName: tx.issuerName,
+            transactionDate: tx.transactionDate,
+          })
+        : null;
+    rows.push({
+      source_country: "NL",
+      accession_number: dedupeKey,
+      // No ISIN/LEI in AFM's export (unlike every other European source
+      // here) — fall back to the issuer name, same as owner_cik below.
+      issuer_cik: tx.issuerName,
+      issuer_name: tx.issuerName,
+      issuer_ticker: null,
+      owner_cik: tx.ownerName,
+      owner_name: tx.ownerName,
+      owner_title: null,
+      is_ceo: false,
+      role: "management_board",
+      transaction_date: tx.transactionDate,
+      transaction_code: transactionCode,
+      shares,
+      price_per_share: tx.pricePerShare,
+      currency: tx.currency,
+      shares_owned_after: tx.sharesOwnedAfter,
+      insider_score: insiderScore,
+      filing_url: `https://www.afm.nl/en/sector/registers/meldingenregisters/bestuurders-commissarissen/details?id=${tx.meldingId}`,
+      filed_at: tx.transactionDate,
+      dedupe_key: dedupeKey,
+    });
+  }
 
   console.log(`${rows.length} row(s) not yet processed.`);
 

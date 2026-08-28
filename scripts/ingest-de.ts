@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { fetchEqsDirectorsDealingsPage, fetchEqsTransaction, resolveTrackedCountry } from "./lib/parseEqs";
+import { computeInsiderScore } from "./lib/insiderScore";
 
 const PAGES_TO_SCAN = 2; // ~200 recent items across all EQS categories, filtered down to tracked DE/AT Directors' Dealings
 
@@ -52,6 +53,20 @@ async function main() {
       const sourceCountry = resolveTrackedCountry(item.isin);
       const accessionNumber = `${sourceCountry}-${item.id}`;
       const shares = Math.round(tx.volumeEur / tx.price);
+      const ownerTitle = tx.role === "management_board" ? "Vorstand" : "Aufsichtsrat";
+      const insiderScore =
+        tx.code === "P"
+          ? await computeInsiderScore(supabase, {
+              ownerTitle,
+              shares,
+              sharesOwnedAfter: null,
+              totalValue: tx.volumeEur,
+              currency: "EUR",
+              issuerName: tx.issuerName,
+              transactionDate: tx.date,
+            })
+          : null;
+
       const { error } = await supabase.from("transactions").upsert(
         {
           source_country: sourceCountry,
@@ -61,7 +76,7 @@ async function main() {
           issuer_ticker: null,
           owner_cik: `${tx.ownerFirstName} ${tx.ownerLastName}`,
           owner_name: `${tx.ownerFirstName} ${tx.ownerLastName}`,
-          owner_title: tx.role === "management_board" ? "Vorstand" : "Aufsichtsrat",
+          owner_title: ownerTitle,
           is_ceo: tx.role === "management_board",
           role: tx.role,
           transaction_date: tx.date,
@@ -70,6 +85,7 @@ async function main() {
           price_per_share: tx.price,
           currency: "EUR",
           shares_owned_after: null,
+          insider_score: insiderScore,
           filing_url: tx.shareUrl,
           filed_at: item.date,
           dedupe_key: accessionNumber,

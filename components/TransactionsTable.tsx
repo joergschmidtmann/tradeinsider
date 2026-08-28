@@ -14,6 +14,7 @@ export interface TransactionRow {
   amount_range: string | null;
   currency: string;
   filing_url: string;
+  insider_score: number | null;
 }
 
 const dateFormatter = new Intl.DateTimeFormat("de-DE", { year: "numeric", month: "short", day: "numeric" });
@@ -37,6 +38,23 @@ function formatCurrency(value: number, currency: string): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
 }
 
+const SCORE_TOOLTIP =
+  "Automatisch berechneter Indikator (0–100) aus Rolle, Kaufgröße relativ zum Bestand, Gesamtsumme und weiteren Insidern derselben Firma. Keine Anlageempfehlung.";
+
+function ScoreBadge({ score }: { score: number }) {
+  const colorClass =
+    score >= 75
+      ? "bg-emerald-500/15 text-emerald-400"
+      : score >= 50
+        ? "bg-amber-500/15 text-amber-400"
+        : "bg-surface-2 text-muted";
+  return (
+    <span title={SCORE_TOOLTIP} className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-2.5 py-1 text-xs font-semibold ${colorClass}`}>
+      {score}
+    </span>
+  );
+}
+
 interface TransactionsTableProps {
   rows: TransactionRow[];
   companyOptions: ColumnFilterOption[];
@@ -47,6 +65,7 @@ interface TransactionsTableProps {
   q: string;
   company?: string;
   insider?: string;
+  showScore: boolean;
 }
 
 export function TransactionsTable({
@@ -59,6 +78,7 @@ export function TransactionsTable({
   q,
   company,
   insider,
+  showScore,
 }: TransactionsTableProps) {
   if (rows.length === 0) {
     return (
@@ -104,6 +124,11 @@ export function TransactionsTable({
               <th className="px-5 py-3.5 text-right font-medium">Aktien</th>
               <th className="px-5 py-3.5 text-right font-medium">Preis</th>
               <th className="px-5 py-3.5 text-right font-medium">Gesamtwert</th>
+              {showScore && (
+                <th className="px-5 py-3.5 text-right font-medium" title={SCORE_TOOLTIP}>
+                  Score
+                </th>
+              )}
               <th className="px-5 py-3.5 font-medium">Meldung</th>
             </tr>
           </thead>
@@ -132,6 +157,11 @@ export function TransactionsTable({
                     ? formatCurrency(row.total_value, row.currency)
                     : (row.amount_range ?? "—")}
                 </td>
+                {showScore && (
+                  <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                    {row.insider_score !== null ? <ScoreBadge score={row.insider_score} /> : <span className="text-muted">—</span>}
+                  </td>
+                )}
                 <td className="px-5 py-3.5 whitespace-nowrap">
                   <a
                     href={row.filing_url}

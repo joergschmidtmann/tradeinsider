@@ -31,6 +31,12 @@ create table if not exists transactions (
   -- and so total_value is null too.
   amount_range text,
   shares_owned_after numeric,
+  -- 0-100 signal-strength score for Vorstand/Aufsichtsrat purchases only (role
+  -- in management_board/supervisory_board, transaction_code='P'); null for
+  -- sales, politicians and hedge funds, where the factors it's built from
+  -- (seniority, position increase, cluster buying) don't apply the same way.
+  -- Computed once at ingest, not on every page load. See scripts/lib/insiderScore.ts.
+  insider_score smallint,
 
   -- Provenance
   filing_url text not null,

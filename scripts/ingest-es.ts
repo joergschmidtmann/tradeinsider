@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { findRecentDeclarations, fetchDeclarationDetail } from "./lib/parseCnmv";
+import { computeInsiderScore } from "./lib/insiderScore";
 
 // CNMV's Nota Legal (https://www.cnmv.es/portal/Utilidades/NotaLegal.aspx)
 // allows commercial reuse of this data, on the condition that anyone who
@@ -63,30 +64,46 @@ async function main() {
       const { lei, transactions } = await fetchDeclarationDetail(declaration.documentUrl);
       if (transactions.length === 0) continue;
 
-      const rows = transactions.map((tx, index) => {
-        const accessionNumber = `ES-${declaration.registrationNumber}-${index}`;
-        return {
-          source_country: "ES",
-          accession_number: accessionNumber,
-          issuer_cik: lei ?? tx.isin,
-          issuer_name: declaration.issuerName,
-          issuer_ticker: null,
-          owner_cik: declaration.declarant,
-          owner_name: declaration.declarant,
-          owner_title: declaration.motivo,
-          is_ceo: false,
-          role: "management_board",
-          transaction_date: tx.date,
-          transaction_code: tx.nature === "Compra" ? "P" : "S",
-          shares: tx.volume,
-          price_per_share: tx.price,
-          currency: tx.currency,
-          shares_owned_after: null,
-          filing_url: declaration.documentUrl,
-          filed_at: declaration.filedDate,
-          dedupe_key: accessionNumber,
-        };
-      });
+      const rows = await Promise.all(
+        transactions.map(async (tx, index) => {
+          const accessionNumber = `ES-${declaration.registrationNumber}-${index}`;
+          const transactionCode = tx.nature === "Compra" ? "P" : "S";
+          const insiderScore =
+            transactionCode === "P"
+              ? await computeInsiderScore(supabase, {
+                  ownerTitle: declaration.motivo,
+                  shares: tx.volume,
+                  sharesOwnedAfter: null,
+                  totalValue: tx.volume !== null && tx.price !== null ? tx.volume * tx.price : null,
+                  currency: tx.currency,
+                  issuerName: declaration.issuerName,
+                  transactionDate: tx.date,
+                })
+              : null;
+          return {
+            source_country: "ES",
+            accession_number: accessionNumber,
+            issuer_cik: lei ?? tx.isin,
+            issuer_name: declaration.issuerName,
+            issuer_ticker: null,
+            owner_cik: declaration.declarant,
+            owner_name: declaration.declarant,
+            owner_title: declaration.motivo,
+            is_ceo: false,
+            role: "management_board",
+            transaction_date: tx.date,
+            transaction_code: transactionCode,
+            shares: tx.volume,
+            price_per_share: tx.price,
+            currency: tx.currency,
+            shares_owned_after: null,
+            insider_score: insiderScore,
+            filing_url: declaration.documentUrl,
+            filed_at: declaration.filedDate,
+            dedupe_key: accessionNumber,
+          };
+        })
+      );
 
       const { error } = await supabase.from("transactions").upsert(rows, { onConflict: "dedupe_key", ignoreDuplicates: true });
       if (error) throw error;

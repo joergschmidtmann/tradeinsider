@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { findRecentTransactionUrls, fetchTransactionDetail } from "./lib/parseFsma";
+import { computeInsiderScore } from "./lib/insiderScore";
 
 // FSMA's Disclaimer & Copyright page (fsma.be/en/disclaimer-copyright) puts
 // this data under CC BY 4.0, with the same condition as Spain's Nota Legal:
@@ -59,6 +60,18 @@ async function main() {
       if (!tx) continue;
 
       const dedupeKey = `BE-${tx.slug}`;
+      const insiderScore =
+        tx.transactionType === "P"
+          ? await computeInsiderScore(supabase, {
+              ownerTitle: tx.ownerTitle,
+              shares: tx.shares,
+              sharesOwnedAfter: null,
+              totalValue: tx.shares * tx.pricePerShare,
+              currency: tx.currency,
+              issuerName: tx.issuerName,
+              transactionDate: tx.transactionDate,
+            })
+          : null;
       const row = {
         source_country: "BE",
         accession_number: dedupeKey,
@@ -76,6 +89,7 @@ async function main() {
         price_per_share: tx.pricePerShare,
         currency: tx.currency,
         shares_owned_after: null,
+        insider_score: insiderScore,
         filing_url: ref.detailUrl,
         filed_at: tx.publicationDate,
         dedupe_key: dedupeKey,

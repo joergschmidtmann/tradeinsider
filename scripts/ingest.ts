@@ -1,8 +1,9 @@
 import "dotenv/config";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { secFetchText } from "./lib/secClient";
 import { parseFeed, type FeedEntry } from "./lib/parseFeed";
 import { parseForm4 } from "./lib/parseForm4";
+import { computeInsiderScore } from "./lib/insiderScore";
 
 const FEED_URL =
   "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=4&company=&dateb=&owner=include&count=100&output=atom";
@@ -61,7 +62,7 @@ async function findPrimaryXmlUrl(filingIndexUrl: string): Promise<string> {
   return candidates[candidates.length - 1];
 }
 
-async function processFiling(entry: FeedEntry) {
+async function processFiling(supabase: SupabaseClient, entry: FeedEntry) {
   const xmlUrl = await findPrimaryXmlUrl(entry.filingIndexUrl);
   const xml = await secFetchText(xmlUrl);
   const parsed = parseForm4(xml);
@@ -73,6 +74,21 @@ async function processFiling(entry: FeedEntry) {
   const rows = [];
   for (const owner of trackedOwners) {
     for (const tx of parsed.transactions) {
+      const ownerTitle = owner.officerTitle ?? "Director";
+      const totalValue = tx.shares !== null && tx.pricePerShare !== null ? tx.shares * tx.pricePerShare : null;
+      const insiderScore =
+        tx.code === "P"
+          ? await computeInsiderScore(supabase, {
+              ownerTitle,
+              shares: tx.shares,
+              sharesOwnedAfter: tx.sharesOwnedAfter,
+              totalValue,
+              currency: "USD",
+              issuerName: parsed.issuerName,
+              transactionDate: tx.date,
+            })
+          : null;
+
       // total_value is a generated column in Postgres (exact decimal math from
       // shares * price_per_share) — it must NOT be included in the insert payload.
       rows.push({
@@ -83,7 +99,7 @@ async function processFiling(entry: FeedEntry) {
         issuer_ticker: parsed.issuerTicker,
         owner_cik: owner.ownerCik,
         owner_name: owner.ownerName,
-        owner_title: owner.officerTitle ?? "Director",
+        owner_title: ownerTitle,
         is_ceo: owner.isCeo,
         role: owner.role,
         transaction_date: tx.date,
@@ -92,6 +108,7 @@ async function processFiling(entry: FeedEntry) {
         price_per_share: tx.pricePerShare,
         currency: "USD",
         shares_owned_after: tx.sharesOwnedAfter,
+        insider_score: insiderScore,
         filing_url: filingIndexUrl,
         filed_at: entry.filedAt || null,
         dedupe_key: `${entry.accessionNumber}:${owner.ownerCik}:${tx.index}`,
@@ -126,7 +143,7 @@ async function main() {
   let matchingFilings = 0;
   for (const entry of newEntries) {
     try {
-      const rows = await processFiling(entry);
+      const rows = await processFiling(supabase, entry);
       if (rows.length === 0) continue;
       matchingFilings++;
 

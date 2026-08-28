@@ -122,7 +122,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
     supabase
       .from("transactions")
       .select(
-        "id, issuer_name, issuer_ticker, owner_name, owner_title, transaction_date, shares, price_per_share, total_value, amount_range, currency, filing_url",
+        "id, issuer_name, issuer_ticker, owner_name, owner_title, transaction_date, shares, price_per_share, total_value, amount_range, currency, filing_url, insider_score",
         { count: "exact" }
       ),
     baseFilters
@@ -196,6 +196,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
               q={q}
               company={company}
               insider={insider}
+              showScore={role === "management_board" && type === "P"}
             />
             <div className="mt-6 flex items-center justify-between text-sm">
               {page > 1 ? (

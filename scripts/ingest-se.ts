@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { findRecentTransactions } from "./lib/parseFi";
+import { computeInsiderScore } from "./lib/insiderScore";
 
 // Finansinspektionen's copyright notice (fi.se/sv/om-fi/om-webbplatsen/) allows
 // free reuse of the site's text material as long as the source is credited —
@@ -47,33 +48,46 @@ async function main() {
   if (knownError) throw knownError;
   const knownDedupeKeys = new Set((known ?? []).map((row) => row.dedupe_key));
 
-  const rows = transactions
-    .map((tx) => {
-      const dedupeKey = `SE-${tx.filingId}-${tx.transactionDate}-${tx.volume}-${tx.price}`;
-      if (knownDedupeKeys.has(dedupeKey)) return null;
-      return {
-        source_country: "SE",
-        accession_number: dedupeKey,
-        issuer_cik: tx.isin,
-        issuer_name: tx.issuerName,
-        issuer_ticker: null,
-        owner_cik: tx.ownerName,
-        owner_name: tx.ownerName,
-        owner_title: tx.ownerTitle,
-        is_ceo: false,
-        role: "management_board",
-        transaction_date: tx.transactionDate,
-        transaction_code: tx.nature === "Förvärv" ? "P" : "S",
-        shares: tx.volume,
-        price_per_share: tx.price,
-        currency: tx.currency,
-        shares_owned_after: null,
-        filing_url: tx.filingUrl,
-        filed_at: tx.filedDate,
-        dedupe_key: dedupeKey,
-      };
-    })
-    .filter((row) => row !== null);
+  const rows = [];
+  for (const tx of transactions) {
+    const dedupeKey = `SE-${tx.filingId}-${tx.transactionDate}-${tx.volume}-${tx.price}`;
+    if (knownDedupeKeys.has(dedupeKey)) continue;
+    const transactionCode = tx.nature === "Förvärv" ? "P" : "S";
+    const insiderScore =
+      transactionCode === "P"
+        ? await computeInsiderScore(supabase, {
+            ownerTitle: tx.ownerTitle,
+            shares: tx.volume,
+            sharesOwnedAfter: null,
+            totalValue: tx.volume * tx.price,
+            currency: tx.currency,
+            issuerName: tx.issuerName,
+            transactionDate: tx.transactionDate,
+          })
+        : null;
+    rows.push({
+      source_country: "SE",
+      accession_number: dedupeKey,
+      issuer_cik: tx.isin,
+      issuer_name: tx.issuerName,
+      issuer_ticker: null,
+      owner_cik: tx.ownerName,
+      owner_name: tx.ownerName,
+      owner_title: tx.ownerTitle,
+      is_ceo: false,
+      role: "management_board",
+      transaction_date: tx.transactionDate,
+      transaction_code: transactionCode,
+      shares: tx.volume,
+      price_per_share: tx.price,
+      currency: tx.currency,
+      shares_owned_after: null,
+      insider_score: insiderScore,
+      filing_url: tx.filingUrl,
+      filed_at: tx.filedDate,
+      dedupe_key: dedupeKey,
+    });
+  }
 
   console.log(`${rows.length} row(s) not yet processed.`);
 
