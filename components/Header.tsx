@@ -9,9 +9,7 @@ const NAV_ITEMS = [
   { href: "/insider-kaeufe", label: "Insider Käufe" },
   { href: "/aktienanalyse", label: "Aktienanalyse" },
   { href: "/trading-academy", label: "Trading Academy" },
-  { href: "/saisonalitaeten", label: "Saisonalitäten" },
   { href: "/fk-anbieter", label: "FK Anbieter" },
-  { href: "/wirtschaftsnews", label: "Wirtschaftsnews" },
 ];
 
 export function Header() {

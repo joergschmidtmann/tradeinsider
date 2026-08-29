@@ -5,7 +5,6 @@ on:
     - cron: "*/15 * * * *" # US (SEC EDGAR)
     - cron: "0 * * * *" # Germany (EQS News) — deliberately less frequent, see scripts/lib/eqsClient.ts
     - cron: "0 */6 * * *" # US politicians (House Stock Watcher) — PTRs lag transactions by up to 45 days anyway
-    - cron: "0 */2 * * *" # Wirtschaftsnews (ECB, Destatis, EQS Corporate) — press releases, not minute-by-minute
     - cron: "0 6 * * *" # Hedgefonds (SEC 13F) — quarterly filings, daily poll is more than enough
     - cron: "30 * * * *" # Spain (CNMV) — similar volume to Germany, offset by 30min to spread load
     - cron: "45 * * * *" # Sweden (Finansinspektionen) — similar volume to Germany/Spain, offset by 45min to spread load
@@ -48,14 +47,6 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-
-      - name: Ingest news (ECB, Destatis, EQS Corporate)
-        if: always() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '0 */2 * * *')
-        run: npm run ingest:news
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
 
       - name: Ingest hedge funds (SEC 13F)
         if: always() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '0 6 * * *')

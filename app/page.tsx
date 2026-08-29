@@ -20,22 +20,10 @@ const SECTIONS = [
     available: false,
   },
   {
-    href: "/saisonalitaeten",
-    title: "Saisonalitäten",
-    description: "Saisonale Muster und Zyklen an den Märkten.",
-    available: false,
-  },
-  {
     href: "/fk-anbieter",
     title: "FK Anbieter",
     description: "Ein Vergleich von Broker-Anbietern.",
     available: false,
-  },
-  {
-    href: "/wirtschaftsnews",
-    title: "Wirtschaftsnews",
-    description: "Zinsentscheidungen, Konjunkturdaten und Unternehmensnews von EZB, Destatis und Unternehmen.",
-    available: true,
   },
 ];
 
