@@ -10,7 +10,6 @@ const NAV_ITEMS = [
   { href: "/insider-kaeufe", label: "Insider Käufe" },
   { href: "/trading-intelligence", label: "Trading Intelligence" },
   { href: "/trading-academy", label: "Trading Academy" },
-  { href: "/fk-anbieter", label: "FK Anbieter" },
 ];
 
 function isNavItemActive(pathname: string, href: string): boolean {

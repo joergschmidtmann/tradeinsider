@@ -19,12 +19,6 @@ const SECTIONS = [
     description: "Kurse und Guides rund ums Trading.",
     available: false,
   },
-  {
-    href: "/fk-anbieter",
-    title: "FK Anbieter",
-    description: "Ein Vergleich von Broker-Anbietern.",
-    available: false,
-  },
 ];
 
 export default function Home() {
