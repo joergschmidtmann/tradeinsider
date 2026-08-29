@@ -8,8 +8,8 @@ const SECTIONS = [
     available: true,
   },
   {
-    href: "/aktienanalyse",
-    title: "Aktienanalyse",
+    href: "/trading-intelligence",
+    title: "Trading Intelligence",
     description: "Fundamentale und technische Analysen zu Aktien.",
     available: false,
   },

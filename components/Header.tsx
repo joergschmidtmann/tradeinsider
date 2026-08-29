@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const NAV_ITEMS = [
   { href: "/insider-kaeufe", label: "Insider Käufe" },
-  { href: "/aktienanalyse", label: "Aktienanalyse" },
+  { href: "/trading-intelligence", label: "Trading Intelligence" },
   { href: "/trading-academy", label: "Trading Academy" },
   { href: "/fk-anbieter", label: "FK Anbieter" },
 ];
