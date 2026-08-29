@@ -6,11 +6,16 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_ITEMS = [
+  { href: "/", label: "Home" },
   { href: "/insider-kaeufe", label: "Insider Käufe" },
   { href: "/trading-intelligence", label: "Trading Intelligence" },
   { href: "/trading-academy", label: "Trading Academy" },
   { href: "/fk-anbieter", label: "FK Anbieter" },
 ];
+
+function isNavItemActive(pathname: string, href: string): boolean {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+}
 
 export function Header() {
   const pathname = usePathname();
@@ -25,7 +30,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-1 lg:flex">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = isNavItemActive(pathname, item.href);
             return (
               <Link
                 key={item.href}
@@ -61,7 +66,7 @@ export function Header() {
       {menuOpen && (
         <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 lg:hidden">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = isNavItemActive(pathname, item.href);
             return (
               <Link
                 key={item.href}
