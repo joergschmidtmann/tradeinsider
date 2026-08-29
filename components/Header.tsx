@@ -22,12 +22,12 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-black/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center" onClick={() => setMenuOpen(false)}>
+      <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
+        <Link href="/" className="flex shrink-0 items-center justify-self-start" onClick={() => setMenuOpen(false)}>
           <Image src="/logo.png" alt="TradeInsider" width={140} height={109} priority className="h-12 w-auto" />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center justify-self-center gap-1 whitespace-nowrap lg:flex">
           {NAV_ITEMS.map((item) => {
             const isActive = isNavItemActive(pathname, item.href);
             return (
@@ -50,7 +50,7 @@ export function Header() {
           onClick={() => setMenuOpen((open) => !open)}
           aria-label={menuOpen ? "Menü schließen" : "Menü öffnen"}
           aria-expanded={menuOpen}
-          className="flex h-9 w-9 items-center justify-center rounded-full text-foreground lg:hidden"
+          className="flex h-9 w-9 items-center justify-center justify-self-end rounded-full text-foreground lg:hidden"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
             {menuOpen ? (
