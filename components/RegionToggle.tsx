@@ -8,12 +8,10 @@ const REGIONS = [
 export function RegionToggle({
   activeCode,
   role,
-  type,
   q,
 }: {
   activeCode: string;
   role: string;
-  type: string;
   q: string;
 }) {
   return (
@@ -23,7 +21,7 @@ export function RegionToggle({
         return (
           <Link
             key={region.code}
-            href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), role, type, region: region.code } }}
+            href={{ pathname: "/insider-kaeufe", query: { ...(q ? { q } : {}), role, region: region.code } }}
             className={
               isActive
                 ? "rounded-full bg-gradient-accent px-4 py-1.5 font-medium text-white"

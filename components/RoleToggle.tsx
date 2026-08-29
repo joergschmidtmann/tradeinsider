@@ -12,12 +12,10 @@ const ROLES = [
 export function RoleToggle({
   activeCode,
   region,
-  type,
   q,
 }: {
   activeCode: string;
   region: string;
-  type: string;
   q: string;
 }) {
   return (
@@ -31,7 +29,7 @@ export function RoleToggle({
             key={role.code}
             href={{
               pathname: "/insider-kaeufe",
-              query: { ...(q ? { q } : {}), type, region: targetRegion, role: role.code },
+              query: { ...(q ? { q } : {}), region: targetRegion, role: role.code },
             }}
             className={
               isActive

@@ -10,7 +10,6 @@ interface ColumnFilterDropdownProps {
   values: ColumnFilterOption[];
   role: string;
   region: string;
-  type: string;
   q: string;
   company?: string;
   insider?: string;
@@ -23,13 +22,13 @@ interface ColumnFilterDropdownProps {
  * just grows the header row, which is simpler and always visible.
  *
  * This is the one client component on an otherwise all-server-component page
- * (RoleToggle/RegionToggle/TypeToggle/SearchBar are plain links/forms) —
- * needed only for the click-outside-to-close behavior below, which native
- * <details> doesn't provide (it only closes on a second click on <summary>). */
-export function ColumnFilterDropdown({ label, paramName, values, role, region, type, q, company, insider }: ColumnFilterDropdownProps) {
+ * (RoleToggle/RegionToggle/SearchBar are plain links/forms) — needed only for
+ * the click-outside-to-close behavior below, which native <details> doesn't
+ * provide (it only closes on a second click on <summary>). */
+export function ColumnFilterDropdown({ label, paramName, values, role, region, q, company, insider }: ColumnFilterDropdownProps) {
   const activeValue = paramName === "company" ? company : insider;
   const otherFilter = paramName === "company" ? (insider ? { insider } : {}) : company ? { company } : {};
-  const baseQuery = { ...(q ? { q } : {}), role, region, type, ...otherFilter };
+  const baseQuery = { ...(q ? { q } : {}), role, region, ...otherFilter };
 
   const detailsRef = useRef<HTMLDetailsElement>(null);
   useEffect(() => {

@@ -61,7 +61,6 @@ interface TransactionsTableProps {
   insiderOptions: ColumnFilterOption[];
   role: string;
   region: string;
-  type: string;
   q: string;
   company?: string;
   insider?: string;
@@ -74,7 +73,6 @@ export function TransactionsTable({
   insiderOptions,
   role,
   region,
-  type,
   q,
   company,
   insider,
@@ -101,7 +99,6 @@ export function TransactionsTable({
                   values={companyOptions}
                   role={role}
                   region={region}
-                  type={type}
                   q={q}
                   company={company}
                   insider={insider}
@@ -114,7 +111,6 @@ export function TransactionsTable({
                   values={insiderOptions}
                   role={role}
                   region={region}
-                  type={type}
                   q={q}
                   company={company}
                   insider={insider}

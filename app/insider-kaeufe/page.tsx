@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { SearchBar } from "@/components/SearchBar";
-import { TypeToggle } from "@/components/TypeToggle";
 import { RegionToggle } from "@/components/RegionToggle";
 import { RoleToggle } from "@/components/RoleToggle";
 import { TransactionsTable, type TransactionRow } from "@/components/TransactionsTable";
@@ -10,7 +9,7 @@ import { applyBaseFilters, fetchDistinctValues } from "@/lib/columnFilters";
 
 export const metadata: Metadata = {
   title: "Insider-Käufe — TradeInsider",
-  description: "Insider-Käufe und -Verkäufe von Vorständen, Aufsichtsräten und Politikern in Echtzeit, auf Basis offizieller Meldungen.",
+  description: "Insider-Käufe von Vorständen, Aufsichtsräten und Politikern in Echtzeit, auf Basis offizieller Meldungen.",
 };
 
 const PAGE_SIZE = 50;
@@ -19,26 +18,6 @@ const PAGE_SIZE = 50;
 // countries are added — the query below and the rest of the page don't need
 // to change when that happens.
 const EU_COUNTRIES = ["DE", "AT", "ES", "SE", "NL", "BE"];
-
-const TRANSACTION_TYPES = {
-  P: {
-    heading: "Insider-Käufe",
-    description: ({ nominative }: { nominative: string; dative: string }) =>
-      `Wenn ${nominative} eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.`,
-    sectionLabel: "Aktuelle Käufe",
-  },
-  S: {
-    heading: "Insider-Verkäufe",
-    description: ({ dative }: { nominative: string; dative: string }) =>
-      `Alle am offenen Markt gemeldeten Verkäufe von ${dative} im Überblick.`,
-    sectionLabel: "Aktuelle Verkäufe",
-  },
-} as const;
-type TransactionType = keyof typeof TRANSACTION_TYPES;
-
-function isTransactionType(value: string): value is TransactionType {
-  return value === "P" || value === "S";
-}
 
 const REGIONS = ["US", "EU"] as const;
 type Region = (typeof REGIONS)[number];
@@ -64,7 +43,6 @@ function roleCopy(role: Role, region: Region) {
       eyebrow: "Live-Daten von House Stock Watcher (US-Kongress)",
       highlight: "von US-Politikern.",
       subjectNominative: "US-Politiker",
-      subjectDative: "US-Politikern",
     };
   }
   if (role === "hedge_fund") {
@@ -72,20 +50,18 @@ function roleCopy(role: Role, region: Region) {
       eyebrow: "Live-Daten von SEC EDGAR (13F, vierteljährlich)",
       highlight: "von Hedgefonds.",
       subjectNominative: "Hedgefonds",
-      subjectDative: "Hedgefonds",
     };
   }
   const eyebrow = region === "US" ? "Live-Daten von SEC EDGAR" : "Live-Daten von EQS News";
   return region === "US"
-    ? { eyebrow, highlight: "von CEOs.", subjectNominative: "CEOs", subjectDative: "CEOs" }
-    : { eyebrow, highlight: "von Vorständen.", subjectNominative: "Vorstände", subjectDative: "Vorständen" };
+    ? { eyebrow, highlight: "von CEOs.", subjectNominative: "CEOs" }
+    : { eyebrow, highlight: "von Vorständen.", subjectNominative: "Vorstände" };
 }
 
 interface PageProps {
   searchParams: Promise<{
     q?: string;
     page?: string;
-    type?: string;
     region?: string;
     role?: string;
     company?: string;
@@ -97,7 +73,6 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
   const params = await searchParams;
   const q = (params.q ?? "").trim().slice(0, 100);
   const page = Math.max(1, Number(params.page) || 1);
-  const type: TransactionType = isTransactionType(params.type ?? "") ? (params.type as TransactionType) : "P";
   const role: Role = isRole(params.role ?? "") ? (params.role as Role) : "management_board";
   // Politician and hedge fund data only exist for the US — pin the region
   // regardless of what's in the URL so a stale role=politician&region=EU
@@ -108,14 +83,13 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
   const insider = (params.insider ?? "").trim().slice(0, 200) || undefined;
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
-  const copy = TRANSACTION_TYPES[type];
   const heroCopy = roleCopy(role, region);
   // "Vorstand" in the UI covers both management_board and supervisory_board
   // rows — Germany/Austria's two-tier board structure doesn't cleanly map to
   // a single "insider" category otherwise, and per-row owner_title still
   // shows which one a given transaction actually was.
   const roles = role === "management_board" ? ["management_board", "supervisory_board"] : [role];
-  const baseFilters = { roles, region, euCountries: EU_COUNTRIES, type, q };
+  const baseFilters = { roles, region, euCountries: EU_COUNTRIES, q };
 
   const supabase = createSupabaseReadClient();
   let query = applyBaseFilters(
@@ -148,16 +122,16 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
           {heroCopy.eyebrow}
         </span>
         <h1 className="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
-          {copy.heading} <span className="text-gradient">{heroCopy.highlight}</span>
+          Insider-Käufe <span className="text-gradient">{heroCopy.highlight}</span>
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">
-          {copy.description({ nominative: heroCopy.subjectNominative, dative: heroCopy.subjectDative })}
+          Wenn {heroCopy.subjectNominative} eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.
         </p>
         <div className="mt-8 flex flex-col items-center gap-3">
-          <RoleToggle activeCode={role} region={region} type={type} q={q} />
+          <RoleToggle activeCode={role} region={region} q={q} />
           {role !== "politician" && role !== "hedge_fund" && (
             <>
-              <RegionToggle activeCode={region} role={role} type={type} q={q} />
+              <RegionToggle activeCode={region} role={role} q={q} />
               {region === "EU" && (
                 <p className="text-xs text-muted">Aktuell: Deutschland, Österreich, Spanien, Schweden, Niederlande, Belgien — weitere Länder folgen</p>
               )}
@@ -173,13 +147,12 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
-          <h2 className="text-xl font-semibold">{copy.sectionLabel}</h2>
-          <TypeToggle activeCode={type} role={role} region={region} q={q} company={company} insider={insider} />
+        <div className="border-b border-border pb-6">
+          <h2 className="text-xl font-semibold">Aktuelle Käufe</h2>
         </div>
 
         <div className="mt-6">
-          <SearchBar initialQuery={q} role={role} region={region} type={type} company={company} insider={insider} />
+          <SearchBar initialQuery={q} role={role} region={region} company={company} insider={insider} />
         </div>
 
         {error ? (
@@ -192,18 +165,17 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
               insiderOptions={insiderOptions}
               role={role}
               region={region}
-              type={type}
               q={q}
               company={company}
               insider={insider}
-              showScore={role === "management_board" && type === "P"}
+              showScore={role === "management_board"}
             />
             <div className="mt-6 flex items-center justify-between text-sm">
               {page > 1 ? (
                 <Link
                   href={{
                     pathname: "/insider-kaeufe",
-                    query: { ...(q ? { q } : {}), role, region, type, ...(company ? { company } : {}), ...(insider ? { insider } : {}), page: page - 1 },
+                    query: { ...(q ? { q } : {}), role, region, ...(company ? { company } : {}), ...(insider ? { insider } : {}), page: page - 1 },
                   }}
                   className="text-muted hover:text-foreground"
                 >
@@ -216,7 +188,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
                 <Link
                   href={{
                     pathname: "/insider-kaeufe",
-                    query: { ...(q ? { q } : {}), role, region, type, ...(company ? { company } : {}), ...(insider ? { insider } : {}), page: page + 1 },
+                    query: { ...(q ? { q } : {}), role, region, ...(company ? { company } : {}), ...(insider ? { insider } : {}), page: page + 1 },
                   }}
                   className="text-muted hover:text-foreground"
                 >

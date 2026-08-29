@@ -7,7 +7,6 @@ export interface BaseTransactionFilters {
   roles: string[];
   region: string;
   euCountries: string[];
-  type: string;
   q: string;
 }
 
@@ -17,7 +16,7 @@ export interface BaseTransactionFilters {
  * sync with what the table itself would show for the same filter state. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase's query builder type changes shape with each chained call
 export function applyBaseFilters(query: any, filters: BaseTransactionFilters) {
-  query = query.in("role", filters.roles).eq("transaction_code", filters.type);
+  query = query.in("role", filters.roles).eq("transaction_code", "P");
   query = filters.region === "US" ? query.eq("source_country", "US") : query.in("source_country", filters.euCountries);
 
   // Postgrest's .or() mini-language uses "," and "(" ")" as structural characters,
