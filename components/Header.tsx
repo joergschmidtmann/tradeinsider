@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -23,8 +22,12 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-black/70 backdrop-blur-xl">
       <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center justify-self-start" onClick={() => setMenuOpen(false)}>
-          <Image src="/logo.png" alt="tradeinsider" width={140} height={109} priority className="h-12 w-auto" />
+        <Link
+          href="/"
+          className="shrink-0 justify-self-start text-2xl font-extrabold tracking-tight text-foreground"
+          onClick={() => setMenuOpen(false)}
+        >
+          trade<span className="text-gradient">insider</span>
         </Link>
 
         <nav className="hidden items-center justify-self-center gap-1 whitespace-nowrap lg:flex">
