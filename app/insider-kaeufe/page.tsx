@@ -6,6 +6,7 @@ import { RegionToggle } from "@/components/RegionToggle";
 import { RoleToggle } from "@/components/RoleToggle";
 import { TransactionsTable, type TransactionRow } from "@/components/TransactionsTable";
 import { applyBaseFilters, fetchDistinctValues } from "@/lib/columnFilters";
+import { getEurRates } from "@/lib/fxRates";
 
 export const metadata: Metadata = {
   title: "Insider-Käufe — tradeinsider",
@@ -107,10 +108,11 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
   if (company) query = query.eq("issuer_name", company);
   if (insider) query = query.eq("owner_name", insider);
 
-  const [{ data, error, count }, companyOptions, insiderOptions] = await Promise.all([
+  const [{ data, error, count }, companyOptions, insiderOptions, eurRates] = await Promise.all([
     query,
     fetchDistinctValues(supabase, "issuer_name", baseFilters),
     fetchDistinctValues(supabase, "owner_name", baseFilters),
+    getEurRates(),
   ]);
   const rows = (data ?? []) as TransactionRow[];
   const hasNextPage = count !== null && to + 1 < count;
@@ -169,6 +171,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
               company={company}
               insider={insider}
               showScore={role === "management_board"}
+              eurRates={eurRates}
             />
             <div className="mt-6 flex items-center justify-between text-sm">
               {page > 1 ? (

@@ -1,5 +1,6 @@
 import { ColumnFilterDropdown } from "./ColumnFilterDropdown";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
+import { convertToEur } from "@/lib/fxRates";
 
 export interface TransactionRow {
   id: number;
@@ -38,6 +39,27 @@ function formatCurrency(value: number, currency: string): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
 }
 
+function CurrencyCell({
+  amount,
+  currency,
+  eurRates,
+  fallback,
+}: {
+  amount: number | null;
+  currency: string;
+  eurRates: Record<string, number>;
+  fallback?: string;
+}) {
+  if (amount === null) return <>{fallback ?? "—"}</>;
+  const eurAmount = convertToEur(amount, currency, eurRates);
+  return (
+    <>
+      <div>{formatCurrency(amount, currency)}</div>
+      {eurAmount !== null && <div className="text-xs font-normal text-muted">≈ {formatCurrency(eurAmount, "EUR")}</div>}
+    </>
+  );
+}
+
 const SCORE_TOOLTIP =
   "Automatisch berechneter Indikator (0–100) aus Rolle, Kaufgröße relativ zum Bestand, Gesamtsumme und weiteren Insidern derselben Firma. Keine Anlageempfehlung.";
 
@@ -65,6 +87,7 @@ interface TransactionsTableProps {
   company?: string;
   insider?: string;
   showScore: boolean;
+  eurRates: Record<string, number>;
 }
 
 export function TransactionsTable({
@@ -77,6 +100,7 @@ export function TransactionsTable({
   company,
   insider,
   showScore,
+  eurRates,
 }: TransactionsTableProps) {
   if (rows.length === 0) {
     return (
@@ -146,12 +170,15 @@ export function TransactionsTable({
                   {row.shares !== null ? numberFormatter.format(row.shares) : "—"}
                 </td>
                 <td className="px-5 py-3.5 text-right whitespace-nowrap text-foreground">
-                  {row.price_per_share !== null ? formatCurrency(row.price_per_share, row.currency) : "—"}
+                  <CurrencyCell amount={row.price_per_share} currency={row.currency} eurRates={eurRates} />
                 </td>
                 <td className="px-5 py-3.5 text-right whitespace-nowrap font-medium text-foreground">
-                  {row.total_value !== null
-                    ? formatCurrency(row.total_value, row.currency)
-                    : (row.amount_range ?? "—")}
+                  <CurrencyCell
+                    amount={row.total_value}
+                    currency={row.currency}
+                    eurRates={eurRates}
+                    fallback={row.amount_range ?? "—"}
+                  />
                 </td>
                 {showScore && (
                   <td className="px-5 py-3.5 text-right whitespace-nowrap">
