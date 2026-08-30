@@ -24,7 +24,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-black/70 backdrop-blur-xl">
       <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
         <Link href="/" className="flex shrink-0 items-center justify-self-start" onClick={() => setMenuOpen(false)}>
-          <Image src="/logo.png" alt="TradeInsider" width={140} height={109} priority className="h-12 w-auto" />
+          <Image src="/logo.png" alt="tradeinsider" width={140} height={109} priority className="h-12 w-auto" />
         </Link>
 
         <nav className="hidden items-center justify-self-center gap-1 whitespace-nowrap lg:flex">

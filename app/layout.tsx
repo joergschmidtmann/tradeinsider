@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TradeInsider — Willkommen",
+  title: "tradeinsider — Willkommen",
   description: "Deine Plattform für Insider-Käufe, Aktienanalysen und alles rund ums Trading.",
 };
 

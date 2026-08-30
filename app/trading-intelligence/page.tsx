@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ComingSoon } from "@/components/ComingSoon";
 
-export const metadata: Metadata = { title: "Trading Intelligence — TradeInsider" };
+export const metadata: Metadata = { title: "Trading Intelligence — tradeinsider" };
 
 export default function Page() {
   return (

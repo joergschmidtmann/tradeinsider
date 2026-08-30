@@ -8,7 +8,7 @@ import { TransactionsTable, type TransactionRow } from "@/components/Transaction
 import { applyBaseFilters, fetchDistinctValues } from "@/lib/columnFilters";
 
 export const metadata: Metadata = {
-  title: "Insider-Käufe — TradeInsider",
+  title: "Insider-Käufe — tradeinsider",
   description: "Insider-Käufe von Vorständen, Aufsichtsräten und Politikern in Echtzeit, auf Basis offizieller Meldungen.",
 };
 
