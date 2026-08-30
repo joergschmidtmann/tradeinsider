@@ -1,6 +1,7 @@
 import { ColumnFilterDropdown } from "./ColumnFilterDropdown";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
 import { convertToEur } from "@/lib/fxRates";
+import { translateTitle } from "@/lib/translateTitle";
 
 export interface TransactionRow {
   id: number;
@@ -161,7 +162,7 @@ export function TransactionsTable({
                 </td>
                 <td className="px-5 py-3.5">
                   <div className="text-foreground">{row.owner_name}</div>
-                  {row.owner_title && <div className="text-xs text-muted">{row.owner_title}</div>}
+                  {row.owner_title && <div className="text-xs text-muted">{translateTitle(row.owner_title)}</div>}
                 </td>
                 <td className="px-5 py-3.5 whitespace-nowrap text-muted">
                   {dateFormatter.format(new Date(row.transaction_date))}
