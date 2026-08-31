@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CategoryToggle } from "@/components/CategoryToggle";
+import { EtfTypeToggle } from "@/components/EtfTypeToggle";
 import { getWeeklyStockRankings, type RankedStock } from "@/lib/marketVolume";
 
 export const metadata: Metadata = { title: "Trading Intelligence — tradeinsider" };
@@ -11,10 +12,23 @@ function isCategory(value: string): value is Category {
   return (CATEGORIES as readonly string[]).includes(value);
 }
 
+const ETF_TYPES = ["etfs", "leveraged", "active"] as const;
+type EtfType = (typeof ETF_TYPES)[number];
+
+function isEtfType(value: string): value is EtfType {
+  return (ETF_TYPES as readonly string[]).includes(value);
+}
+
 const DESCRIPTIONS: Record<Category, string> = {
   etfs: "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
   krypto: "Fundamentale und technische Analysen zu Kryptowährungen folgen in Kürze.",
   aktien: "Die 20 meistgehandelten und die 20 meist leerverkauften US-Aktien der letzten Handelswoche.",
+};
+
+const ETF_TYPE_DESCRIPTIONS: Record<EtfType, string> = {
+  etfs: "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
+  leveraged: "Fundamentale und technische Analysen zu gehebelten ETFs folgen in Kürze.",
+  active: "Fundamentale und technische Analysen zu aktiv gemanagten Fonds folgen in Kürze.",
 };
 
 const numberFormatter = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 });
@@ -59,13 +73,15 @@ function RankTable({
 }
 
 interface PageProps {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; etfType?: string }>;
 }
 
 export default async function Page({ searchParams }: PageProps) {
   const params = await searchParams;
   const category: Category = isCategory(params.category ?? "") ? (params.category as Category) : "aktien";
+  const etfType: EtfType = isEtfType(params.etfType ?? "") ? (params.etfType as EtfType) : "etfs";
   const rankings = category === "aktien" ? await getWeeklyStockRankings() : null;
+  const description = category === "etfs" ? ETF_TYPE_DESCRIPTIONS[etfType] : DESCRIPTIONS[category];
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col items-center px-4 py-24 text-center sm:px-6">
@@ -73,10 +89,16 @@ export default async function Page({ searchParams }: PageProps) {
         {category === "aktien" ? "Live · FINRA Reg SHO" : "Bald verfügbar"}
       </span>
       <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">Trading Intelligence</h1>
-      <p className="mt-4 max-w-xl text-lg text-muted">{DESCRIPTIONS[category]}</p>
+      <p className="mt-4 max-w-xl text-lg text-muted">{description}</p>
       <div className="mt-8">
         <CategoryToggle activeCode={category} />
       </div>
+
+      {category === "etfs" && (
+        <div className="mt-4">
+          <EtfTypeToggle activeCode={etfType} />
+        </div>
+      )}
 
       {category === "aktien" &&
         (rankings ? (
