@@ -80,12 +80,12 @@ export default async function Page({ searchParams }: PageProps) {
           <div className="mt-12 w-full text-left">
             <div className="grid gap-8 lg:grid-cols-2">
               <RankTable
-                title={`Meistgehandelt (letzte ${rankings.tradingDays} Handelstage)`}
+                title={`Aktien mit dem höchsten Handelsvolumen (long) — letzte ${rankings.tradingDays} Handelstage`}
                 rows={rankings.mostTraded}
                 renderValue={(row) => `${numberFormatter.format(row.totalVolume)} Stk.`}
               />
               <RankTable
-                title={`Meist leerverkauft (letzte ${rankings.tradingDays} Handelstage)`}
+                title={`Aktien mit dem höchsten Handelsvolumen (short) — letzte ${rankings.tradingDays} Handelstage`}
                 rows={rankings.mostShorted}
                 renderValue={(row) => `${percentFormatter.format(row.shortRatio)} %`}
               />
