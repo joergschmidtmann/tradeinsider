@@ -4,6 +4,7 @@ const ETF_TYPES = [
   { code: "etfs", label: "ETFs" },
   { code: "leveraged", label: "Gehebelte ETFs" },
   { code: "active", label: "Aktiv gemanagte Fonds" },
+  { code: "commodity", label: "Rohstoff ETFs" },
 ] as const;
 
 export function EtfTypeToggle({ activeCode }: { activeCode: string }) {

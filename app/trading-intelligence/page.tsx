@@ -12,7 +12,7 @@ function isCategory(value: string): value is Category {
   return (CATEGORIES as readonly string[]).includes(value);
 }
 
-const ETF_TYPES = ["etfs", "leveraged", "active"] as const;
+const ETF_TYPES = ["etfs", "leveraged", "active", "commodity"] as const;
 type EtfType = (typeof ETF_TYPES)[number];
 
 function isEtfType(value: string): value is EtfType {
@@ -29,6 +29,7 @@ const ETF_TYPE_DESCRIPTIONS: Record<EtfType, string> = {
   etfs: "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
   leveraged: "Fundamentale und technische Analysen zu gehebelten ETFs folgen in Kürze.",
   active: "Fundamentale und technische Analysen zu aktiv gemanagten Fonds folgen in Kürze.",
+  commodity: "Fundamentale und technische Analysen zu Rohstoff-ETFs folgen in Kürze.",
 };
 
 const numberFormatter = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 });
