@@ -38,9 +38,33 @@ interface DailyVolume {
 export interface RankedStock {
   symbol: string;
   name: string;
+  securityType: string | null;
   totalVolume: number;
   shortVolume: number;
   shortRatio: number; // 0-100
+}
+
+const SECURITY_TYPE_PATTERN =
+  /\s+((?:Class\s+[A-Z]\s+)?(?:Common Stock|Common Shares|Ordinary Shares|American Depositary Shares|Depositary Shares|Units|Warrants|Preferred Stock))\s*(?:\([A-Z]{2}\))?$/i;
+
+function titleCase(s: string): string {
+  return s.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+}
+
+/** Nasdaq Trader's "Security Name" bundles the security type into the name
+ * itself (e.g. "NVIDIA Corporation - Common Stock", or without a dash:
+ * "UiPath, Inc. Class A Common Stock") — split that off so the company name
+ * displays cleanly, with the type available separately next to the ticker. */
+function splitSecurityName(fullName: string): { name: string; securityType: string | null } {
+  const dashIndex = fullName.indexOf(" - ");
+  if (dashIndex !== -1) {
+    return { name: fullName.slice(0, dashIndex).trim(), securityType: titleCase(fullName.slice(dashIndex + 3).trim()) };
+  }
+  const match = fullName.match(SECURITY_TYPE_PATTERN);
+  if (match) {
+    return { name: fullName.slice(0, match.index).trim(), securityType: titleCase(match[1]) };
+  }
+  return { name: fullName, securityType: null };
 }
 
 export interface WeeklyStockRankings {
@@ -140,13 +164,17 @@ export async function getWeeklyStockRankings(): Promise<WeeklyStockRankings | nu
       }
     }
 
-    const ranked: RankedStock[] = [...totals.entries()].map(([symbol, v]) => ({
-      symbol,
-      name: directory.get(symbol)?.name ?? symbol,
-      totalVolume: v.totalVolume,
-      shortVolume: v.shortVolume,
-      shortRatio: v.totalVolume > 0 ? (v.shortVolume / v.totalVolume) * 100 : 0,
-    }));
+    const ranked: RankedStock[] = [...totals.entries()].map(([symbol, v]) => {
+      const { name, securityType } = splitSecurityName(directory.get(symbol)?.name ?? symbol);
+      return {
+        symbol,
+        name,
+        securityType,
+        totalVolume: v.totalVolume,
+        shortVolume: v.shortVolume,
+        shortRatio: v.totalVolume > 0 ? (v.shortVolume / v.totalVolume) * 100 : 0,
+      };
+    });
 
     return {
       mostTraded: [...ranked].sort((a, b) => b.totalVolume - a.totalVolume).slice(0, 20),

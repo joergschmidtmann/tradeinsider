@@ -43,8 +43,11 @@ function RankTable({
             <div className="flex min-w-0 items-center gap-3">
               <span className="w-5 shrink-0 text-right font-mono text-xs text-muted">{i + 1}</span>
               <div className="min-w-0">
-                <div className="truncate font-medium text-foreground">{row.symbol}</div>
-                <div className="truncate text-xs text-muted">{row.name}</div>
+                <div className="truncate font-medium text-foreground">{row.name}</div>
+                <div className="truncate text-xs text-muted">
+                  {row.symbol}
+                  {row.securityType ? ` (${row.securityType})` : ""}
+                </div>
               </div>
             </div>
             <div className="shrink-0 font-medium text-foreground">{renderValue(row)}</div>
