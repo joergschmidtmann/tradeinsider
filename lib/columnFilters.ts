@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { HEDGE_FUNDS } from "@/scripts/lib/hedgeFunds";
 
 export interface BaseTransactionFilters {
   // Array rather than a single value because "Vorstand" in the UI covers both
@@ -35,16 +36,24 @@ export interface ColumnFilterOption {
 
 /** Computes the "which values appear, how often" list behind the Unternehmen/
  * Insider column-header dropdowns. Not exhaustive for very large result sets:
- * capped at the first 2000 matching rows (Supabase's own default cap is 1000
- * per request without an explicit range — see the hedge-fund ingest scripts'
- * pagination fix for that same limit) — acceptable for a filter dropdown,
- * since the free-text search box remains exact regardless of this cap. */
+ * capped at the first 1000 matching rows (Supabase's project-level row cap —
+ * an explicit .range() beyond it is silently truncated, it does not raise the
+ * cap) — acceptable for a filter dropdown, since the free-text search box
+ * remains exact regardless of this cap, *except* for the hedge-fund Insider
+ * dropdown (see isHedgeFundOwnerQuery below): a single 13F filing produces one
+ * row per portfolio position, so a large fund's own filing alone can fill the
+ * entire 1000-row window and push every other fund out of the list — that
+ * case gets an exact-count query instead of this scan-and-dedupe approach. */
 export async function fetchDistinctValues(
   supabase: SupabaseClient,
   column: "issuer_name" | "owner_name",
   filters: BaseTransactionFilters
 ): Promise<ColumnFilterOption[]> {
-  const query = applyBaseFilters(supabase.from("transactions").select(column), filters).range(0, 1999);
+  if (isHedgeFundOwnerQuery(column, filters)) {
+    return fetchHedgeFundCounts(supabase, filters);
+  }
+
+  const query = applyBaseFilters(supabase.from("transactions").select(column), filters).range(0, 999);
   const { data, error } = await query;
   if (error || !data) return [];
 
@@ -56,4 +65,26 @@ export async function fetchDistinctValues(
   }
 
   return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
+}
+
+function isHedgeFundOwnerQuery(column: "issuer_name" | "owner_name", filters: BaseTransactionFilters): boolean {
+  return column === "owner_name" && filters.roles.length === 1 && filters.roles[0] === "hedge_fund";
+}
+
+/** Exact per-fund transaction counts for the curated HEDGE_FUNDS list, via one
+ * cheap head-only count query per fund rather than scanning rows — correct
+ * regardless of how many portfolio-position rows any single fund's filings
+ * contribute, unlike the generic scan-and-dedupe approach above. */
+async function fetchHedgeFundCounts(supabase: SupabaseClient, filters: BaseTransactionFilters): Promise<ColumnFilterOption[]> {
+  const counts = await Promise.all(
+    HEDGE_FUNDS.map(async (fund) => {
+      const { count, error } = await applyBaseFilters(
+        supabase.from("transactions").select("id", { count: "exact", head: true }),
+        filters
+      ).eq("owner_name", fund.name);
+      if (error) throw error;
+      return { value: fund.name, count: count ?? 0 };
+    })
+  );
+  return counts.filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
 }
