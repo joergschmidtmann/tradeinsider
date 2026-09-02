@@ -84,6 +84,7 @@ export default async function InsiderKaeufePage({ searchParams }: PageProps) {
     baseFilters
   )
     .order("transaction_date", { ascending: false })
+    .order("issuer_name", { ascending: true })
     .range(from, to);
 
   if (company) query = query.eq("issuer_name", company);
