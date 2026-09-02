@@ -1,24 +1,24 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { HEDGE_FUNDS } from "@/scripts/lib/hedgeFunds";
+import { COUNTRIES } from "@/lib/countries";
 
 export interface BaseTransactionFilters {
   // Array rather than a single value because "Vorstand" in the UI covers both
   // role="management_board" and role="supervisory_board" rows underneath —
   // see the `roles` expansion in app/insider-kaeufe/page.tsx.
   roles: string[];
-  region: string;
-  euCountries: string[];
   q: string;
 }
 
-/** Applies the same role/region/search filters used by the main transactions
- * query on `/insider-kaeufe` (app/insider-kaeufe/page.tsx) to any Supabase
- * query builder — shared so the column-filter dropdowns' value lists stay in
- * sync with what the table itself would show for the same filter state. */
+/** Applies the same role/search filters used by the main transactions query
+ * on `/insider-kaeufe` (app/insider-kaeufe/page.tsx) to any Supabase query
+ * builder — shared so the column-filter dropdowns' value lists stay in sync
+ * with what the table itself would show for the same filter state. Country
+ * is deliberately not part of this base filter set — it's an exact-match
+ * column filter applied separately in page.tsx, same as company/insider. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase's query builder type changes shape with each chained call
 export function applyBaseFilters(query: any, filters: BaseTransactionFilters) {
   query = query.in("role", filters.roles).eq("transaction_code", "P");
-  query = filters.region === "US" ? query.eq("source_country", "US") : query.in("source_country", filters.euCountries);
 
   // Postgrest's .or() mini-language uses "," and "(" ")" as structural characters,
   // so strip them from user input before building the filter string.
@@ -31,6 +31,7 @@ export function applyBaseFilters(query: any, filters: BaseTransactionFilters) {
 
 export interface ColumnFilterOption {
   value: string;
+  label?: string;
   count: number;
 }
 
@@ -46,11 +47,14 @@ export interface ColumnFilterOption {
  * case gets an exact-count query instead of this scan-and-dedupe approach. */
 export async function fetchDistinctValues(
   supabase: SupabaseClient,
-  column: "issuer_name" | "owner_name",
+  column: "issuer_name" | "owner_name" | "source_country",
   filters: BaseTransactionFilters
 ): Promise<ColumnFilterOption[]> {
   if (isHedgeFundOwnerQuery(column, filters)) {
     return fetchHedgeFundCounts(supabase, filters);
+  }
+  if (column === "source_country") {
+    return fetchCountryCounts(supabase, filters);
   }
 
   const query = applyBaseFilters(supabase.from("transactions").select(column), filters).range(0, 999);
@@ -67,7 +71,7 @@ export async function fetchDistinctValues(
   return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
 }
 
-function isHedgeFundOwnerQuery(column: "issuer_name" | "owner_name", filters: BaseTransactionFilters): boolean {
+function isHedgeFundOwnerQuery(column: "issuer_name" | "owner_name" | "source_country", filters: BaseTransactionFilters): boolean {
   return column === "owner_name" && filters.roles.length === 1 && filters.roles[0] === "hedge_fund";
 }
 
@@ -84,6 +88,24 @@ async function fetchHedgeFundCounts(supabase: SupabaseClient, filters: BaseTrans
       ).eq("owner_name", fund.name);
       if (error) throw error;
       return { value: fund.name, count: count ?? 0 };
+    })
+  );
+  return counts.filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
+}
+
+/** Exact per-country counts, same reasoning as fetchHedgeFundCounts above:
+ * the universe of countries is small and fixed, so an exact count per code
+ * is both cheap and correct — no risk of the scan-and-dedupe row cap ever
+ * hiding a country. */
+async function fetchCountryCounts(supabase: SupabaseClient, filters: BaseTransactionFilters): Promise<ColumnFilterOption[]> {
+  const counts = await Promise.all(
+    COUNTRIES.map(async (country) => {
+      const { count, error } = await applyBaseFilters(
+        supabase.from("transactions").select("id", { count: "exact", head: true }),
+        filters
+      ).eq("source_country", country.code);
+      if (error) throw error;
+      return { value: country.code, label: country.label, count: count ?? 0 };
     })
   );
   return counts.filter((c) => c.count > 0).sort((a, b) => b.count - a.count);

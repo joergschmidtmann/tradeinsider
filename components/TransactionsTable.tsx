@@ -2,6 +2,7 @@ import { ColumnFilterDropdown } from "./ColumnFilterDropdown";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
 import { convertToEur } from "@/lib/fxRates";
 import { translateTitle } from "@/lib/translateTitle";
+import { countryLabel } from "@/lib/countries";
 
 export interface TransactionRow {
   id: number;
@@ -9,6 +10,7 @@ export interface TransactionRow {
   issuer_ticker: string | null;
   owner_name: string;
   owner_title: string | null;
+  source_country: string;
   transaction_date: string;
   shares: number | null;
   price_per_share: number | null;
@@ -82,12 +84,14 @@ interface TransactionsTableProps {
   rows: TransactionRow[];
   companyOptions: ColumnFilterOption[];
   insiderOptions: ColumnFilterOption[];
+  countryOptions: ColumnFilterOption[];
   role: string;
-  region: string;
   q: string;
   company?: string;
   insider?: string;
+  country?: string;
   showScore: boolean;
+  showCountry: boolean;
   eurRates: Record<string, number>;
 }
 
@@ -95,12 +99,14 @@ export function TransactionsTable({
   rows,
   companyOptions,
   insiderOptions,
+  countryOptions,
   role,
-  region,
   q,
   company,
   insider,
+  country,
   showScore,
+  showCountry,
   eurRates,
 }: TransactionsTableProps) {
   if (rows.length === 0) {
@@ -123,10 +129,10 @@ export function TransactionsTable({
                   paramName="company"
                   values={companyOptions}
                   role={role}
-                  region={region}
                   q={q}
                   company={company}
                   insider={insider}
+                  country={country}
                 />
               </th>
               <th className="px-5 py-3.5 font-medium">
@@ -135,12 +141,26 @@ export function TransactionsTable({
                   paramName="insider"
                   values={insiderOptions}
                   role={role}
-                  region={region}
                   q={q}
                   company={company}
                   insider={insider}
+                  country={country}
                 />
               </th>
+              {showCountry && (
+                <th className="px-5 py-3.5 font-medium">
+                  <ColumnFilterDropdown
+                    label="Land"
+                    paramName="country"
+                    values={countryOptions}
+                    role={role}
+                    q={q}
+                    company={company}
+                    insider={insider}
+                    country={country}
+                  />
+                </th>
+              )}
               <th className="px-5 py-3.5 font-medium">Datum</th>
               <th className="px-5 py-3.5 text-right font-medium">Aktien</th>
               <th className="px-5 py-3.5 text-right font-medium">Preis</th>
@@ -164,6 +184,9 @@ export function TransactionsTable({
                   <div className="text-foreground">{row.owner_name}</div>
                   {row.owner_title && <div className="text-xs text-muted">{translateTitle(row.owner_title)}</div>}
                 </td>
+                {showCountry && (
+                  <td className="px-5 py-3.5 whitespace-nowrap text-foreground">{countryLabel(row.source_country)}</td>
+                )}
                 <td className="px-5 py-3.5 whitespace-nowrap text-muted">
                   {dateFormatter.format(new Date(row.transaction_date))}
                 </td>
