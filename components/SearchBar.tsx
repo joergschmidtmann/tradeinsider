@@ -1,18 +1,27 @@
+import { useTranslations } from "next-intl";
+import { getPathname } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
+
 export function SearchBar({
   initialQuery,
   role,
   company,
   insider,
   country,
+  locale,
 }: {
   initialQuery: string;
   role: string;
   company?: string;
   insider?: string;
   country?: string;
+  locale: Locale;
 }) {
+  const t = useTranslations("insiderKaeufe");
+  const action = getPathname({ href: "/insider-kaeufe", locale });
+
   return (
-    <form action="/insider-kaeufe" method="get" className="mb-8">
+    <form action={action} method="get" className="mb-8">
       <input type="hidden" name="role" value={role} />
       {company && <input type="hidden" name="company" value={company} />}
       {insider && <input type="hidden" name="insider" value={insider} />}
@@ -32,7 +41,7 @@ export function SearchBar({
           type="text"
           name="q"
           defaultValue={initialQuery}
-          placeholder="Firma oder Ticker suchen…"
+          placeholder={t("searchPlaceholder")}
           className="w-full rounded-full border border-border bg-surface py-2.5 pr-4 pl-10 text-sm text-foreground placeholder:text-muted outline-none focus:border-white/25"
         />
       </div>

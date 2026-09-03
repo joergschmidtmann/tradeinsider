@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
 
 type FilterParam = "company" | "insider" | "country";
@@ -28,6 +29,7 @@ interface ColumnFilterDropdownProps {
  * click-outside-to-close behavior below, which native <details> doesn't
  * provide (it only closes on a second click on <summary>). */
 export function ColumnFilterDropdown({ label, paramName, values, role, q, company, insider, country }: ColumnFilterDropdownProps) {
+  const t = useTranslations("insiderKaeufe.table");
   const activeValues: Record<FilterParam, string | undefined> = { company, insider, country };
   const activeValue = activeValues[paramName];
   const activeLabel = values.find((option) => option.value === activeValue)?.label ?? activeValue;
@@ -62,10 +64,10 @@ export function ColumnFilterDropdown({ label, paramName, values, role, q, compan
             href={{ pathname: "/insider-kaeufe", query: baseQuery }}
             className="block rounded-lg px-2.5 py-1.5 font-medium text-gradient hover:bg-surface"
           >
-            Alle anzeigen
+            {t("showAll")}
           </Link>
         )}
-        {values.length === 0 && <p className="px-2.5 py-1.5 text-muted">Keine Werte gefunden.</p>}
+        {values.length === 0 && <p className="px-2.5 py-1.5 text-muted">{t("noValues")}</p>}
         {values.map((option) => (
           <Link
             key={option.value}

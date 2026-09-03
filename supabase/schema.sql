@@ -112,3 +112,45 @@ create index if not exists institutional_holdings_lookup_idx
   on institutional_holdings (manager_cik, cusip, period_of_report desc);
 
 alter table institutional_holdings enable row level security;
+
+-- One row per auth.users user, tracking subscription tier and the Stripe
+-- identifiers needed to look the user up again from a webhook event (which
+-- only carries Stripe IDs, not the Supabase user id, after checkout).
+create table if not exists profiles (
+  id uuid primary key references auth.users (id) on delete cascade,
+  tier text not null default 'free' check (tier in ('free', 'pro')),
+  stripe_customer_id text unique,
+  stripe_subscription_id text,
+  updated_at timestamptz not null default now()
+);
+
+alter table profiles enable row level security;
+
+create policy "Users can read their own profile"
+  on profiles for select
+  using (auth.uid() = id);
+
+-- No insert/update/delete policy: rows are created by the trigger below and
+-- kept in sync exclusively by the Stripe webhook using the service role key,
+-- which bypasses RLS. Users never write their own tier.
+
+-- search_path during an auth.users insert doesn't include `public`, so the
+-- target table must be schema-qualified here or the insert silently can't
+-- find it and the whole signup fails with a generic "Database error".
+create or replace function handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id) values (new.id);
+  return new;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function handle_new_user();
+
+-- Backfill for accounts created before this trigger existed.
+insert into profiles (id)
+select id from auth.users
+on conflict (id) do nothing;

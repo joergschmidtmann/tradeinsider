@@ -1,0 +1,179 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "insiderKaeufe": "Compras de Insiders",
+    "tradingIntelligence": "Trading Intelligence",
+    "tradingAcademy": "Trading Academy",
+    "login": "Acceder",
+    "konto": "Cuenta",
+    "menuOpen": "Abrir menú",
+    "menuClose": "Cerrar menú"
+  },
+  "footer": {
+    "disclaimer": "Datos de <link>SEC EDGAR</link> (formularios Form 4). Solo con fines informativos — no es asesoramiento de inversión. Consulta siempre la publicación original enlazada. No afiliado a la U.S. Securities and Exchange Commission."
+  },
+  "home": {
+    "heroPrefix": "Bienvenido a",
+    "subtitle": "Tu plataforma para compras de insiders, análisis bursátil y todo sobre trading.",
+    "insiderKaeufe": {
+      "live": "En vivo · SEC EDGAR y EQS News",
+      "heading": "Compras de Insiders",
+      "description": "Compras y ventas de insiders de directivos en tiempo real — EE.UU. (SEC) y Alemania. Cuando los directivos invierten su propio dinero en sus propias acciones, vale la pena prestar atención.",
+      "cta": "Ver ahora →"
+    },
+    "tradingIntelligence": {
+      "soon": "Pronto",
+      "heading": "Trading Intelligence",
+      "description": "Análisis fundamental y técnico de acciones — métricas, patrones de gráficos e indicadores en un solo lugar, en vez de cinco pestañas distintas.",
+      "cta": "Más información →"
+    },
+    "tradingAcademy": {
+      "soon": "Pronto",
+      "heading": "Trading Academy",
+      "description": "Cursos y guías sobre trading — desde los fundamentos hasta tu propia estrategia, paso a paso.",
+      "cta": "Más información →"
+    }
+  },
+  "insiderKaeufe": {
+    "roles": {
+      "managementBoard": "Directivos",
+      "politician": "Políticos",
+      "hedgeFund": "Fondos de Cobertura"
+    },
+    "hero": {
+      "managementBoard": {
+        "eyebrow": "Datos en vivo de SEC EDGAR y EQS News",
+        "highlight": "de directivos.",
+        "subject": "los directivos"
+      },
+      "politician": {
+        "eyebrow": "Datos en vivo de House Stock Watcher (Congreso de EE.UU.)",
+        "highlight": "de políticos de EE.UU.",
+        "subject": "los políticos de EE.UU."
+      },
+      "hedgeFund": {
+        "eyebrow": "Datos en vivo de SEC EDGAR (13F, trimestral)",
+        "highlight": "de fondos de cobertura.",
+        "subject": "los fondos de cobertura"
+      }
+    },
+    "titlePrefix": "Compras de Insiders",
+    "subtitleTemplate": "Cuando {subject} invierten su propio dinero en sus propias acciones, vale la pena prestar atención.",
+    "availability": "Disponible actualmente: EE.UU., Alemania, Austria, España, Suecia, Países Bajos, Bélgica",
+    "hedgeFundNote": "Basado en los informes trimestrales 13F de la SEC (con un retraso de hasta 45 días). El precio es una estimación a fin de trimestre, no el precio de compra real.",
+    "recentPurchases": "Compras Recientes",
+    "noResults": "No se encontraron resultados.",
+    "loadError": "No se pudieron cargar los datos en este momento. Inténtalo de nuevo en un momento.",
+    "back": "← Atrás",
+    "next": "Siguiente →",
+    "searchPlaceholder": "Buscar empresa o ticker…",
+    "table": {
+      "company": "Empresa",
+      "insider": "Insider",
+      "country": "País",
+      "date": "Fecha",
+      "shares": "Acciones",
+      "price": "Precio",
+      "totalValue": "Valor Total",
+      "score": "Puntuación",
+      "filing": "Informe",
+      "view": "Ver",
+      "news": "Noticias",
+      "scoreTooltip": "Indicador calculado automáticamente (0–100) según el cargo, el tamaño de la compra en relación con la posición, el importe total y otros insiders de la misma empresa. No es asesoramiento de inversión.",
+      "showAll": "Mostrar todos",
+      "noValues": "No se encontraron valores."
+    }
+  },
+  "tradingIntelligence": {
+    "title": "Trading Intelligence",
+    "badgeLive": "En vivo · FINRA Reg SHO",
+    "badgeSoon": "Próximamente",
+    "descriptions": {
+      "etfs": "Análisis fundamental y técnico de ETFs próximamente.",
+      "krypto": "Análisis fundamental y técnico de criptomonedas próximamente.",
+      "aktien": "Las 20 acciones estadounidenses más negociadas y las 20 más vendidas en corto de la última semana de negociación."
+    },
+    "etfTypeDescriptions": {
+      "etfs": "Análisis fundamental y técnico de ETFs próximamente.",
+      "leveraged": "Análisis fundamental y técnico de ETFs apalancados próximamente.",
+      "active": "Análisis fundamental y técnico de fondos de gestión activa próximamente.",
+      "commodity": "Análisis fundamental y técnico de ETFs de materias primas próximamente."
+    },
+    "categories": {
+      "etfs": "ETFs",
+      "krypto": "Cripto",
+      "aktien": "Acciones"
+    },
+    "etfTypes": {
+      "etfs": "ETFs",
+      "leveraged": "ETFs Apalancados",
+      "active": "Fondos de Gestión Activa",
+      "commodity": "ETFs de Materias Primas"
+    },
+    "rankTitleLong": "Acciones con mayor volumen de negociación (largo) — últimos {days} días de negociación",
+    "rankTitleShort": "Acciones con mayor volumen de negociación (corto) — últimos {days} días de negociación",
+    "sharesUnit": "acc.",
+    "footnote": "Basado en los archivos diarios de volumen de ventas en corto Reg SHO de FINRA (acciones de EE.UU., ETFs excluidos). Se trata del volumen de ventas en corto realmente ejecutado ese día, no de la posición abierta de interés en corto — un porcentaje alto indica actividad de negociación intensa, no necesariamente una apuesta bajista contra la acción. No es asesoramiento de inversión.",
+    "loadError": "No se pudieron cargar los datos de mercado en este momento. Inténtalo de nuevo más tarde."
+  },
+  "tradingAcademy": {
+    "badge": "Próximamente",
+    "title": "Trading Academy",
+    "description": "Cursos y guías sobre trading próximamente."
+  },
+  "auth": {
+    "login": {
+      "heading": "Iniciar sesión",
+      "subtitle": "Bienvenido de nuevo a tradeinsider.",
+      "emailLabel": "Correo electrónico",
+      "passwordLabel": "Contraseña",
+      "submit": "Iniciar sesión",
+      "submitPending": "Iniciando sesión…",
+      "error": "El correo electrónico o la contraseña son incorrectos.",
+      "noAccount": "¿Aún no tienes una cuenta?",
+      "signUpLink": "Regístrate"
+    },
+    "signup": {
+      "heading": "Crear cuenta",
+      "subtitle": "Regístrate gratis en tradeinsider.",
+      "emailLabel": "Correo electrónico",
+      "passwordLabel": "Contraseña",
+      "passwordHint": "Al menos 8 caracteres.",
+      "submit": "Registrarse",
+      "submitPending": "Creando…",
+      "successHeading": "Casi listo",
+      "successText": "Te hemos enviado un correo de confirmación. Haz clic en el enlace para activar tu cuenta.",
+      "errorTaken": "Este correo electrónico ya está registrado.",
+      "errorGeneric": "Error al registrarse. Inténtalo de nuevo.",
+      "errorPasswordLength": "La contraseña debe tener al menos 8 caracteres.",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "signInLink": "Iniciar sesión"
+    },
+    "konto": {
+      "heading": "Mi Cuenta",
+      "loggedInAs": "Sesión iniciada como {email}",
+      "proBadge": "Pro",
+      "proDescription": "Acceso completo a todas las compras de insiders, incluida la puntuación de insider.",
+      "manageSubscription": "Gestionar suscripción",
+      "upgradeHeading": "Mejorar a Pro",
+      "upgradeDescription": "Desbloquea las compras de insiders de directivos y consejos de supervisión, incluida la puntuación de insider.",
+      "monthly": "Mensual — 14,99 €",
+      "yearly": "Anual — 149 €",
+      "logout": "Cerrar sesión"
+    },
+    "paywall": {
+      "heading": "Solo para miembros Pro",
+      "description": "Las compras de insiders de directivos y consejos de supervisión, incluida la puntuación de insider, forman parte de tradeinsider Pro. Las operaciones de políticos y fondos de cobertura siguen siendo gratuitas.",
+      "ctaLoggedIn": "Mejorar ahora",
+      "ctaLoggedOut": "Regístrate gratis"
+    }
+  },
+  "metadata": {
+    "homeTitle": "tradeinsider — Bienvenido",
+    "homeDescription": "Tu plataforma para compras de insiders, análisis bursátil y todo sobre trading.",
+    "insiderKaeufeTitle": "Compras de Insiders — tradeinsider",
+    "insiderKaeufeDescription": "Compras de insiders de directivos, consejos de supervisión y políticos en tiempo real, basadas en informes oficiales.",
+    "tradingIntelligenceTitle": "Trading Intelligence — tradeinsider",
+    "tradingAcademyTitle": "Trading Academy — tradeinsider"
+  }
+}

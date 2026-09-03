@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { HEDGE_FUNDS } from "@/scripts/lib/hedgeFunds";
-import { COUNTRIES } from "@/lib/countries";
+import { COUNTRIES, countryLabel } from "@/lib/countries";
+import type { Locale } from "@/i18n/routing";
 
 export interface BaseTransactionFilters {
   // Array rather than a single value because "Vorstand" in the UI covers both
@@ -48,13 +49,14 @@ export interface ColumnFilterOption {
 export async function fetchDistinctValues(
   supabase: SupabaseClient,
   column: "issuer_name" | "owner_name" | "source_country",
-  filters: BaseTransactionFilters
+  filters: BaseTransactionFilters,
+  locale: Locale
 ): Promise<ColumnFilterOption[]> {
   if (isHedgeFundOwnerQuery(column, filters)) {
     return fetchHedgeFundCounts(supabase, filters);
   }
   if (column === "source_country") {
-    return fetchCountryCounts(supabase, filters);
+    return fetchCountryCounts(supabase, filters, locale);
   }
 
   const query = applyBaseFilters(supabase.from("transactions").select(column), filters).range(0, 999);
@@ -97,7 +99,7 @@ async function fetchHedgeFundCounts(supabase: SupabaseClient, filters: BaseTrans
  * the universe of countries is small and fixed, so an exact count per code
  * is both cheap and correct — no risk of the scan-and-dedupe row cap ever
  * hiding a country. */
-async function fetchCountryCounts(supabase: SupabaseClient, filters: BaseTransactionFilters): Promise<ColumnFilterOption[]> {
+async function fetchCountryCounts(supabase: SupabaseClient, filters: BaseTransactionFilters, locale: Locale): Promise<ColumnFilterOption[]> {
   const counts = await Promise.all(
     COUNTRIES.map(async (country) => {
       const { count, error } = await applyBaseFilters(
@@ -105,7 +107,7 @@ async function fetchCountryCounts(supabase: SupabaseClient, filters: BaseTransac
         filters
       ).eq("source_country", country.code);
       if (error) throw error;
-      return { value: country.code, label: country.label, count: count ?? 0 };
+      return { value: country.code, label: countryLabel(country.code, locale), count: count ?? 0 };
     })
   );
   return counts.filter((c) => c.count > 0).sort((a, b) => b.count - a.count);

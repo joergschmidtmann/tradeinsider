@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { CategoryToggle } from "@/components/CategoryToggle";
 import { EtfTypeToggle } from "@/components/EtfTypeToggle";
 import { getWeeklyStockRankings, type RankedStock } from "@/lib/marketVolume";
+import type { Locale } from "@/i18n/routing";
 
-export const metadata: Metadata = { title: "Trading Intelligence — tradeinsider" };
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata" });
+  return { title: t("tradingIntelligenceTitle") };
+}
 
 const CATEGORIES = ["etfs", "krypto", "aktien"] as const;
 type Category = (typeof CATEGORIES)[number];
@@ -19,21 +25,7 @@ function isEtfType(value: string): value is EtfType {
   return (ETF_TYPES as readonly string[]).includes(value);
 }
 
-const DESCRIPTIONS: Record<Category, string> = {
-  etfs: "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
-  krypto: "Fundamentale und technische Analysen zu Kryptowährungen folgen in Kürze.",
-  aktien: "Die 20 meistgehandelten und die 20 meist leerverkauften US-Aktien der letzten Handelswoche.",
-};
-
-const ETF_TYPE_DESCRIPTIONS: Record<EtfType, string> = {
-  etfs: "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
-  leveraged: "Fundamentale und technische Analysen zu gehebelten ETFs folgen in Kürze.",
-  active: "Fundamentale und technische Analysen zu aktiv gemanagten Fonds folgen in Kürze.",
-  commodity: "Fundamentale und technische Analysen zu Rohstoff-ETFs folgen in Kürze.",
-};
-
-const numberFormatter = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 });
-const percentFormatter = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const INTL_LOCALES: Record<Locale, string> = { de: "de-DE", en: "en-US", es: "es-ES" };
 
 function RankTable({
   title,
@@ -74,22 +66,29 @@ function RankTable({
 }
 
 interface PageProps {
+  params: Promise<{ locale: Locale }>;
   searchParams: Promise<{ category?: string; etfType?: string }>;
 }
 
-export default async function Page({ searchParams }: PageProps) {
-  const params = await searchParams;
-  const category: Category = isCategory(params.category ?? "") ? (params.category as Category) : "aktien";
-  const etfType: EtfType = isEtfType(params.etfType ?? "") ? (params.etfType as EtfType) : "etfs";
+export default async function Page({ params, searchParams }: PageProps) {
+  const { locale } = await params;
+  const sp = await searchParams;
+  const t = await getTranslations("tradingIntelligence");
+  const category: Category = isCategory(sp.category ?? "") ? (sp.category as Category) : "aktien";
+  const etfType: EtfType = isEtfType(sp.etfType ?? "") ? (sp.etfType as EtfType) : "etfs";
   const rankings = category === "aktien" ? await getWeeklyStockRankings() : null;
-  const description = category === "etfs" ? ETF_TYPE_DESCRIPTIONS[etfType] : DESCRIPTIONS[category];
+  const description = category === "etfs" ? t(`etfTypeDescriptions.${etfType}`) : t(`descriptions.${category}`);
+
+  const uiLocale = INTL_LOCALES[locale];
+  const numberFormatter = new Intl.NumberFormat(uiLocale, { maximumFractionDigits: 0 });
+  const percentFormatter = new Intl.NumberFormat(uiLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col items-center px-4 py-24 text-center sm:px-6">
       <span className="rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
-        {category === "aktien" ? "Live · FINRA Reg SHO" : "Bald verfügbar"}
+        {category === "aktien" ? t("badgeLive") : t("badgeSoon")}
       </span>
-      <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">Trading Intelligence</h1>
+      <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">{t("title")}</h1>
       <p className="mt-4 max-w-xl text-lg text-muted">{description}</p>
       <div className="mt-8">
         <CategoryToggle activeCode={category} />
@@ -106,25 +105,20 @@ export default async function Page({ searchParams }: PageProps) {
           <div className="mt-12 w-full text-left">
             <div className="grid gap-8 lg:grid-cols-2">
               <RankTable
-                title={`Aktien mit dem höchsten Handelsvolumen (long) — letzte ${rankings.tradingDays} Handelstage`}
+                title={t("rankTitleLong", { days: rankings.tradingDays })}
                 rows={rankings.mostTraded}
-                renderValue={(row) => `${numberFormatter.format(row.totalVolume)} Stk.`}
+                renderValue={(row) => `${numberFormatter.format(row.totalVolume)} ${t("sharesUnit")}`}
               />
               <RankTable
-                title={`Aktien mit dem höchsten Handelsvolumen (short) — letzte ${rankings.tradingDays} Handelstage`}
+                title={t("rankTitleShort", { days: rankings.tradingDays })}
                 rows={rankings.mostShorted}
                 renderValue={(row) => `${percentFormatter.format(row.shortRatio)} %`}
               />
             </div>
-            <p className="mx-auto mt-6 max-w-2xl text-xs text-muted">
-              Basiert auf den täglichen Reg-SHO-Leerverkaufsvolumen-Dateien der FINRA (US-Aktien, ETFs
-              ausgeschlossen). Das ist das tatsächlich als Leerverkauf ausgeführte Handelsvolumen des Tages, nicht
-              die offene Short-Interest-Position — ein hoher Anteil zeigt reges Handelsgeschehen, nicht automatisch
-              eine bearishe Wette gegen die Aktie. Keine Anlageberatung.
-            </p>
+            <p className="mx-auto mt-6 max-w-2xl text-xs text-muted">{t("footnote")}</p>
           </div>
         ) : (
-          <p className="mt-12 text-sm text-red-400">Marktdaten konnten gerade nicht geladen werden. Bitte später erneut versuchen.</p>
+          <p className="mt-12 text-sm text-red-400">{t("loadError")}</p>
         ))}
     </div>
   );

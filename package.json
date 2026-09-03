@@ -15,16 +15,20 @@
     "ingest:se": "tsx scripts/ingest-se.ts",
     "ingest:nl": "tsx scripts/ingest-nl.ts",
     "ingest:be": "tsx scripts/ingest-be.ts",
-    "backfill:insider-scores": "tsx scripts/backfill-insider-scores.ts"
+    "backfill:insider-scores": "tsx scripts/backfill-insider-scores.ts",
+    "setup:stripe": "tsx scripts/setup-stripe.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.3",
     "@vercel/analytics": "^2.0.1",
     "fast-xml-parser": "^5.11.0",
     "next": "16.3.2",
+    "next-intl": "^4.14.2",
     "pdf-parse": "^2.4.5",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "stripe": "^22.6.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

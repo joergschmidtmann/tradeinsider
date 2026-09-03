@@ -1,8 +1,10 @@
+import { useTranslations } from "next-intl";
 import { ColumnFilterDropdown } from "./ColumnFilterDropdown";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
 import { convertToEur } from "@/lib/fxRates";
 import { translateTitle } from "@/lib/translateTitle";
 import { countryLabel } from "@/lib/countries";
+import type { Locale } from "@/i18n/routing";
 
 export interface TransactionRow {
   id: number;
@@ -21,8 +23,8 @@ export interface TransactionRow {
   insider_score: number | null;
 }
 
-const dateFormatter = new Intl.DateTimeFormat("de-DE", { year: "numeric", month: "short", day: "numeric" });
-const numberFormatter = new Intl.NumberFormat("de-DE");
+// Maps our app locales to full Intl locale tags for date/number formatting.
+const INTL_LOCALES: Record<Locale, string> = { de: "de-DE", en: "en-US", es: "es-ES" };
 
 // Each currency reads naturally in its own locale ($1,234.56 / 1.234,56 € /
 // 1 234,56 kr); NOK falls back to sv-SE too since we don't otherwise source
@@ -37,8 +39,8 @@ const CURRENCY_LOCALES: Record<string, string> = {
   ZAR: "en-ZA",
   CZK: "cs-CZ",
 };
-function formatCurrency(value: number, currency: string): string {
-  const locale = CURRENCY_LOCALES[currency] ?? "de-DE";
+function formatCurrency(value: number, currency: string, uiLocale: string): string {
+  const locale = CURRENCY_LOCALES[currency] ?? uiLocale;
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
 }
 
@@ -46,27 +48,26 @@ function CurrencyCell({
   amount,
   currency,
   eurRates,
+  uiLocale,
   fallback,
 }: {
   amount: number | null;
   currency: string;
   eurRates: Record<string, number>;
+  uiLocale: string;
   fallback?: string;
 }) {
   if (amount === null) return <>{fallback ?? "—"}</>;
   const eurAmount = convertToEur(amount, currency, eurRates);
   return (
     <>
-      <div>{formatCurrency(amount, currency)}</div>
-      {eurAmount !== null && <div className="text-xs font-normal text-muted">≈ {formatCurrency(eurAmount, "EUR")}</div>}
+      <div>{formatCurrency(amount, currency, uiLocale)}</div>
+      {eurAmount !== null && <div className="text-xs font-normal text-muted">≈ {formatCurrency(eurAmount, "EUR", uiLocale)}</div>}
     </>
   );
 }
 
-const SCORE_TOOLTIP =
-  "Automatisch berechneter Indikator (0–100) aus Rolle, Kaufgröße relativ zum Bestand, Gesamtsumme und weiteren Insidern derselben Firma. Keine Anlageempfehlung.";
-
-function ScoreBadge({ score }: { score: number }) {
+function ScoreBadge({ score, tooltip }: { score: number; tooltip: string }) {
   const colorClass =
     score >= 75
       ? "bg-emerald-500/15 text-emerald-400"
@@ -74,7 +75,7 @@ function ScoreBadge({ score }: { score: number }) {
         ? "bg-amber-500/15 text-amber-400"
         : "bg-surface-2 text-muted";
   return (
-    <span title={SCORE_TOOLTIP} className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-2.5 py-1 text-xs font-semibold ${colorClass}`}>
+    <span title={tooltip} className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-2.5 py-1 text-xs font-semibold ${colorClass}`}>
       {score}
     </span>
   );
@@ -93,6 +94,7 @@ interface TransactionsTableProps {
   showScore: boolean;
   showCountry: boolean;
   eurRates: Record<string, number>;
+  locale: Locale;
 }
 
 export function TransactionsTable({
@@ -108,11 +110,17 @@ export function TransactionsTable({
   showScore,
   showCountry,
   eurRates,
+  locale,
 }: TransactionsTableProps) {
+  const t = useTranslations("insiderKaeufe");
+  const uiLocale = INTL_LOCALES[locale];
+  const dateFormatter = new Intl.DateTimeFormat(uiLocale, { year: "numeric", month: "short", day: "numeric" });
+  const numberFormatter = new Intl.NumberFormat(uiLocale);
+
   if (rows.length === 0) {
     return (
       <div className="rounded-2xl border border-border bg-surface px-6 py-16 text-center text-sm text-muted">
-        Keine Treffer gefunden.
+        {t("noResults")}
       </div>
     );
   }
@@ -125,7 +133,7 @@ export function TransactionsTable({
             <tr className="border-b border-border text-left text-xs tracking-wide text-muted uppercase">
               <th className="px-5 py-3.5 font-medium">
                 <ColumnFilterDropdown
-                  label="Unternehmen"
+                  label={t("table.company")}
                   paramName="company"
                   values={companyOptions}
                   role={role}
@@ -137,7 +145,7 @@ export function TransactionsTable({
               </th>
               <th className="px-5 py-3.5 font-medium">
                 <ColumnFilterDropdown
-                  label="Insider"
+                  label={t("table.insider")}
                   paramName="insider"
                   values={insiderOptions}
                   role={role}
@@ -150,7 +158,7 @@ export function TransactionsTable({
               {showCountry && (
                 <th className="px-5 py-3.5 font-medium">
                   <ColumnFilterDropdown
-                    label="Land"
+                    label={t("table.country")}
                     paramName="country"
                     values={countryOptions}
                     role={role}
@@ -161,16 +169,16 @@ export function TransactionsTable({
                   />
                 </th>
               )}
-              <th className="px-5 py-3.5 font-medium">Datum</th>
-              <th className="px-5 py-3.5 text-right font-medium">Aktien</th>
-              <th className="px-5 py-3.5 text-right font-medium">Preis</th>
-              <th className="px-5 py-3.5 text-right font-medium">Gesamtwert</th>
+              <th className="px-5 py-3.5 font-medium">{t("table.date")}</th>
+              <th className="px-5 py-3.5 text-right font-medium">{t("table.shares")}</th>
+              <th className="px-5 py-3.5 text-right font-medium">{t("table.price")}</th>
+              <th className="px-5 py-3.5 text-right font-medium">{t("table.totalValue")}</th>
               {showScore && (
-                <th className="px-5 py-3.5 text-right font-medium" title={SCORE_TOOLTIP}>
-                  Score
+                <th className="px-5 py-3.5 text-right font-medium" title={t("table.scoreTooltip")}>
+                  {t("table.score")}
                 </th>
               )}
-              <th className="px-5 py-3.5 font-medium">Meldung</th>
+              <th className="px-5 py-3.5 font-medium">{t("table.filing")}</th>
             </tr>
           </thead>
           <tbody>
@@ -182,10 +190,10 @@ export function TransactionsTable({
                 </td>
                 <td className="px-5 py-3.5">
                   <div className="text-foreground">{row.owner_name}</div>
-                  {row.owner_title && <div className="text-xs text-muted">{translateTitle(row.owner_title)}</div>}
+                  {row.owner_title && <div className="text-xs text-muted">{translateTitle(row.owner_title, locale)}</div>}
                 </td>
                 {showCountry && (
-                  <td className="px-5 py-3.5 whitespace-nowrap text-foreground">{countryLabel(row.source_country)}</td>
+                  <td className="px-5 py-3.5 whitespace-nowrap text-foreground">{countryLabel(row.source_country, locale)}</td>
                 )}
                 <td className="px-5 py-3.5 whitespace-nowrap text-muted">
                   {dateFormatter.format(new Date(row.transaction_date))}
@@ -194,19 +202,24 @@ export function TransactionsTable({
                   {row.shares !== null ? numberFormatter.format(row.shares) : "—"}
                 </td>
                 <td className="px-5 py-3.5 text-right whitespace-nowrap text-foreground">
-                  <CurrencyCell amount={row.price_per_share} currency={row.currency} eurRates={eurRates} />
+                  <CurrencyCell amount={row.price_per_share} currency={row.currency} eurRates={eurRates} uiLocale={uiLocale} />
                 </td>
                 <td className="px-5 py-3.5 text-right whitespace-nowrap font-medium text-foreground">
                   <CurrencyCell
                     amount={row.total_value}
                     currency={row.currency}
                     eurRates={eurRates}
+                    uiLocale={uiLocale}
                     fallback={row.amount_range ?? "—"}
                   />
                 </td>
                 {showScore && (
                   <td className="px-5 py-3.5 text-right whitespace-nowrap">
-                    {row.insider_score !== null ? <ScoreBadge score={row.insider_score} /> : <span className="text-muted">—</span>}
+                    {row.insider_score !== null ? (
+                      <ScoreBadge score={row.insider_score} tooltip={t("table.scoreTooltip")} />
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
                   </td>
                 )}
                 <td className="px-5 py-3.5 whitespace-nowrap">
@@ -216,7 +229,16 @@ export function TransactionsTable({
                     rel="noopener noreferrer"
                     className="text-gradient font-medium hover:opacity-80"
                   >
-                    Ansehen
+                    {t("table.view")}
+                  </a>
+                  <span className="text-muted"> · </span>
+                  <a
+                    href={`https://news.google.com/search?q=${encodeURIComponent(row.issuer_name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted hover:text-foreground"
+                  >
+                    {t("table.news")}
                   </a>
                 </td>
               </tr>

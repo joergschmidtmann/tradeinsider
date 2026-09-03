@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 function InsiderKaeufeIllustration() {
   return (
@@ -155,15 +156,15 @@ const SCRIM_BACKGROUND =
   "radial-gradient(ellipse 72% 68% at 50% 50%, rgba(4,4,7,0.82) 0%, rgba(4,4,7,0.58) 42%, rgba(4,4,7,0.18) 68%, transparent 86%)";
 
 export default function Home() {
+  const t = useTranslations("home");
+
   return (
     <main className="flex-1">
       <section className="mx-auto max-w-4xl px-4 pt-24 pb-16 text-center sm:px-6 sm:pt-32">
         <h1 className="text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
-          Willkommen bei <span className="text-gradient">tradeinsider</span>
+          {t("heroPrefix")} <span className="text-gradient">tradeinsider</span>
         </h1>
-        <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">
-          Deine Plattform für Insider-Käufe, Aktienanalysen und alles rund ums Trading.
-        </p>
+        <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">{t("subtitle")}</p>
       </section>
 
       <div className="mx-auto flex max-w-6xl flex-col px-4 pb-24 sm:px-6">
@@ -182,20 +183,19 @@ export default function Home() {
                 <span className="relative h-[7px] w-[7px] rounded-full bg-gradient-accent">
                   <span className="absolute -inset-[5px] animate-[home-livepulse_2.2s_ease-out_infinite] rounded-full border border-[#a855f7] motion-reduce:animate-none" />
                 </span>
-                Live · SEC EDGAR &amp; EQS News
+                {t("insiderKaeufe.live")}
               </p>
               <h2 className="mb-4 text-[clamp(2rem,4vw,2.75rem)] font-extrabold tracking-tight text-balance [text-shadow:0_4px_26px_rgba(0,0,0,0.55)]">
-                Insider Käufe
+                {t("insiderKaeufe.heading")}
               </h2>
               <p className="mb-8 max-w-xl text-[1.08rem] leading-relaxed text-[#d4d4d9] [text-shadow:0_2px_16px_rgba(0,0,0,0.6)]">
-                Insider-Käufe und -Verkäufe von Vorständen in Echtzeit — USA (SEC) und Deutschland. Wenn
-                Führungskräfte eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.
+                {t("insiderKaeufe.description")}
               </p>
               <Link
                 href="/insider-kaeufe"
                 className="inline-flex items-center gap-1.5 rounded-full bg-gradient-accent px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_-8px_rgba(168,85,247,0.55)] transition hover:-translate-y-px hover:opacity-90"
               >
-                Jetzt ansehen →
+                {t("insiderKaeufe.cta")}
               </Link>
             </div>
           </div>
@@ -214,21 +214,20 @@ export default function Home() {
             <div className="absolute inset-0 flex flex-col items-center justify-center px-8 py-10 text-center sm:px-10">
               <p className="mb-4">
                 <span className="rounded-full border border-white/[0.18] bg-black/50 px-3 py-1 text-[11px] font-medium tracking-wide text-foreground uppercase backdrop-blur-sm">
-                  Bald
+                  {t("tradingIntelligence.soon")}
                 </span>
               </p>
               <h2 className="mb-4 text-[clamp(2rem,4vw,2.75rem)] font-extrabold tracking-tight text-balance [text-shadow:0_4px_26px_rgba(0,0,0,0.55)]">
-                Trading Intelligence
+                {t("tradingIntelligence.heading")}
               </h2>
               <p className="mb-8 max-w-xl text-[1.08rem] leading-relaxed text-[#d4d4d9] [text-shadow:0_2px_16px_rgba(0,0,0,0.6)]">
-                Fundamentale und technische Analysen zu Aktien — Kennzahlen, Chartmuster und Indikatoren an
-                einem Ort, statt in fünf verschiedenen Tabs.
+                {t("tradingIntelligence.description")}
               </p>
               <Link
                 href="/trading-intelligence"
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.18] bg-black/45 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur-sm transition hover:-translate-y-px hover:border-white/35"
               >
-                Mehr erfahren →
+                {t("tradingIntelligence.cta")}
               </Link>
             </div>
           </div>
@@ -247,21 +246,20 @@ export default function Home() {
             <div className="absolute inset-0 flex flex-col items-center justify-center px-8 py-10 text-center sm:px-10">
               <p className="mb-4">
                 <span className="rounded-full border border-white/[0.18] bg-black/50 px-3 py-1 text-[11px] font-medium tracking-wide text-foreground uppercase backdrop-blur-sm">
-                  Bald
+                  {t("tradingAcademy.soon")}
                 </span>
               </p>
               <h2 className="mb-4 text-[clamp(2rem,4vw,2.75rem)] font-extrabold tracking-tight text-balance [text-shadow:0_4px_26px_rgba(0,0,0,0.55)]">
-                Trading Academy
+                {t("tradingAcademy.heading")}
               </h2>
               <p className="mb-8 max-w-xl text-[1.08rem] leading-relaxed text-[#d4d4d9] [text-shadow:0_2px_16px_rgba(0,0,0,0.6)]">
-                Kurse und Guides rund ums Trading — von den Grundlagen bis zur eigenen Strategie, Schritt
-                für Schritt aufgebaut.
+                {t("tradingAcademy.description")}
               </p>
               <Link
                 href="/trading-academy"
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.18] bg-black/45 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur-sm transition hover:-translate-y-px hover:border-white/35"
               >
-                Mehr erfahren →
+                {t("tradingAcademy.cta")}
               </Link>
             </div>
           </div>

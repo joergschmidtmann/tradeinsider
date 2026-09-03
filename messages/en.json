@@ -1,0 +1,179 @@
+{
+  "nav": {
+    "home": "Home",
+    "insiderKaeufe": "Insider Trades",
+    "tradingIntelligence": "Trading Intelligence",
+    "tradingAcademy": "Trading Academy",
+    "login": "Login",
+    "konto": "Account",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu"
+  },
+  "footer": {
+    "disclaimer": "Data from <link>SEC EDGAR</link> (Form 4 filings). For informational purposes only — not investment advice. Always check the linked original filing. Not affiliated with the U.S. Securities and Exchange Commission."
+  },
+  "home": {
+    "heroPrefix": "Welcome to",
+    "subtitle": "Your platform for insider trades, stock analysis, and everything trading.",
+    "insiderKaeufe": {
+      "live": "Live · SEC EDGAR & EQS News",
+      "heading": "Insider Trades",
+      "description": "Insider buys and sells by executives in real time — US (SEC) and Germany. When executives put their own money into their own stock, it's worth a second look.",
+      "cta": "View now →"
+    },
+    "tradingIntelligence": {
+      "soon": "Soon",
+      "heading": "Trading Intelligence",
+      "description": "Fundamental and technical stock analysis — metrics, chart patterns, and indicators in one place instead of five different tabs.",
+      "cta": "Learn more →"
+    },
+    "tradingAcademy": {
+      "soon": "Soon",
+      "heading": "Trading Academy",
+      "description": "Courses and guides about trading — from the basics to your own strategy, built step by step.",
+      "cta": "Learn more →"
+    }
+  },
+  "insiderKaeufe": {
+    "roles": {
+      "managementBoard": "Executives",
+      "politician": "Politicians",
+      "hedgeFund": "Hedge Funds"
+    },
+    "hero": {
+      "managementBoard": {
+        "eyebrow": "Live data from SEC EDGAR & EQS News",
+        "highlight": "by executives.",
+        "subject": "executives"
+      },
+      "politician": {
+        "eyebrow": "Live data from House Stock Watcher (US Congress)",
+        "highlight": "by US politicians.",
+        "subject": "US politicians"
+      },
+      "hedgeFund": {
+        "eyebrow": "Live data from SEC EDGAR (13F, quarterly)",
+        "highlight": "by hedge funds.",
+        "subject": "hedge funds"
+      }
+    },
+    "titlePrefix": "Insider Trades",
+    "subtitleTemplate": "When {subject} put their own money into their own stock, it's worth a second look.",
+    "availability": "Currently available: USA, Germany, Austria, Spain, Sweden, Netherlands, Belgium",
+    "hedgeFundNote": "Based on quarterly SEC 13F filings (up to 45 days delayed). Price is an estimate as of quarter-end, not the actual purchase price.",
+    "recentPurchases": "Recent Purchases",
+    "noResults": "No results found.",
+    "loadError": "Data couldn't be loaded right now. Please try again shortly.",
+    "back": "← Back",
+    "next": "Next →",
+    "searchPlaceholder": "Search company or ticker…",
+    "table": {
+      "company": "Company",
+      "insider": "Insider",
+      "country": "Country",
+      "date": "Date",
+      "shares": "Shares",
+      "price": "Price",
+      "totalValue": "Total Value",
+      "score": "Score",
+      "filing": "Filing",
+      "view": "View",
+      "news": "News",
+      "scoreTooltip": "Automatically calculated indicator (0–100) based on role, purchase size relative to holdings, total amount, and other insiders at the same company. Not investment advice.",
+      "showAll": "Show all",
+      "noValues": "No values found."
+    }
+  },
+  "tradingIntelligence": {
+    "title": "Trading Intelligence",
+    "badgeLive": "Live · FINRA Reg SHO",
+    "badgeSoon": "Coming soon",
+    "descriptions": {
+      "etfs": "Fundamental and technical ETF analysis coming soon.",
+      "krypto": "Fundamental and technical crypto analysis coming soon.",
+      "aktien": "The 20 most-traded and 20 most-shorted US stocks of the past trading week."
+    },
+    "etfTypeDescriptions": {
+      "etfs": "Fundamental and technical ETF analysis coming soon.",
+      "leveraged": "Fundamental and technical analysis of leveraged ETFs coming soon.",
+      "active": "Fundamental and technical analysis of actively managed funds coming soon.",
+      "commodity": "Fundamental and technical analysis of commodity ETFs coming soon."
+    },
+    "categories": {
+      "etfs": "ETFs",
+      "krypto": "Crypto",
+      "aktien": "Stocks"
+    },
+    "etfTypes": {
+      "etfs": "ETFs",
+      "leveraged": "Leveraged ETFs",
+      "active": "Actively Managed Funds",
+      "commodity": "Commodity ETFs"
+    },
+    "rankTitleLong": "Stocks with the highest trading volume (long) — last {days} trading days",
+    "rankTitleShort": "Stocks with the highest trading volume (short) — last {days} trading days",
+    "sharesUnit": "shares",
+    "footnote": "Based on FINRA's daily Reg SHO short volume files (US stocks, ETFs excluded). This is the day's actual executed short-sale volume, not the open short-interest position — a high share indicates active trading, not automatically a bearish bet against the stock. Not investment advice.",
+    "loadError": "Market data couldn't be loaded right now. Please try again later."
+  },
+  "tradingAcademy": {
+    "badge": "Coming soon",
+    "title": "Trading Academy",
+    "description": "Courses and guides about trading coming soon."
+  },
+  "auth": {
+    "login": {
+      "heading": "Sign in",
+      "subtitle": "Welcome back to tradeinsider.",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "submitPending": "Signing in…",
+      "error": "Email or password is incorrect.",
+      "noAccount": "Don't have an account yet?",
+      "signUpLink": "Sign up"
+    },
+    "signup": {
+      "heading": "Create account",
+      "subtitle": "Sign up for free at tradeinsider.",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "passwordHint": "At least 8 characters.",
+      "submit": "Sign up",
+      "submitPending": "Creating…",
+      "successHeading": "Almost there",
+      "successText": "We've sent you a confirmation email. Click the link in it to activate your account.",
+      "errorTaken": "This email is already registered.",
+      "errorGeneric": "Sign-up failed. Please try again.",
+      "errorPasswordLength": "Password must be at least 8 characters long.",
+      "haveAccount": "Already have an account?",
+      "signInLink": "Sign in"
+    },
+    "konto": {
+      "heading": "My Account",
+      "loggedInAs": "Signed in as {email}",
+      "proBadge": "Pro",
+      "proDescription": "Full access to all insider trades incl. insider score.",
+      "manageSubscription": "Manage subscription",
+      "upgradeHeading": "Upgrade to Pro",
+      "upgradeDescription": "Unlock insider trades by executives and supervisory board members incl. insider score.",
+      "monthly": "Monthly — €14.99",
+      "yearly": "Yearly — €149",
+      "logout": "Sign out"
+    },
+    "paywall": {
+      "heading": "Pro members only",
+      "description": "Insider trades by executives and supervisory board members incl. insider score are part of tradeinsider Pro. Politician and hedge fund trades remain free.",
+      "ctaLoggedIn": "Upgrade now",
+      "ctaLoggedOut": "Sign up for free"
+    }
+  },
+  "metadata": {
+    "homeTitle": "tradeinsider — Welcome",
+    "homeDescription": "Your platform for insider trades, stock analysis, and everything trading.",
+    "insiderKaeufeTitle": "Insider Trades — tradeinsider",
+    "insiderKaeufeDescription": "Insider trades by executives, supervisory board members, and politicians in real time, based on official filings.",
+    "tradingIntelligenceTitle": "Trading Intelligence — tradeinsider",
+    "tradingAcademyTitle": "Trading Academy — tradeinsider"
+  }
+}

@@ -1,15 +1,18 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 // "Vorstand" also covers supervisory-board rows (role="supervisory_board")
-// under the hood — see the `roles` expansion in app/insider-kaeufe/page.tsx.
+// under the hood — see the `roles` expansion in app/[locale]/insider-kaeufe/page.tsx.
 // Per-row owner_title still shows which one a given transaction actually was.
 const ROLES = [
-  { code: "management_board", label: "Vorstand" },
-  { code: "politician", label: "Politiker" },
-  { code: "hedge_fund", label: "Hedgefonds" },
+  { code: "management_board", labelKey: "managementBoard" },
+  { code: "politician", labelKey: "politician" },
+  { code: "hedge_fund", labelKey: "hedgeFund" },
 ] as const;
 
 export function RoleToggle({ activeCode, q }: { activeCode: string; q: string }) {
+  const t = useTranslations("insiderKaeufe.roles");
+
   return (
     <div className="inline-flex rounded-full border border-border bg-surface p-1 text-sm">
       {ROLES.map((role) => {
@@ -27,7 +30,7 @@ export function RoleToggle({ activeCode, q }: { activeCode: string; q: string })
                 : "rounded-full px-4 py-1.5 text-muted transition-colors hover:text-foreground"
             }
           >
-            {role.label}
+            {t(role.labelKey)}
           </Link>
         );
       })}

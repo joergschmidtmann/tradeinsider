@@ -1,0 +1,179 @@
+{
+  "nav": {
+    "home": "Home",
+    "insiderKaeufe": "Insider Käufe",
+    "tradingIntelligence": "Trading Intelligence",
+    "tradingAcademy": "Trading Academy",
+    "login": "Login",
+    "konto": "Konto",
+    "menuOpen": "Menü öffnen",
+    "menuClose": "Menü schließen"
+  },
+  "footer": {
+    "disclaimer": "Daten von <link>SEC EDGAR</link> (Form-4-Meldungen). Nur zu Informationszwecken — keine Anlageberatung. Bitte immer die verlinkte Original-Meldung prüfen. Nicht verbunden mit der U.S. Securities and Exchange Commission."
+  },
+  "home": {
+    "heroPrefix": "Willkommen bei",
+    "subtitle": "Deine Plattform für Insider-Käufe, Aktienanalysen und alles rund ums Trading.",
+    "insiderKaeufe": {
+      "live": "Live · SEC EDGAR & EQS News",
+      "heading": "Insider Käufe",
+      "description": "Insider-Käufe und -Verkäufe von Vorständen in Echtzeit — USA (SEC) und Deutschland. Wenn Führungskräfte eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.",
+      "cta": "Jetzt ansehen →"
+    },
+    "tradingIntelligence": {
+      "soon": "Bald",
+      "heading": "Trading Intelligence",
+      "description": "Fundamentale und technische Analysen zu Aktien — Kennzahlen, Chartmuster und Indikatoren an einem Ort, statt in fünf verschiedenen Tabs.",
+      "cta": "Mehr erfahren →"
+    },
+    "tradingAcademy": {
+      "soon": "Bald",
+      "heading": "Trading Academy",
+      "description": "Kurse und Guides rund ums Trading — von den Grundlagen bis zur eigenen Strategie, Schritt für Schritt aufgebaut.",
+      "cta": "Mehr erfahren →"
+    }
+  },
+  "insiderKaeufe": {
+    "roles": {
+      "managementBoard": "Vorstand",
+      "politician": "Politiker",
+      "hedgeFund": "Hedgefonds"
+    },
+    "hero": {
+      "managementBoard": {
+        "eyebrow": "Live-Daten von SEC EDGAR & EQS News",
+        "highlight": "von Vorständen.",
+        "subject": "Vorstände"
+      },
+      "politician": {
+        "eyebrow": "Live-Daten von House Stock Watcher (US-Kongress)",
+        "highlight": "von US-Politikern.",
+        "subject": "US-Politiker"
+      },
+      "hedgeFund": {
+        "eyebrow": "Live-Daten von SEC EDGAR (13F, vierteljährlich)",
+        "highlight": "von Hedgefonds.",
+        "subject": "Hedgefonds"
+      }
+    },
+    "titlePrefix": "Insider-Käufe",
+    "subtitleTemplate": "Wenn {subject} eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.",
+    "availability": "Aktuell verfügbar: USA, Deutschland, Österreich, Spanien, Schweden, Niederlande, Belgien",
+    "hedgeFundNote": "Basiert auf vierteljährlichen SEC-13F-Meldungen (bis zu 45 Tage verzögert). Preis ist eine Schätzung zum Quartalsende, kein tatsächlicher Kaufpreis.",
+    "recentPurchases": "Aktuelle Käufe",
+    "noResults": "Keine Treffer gefunden.",
+    "loadError": "Daten konnten gerade nicht geladen werden. Bitte gleich nochmal versuchen.",
+    "back": "← Zurück",
+    "next": "Weiter →",
+    "searchPlaceholder": "Firma oder Ticker suchen…",
+    "table": {
+      "company": "Unternehmen",
+      "insider": "Insider",
+      "country": "Land",
+      "date": "Datum",
+      "shares": "Aktien",
+      "price": "Preis",
+      "totalValue": "Gesamtwert",
+      "score": "Score",
+      "filing": "Meldung",
+      "view": "Ansehen",
+      "news": "News",
+      "scoreTooltip": "Automatisch berechneter Indikator (0–100) aus Rolle, Kaufgröße relativ zum Bestand, Gesamtsumme und weiteren Insidern derselben Firma. Keine Anlageempfehlung.",
+      "showAll": "Alle anzeigen",
+      "noValues": "Keine Werte gefunden."
+    }
+  },
+  "tradingIntelligence": {
+    "title": "Trading Intelligence",
+    "badgeLive": "Live · FINRA Reg SHO",
+    "badgeSoon": "Bald verfügbar",
+    "descriptions": {
+      "etfs": "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
+      "krypto": "Fundamentale und technische Analysen zu Kryptowährungen folgen in Kürze.",
+      "aktien": "Die 20 meistgehandelten und die 20 meist leerverkauften US-Aktien der letzten Handelswoche."
+    },
+    "etfTypeDescriptions": {
+      "etfs": "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
+      "leveraged": "Fundamentale und technische Analysen zu gehebelten ETFs folgen in Kürze.",
+      "active": "Fundamentale und technische Analysen zu aktiv gemanagten Fonds folgen in Kürze.",
+      "commodity": "Fundamentale und technische Analysen zu Rohstoff-ETFs folgen in Kürze."
+    },
+    "categories": {
+      "etfs": "ETFs",
+      "krypto": "Krypto",
+      "aktien": "Aktien"
+    },
+    "etfTypes": {
+      "etfs": "ETFs",
+      "leveraged": "Gehebelte ETFs",
+      "active": "Aktiv gemanagte Fonds",
+      "commodity": "Rohstoff ETFs"
+    },
+    "rankTitleLong": "Aktien mit dem höchsten Handelsvolumen (long) — letzte {days} Handelstage",
+    "rankTitleShort": "Aktien mit dem höchsten Handelsvolumen (short) — letzte {days} Handelstage",
+    "sharesUnit": "Stk.",
+    "footnote": "Basiert auf den täglichen Reg-SHO-Leerverkaufsvolumen-Dateien der FINRA (US-Aktien, ETFs ausgeschlossen). Das ist das tatsächlich als Leerverkauf ausgeführte Handelsvolumen des Tages, nicht die offene Short-Interest-Position — ein hoher Anteil zeigt reges Handelsgeschehen, nicht automatisch eine bearishe Wette gegen die Aktie. Keine Anlageberatung.",
+    "loadError": "Marktdaten konnten gerade nicht geladen werden. Bitte später erneut versuchen."
+  },
+  "tradingAcademy": {
+    "badge": "Bald verfügbar",
+    "title": "Trading Academy",
+    "description": "Kurse und Guides rund ums Trading folgen in Kürze."
+  },
+  "auth": {
+    "login": {
+      "heading": "Anmelden",
+      "subtitle": "Willkommen zurück bei tradeinsider.",
+      "emailLabel": "Email",
+      "passwordLabel": "Passwort",
+      "submit": "Anmelden",
+      "submitPending": "Anmelden…",
+      "error": "Email oder Passwort ist falsch.",
+      "noAccount": "Noch kein Konto?",
+      "signUpLink": "Registrieren"
+    },
+    "signup": {
+      "heading": "Konto erstellen",
+      "subtitle": "Registriere dich kostenlos bei tradeinsider.",
+      "emailLabel": "Email",
+      "passwordLabel": "Passwort",
+      "passwordHint": "Mindestens 8 Zeichen.",
+      "submit": "Registrieren",
+      "submitPending": "Wird erstellt…",
+      "successHeading": "Fast geschafft",
+      "successText": "Wir haben dir eine Bestätigungsmail geschickt. Klick auf den Link darin, um dein Konto zu aktivieren.",
+      "errorTaken": "Diese Email ist bereits registriert.",
+      "errorGeneric": "Registrierung fehlgeschlagen. Bitte versuch es erneut.",
+      "errorPasswordLength": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+      "haveAccount": "Schon ein Konto?",
+      "signInLink": "Anmelden"
+    },
+    "konto": {
+      "heading": "Mein Konto",
+      "loggedInAs": "Angemeldet als {email}",
+      "proBadge": "Pro",
+      "proDescription": "Voller Zugriff auf alle Insider-Käufe inkl. Insider-Score.",
+      "manageSubscription": "Abo verwalten",
+      "upgradeHeading": "Auf Pro upgraden",
+      "upgradeDescription": "Insider-Käufe von Vorständen und Aufsichtsräten inkl. Insider-Score freischalten.",
+      "monthly": "Monatlich — €14,99",
+      "yearly": "Jährlich — €149",
+      "logout": "Abmelden"
+    },
+    "paywall": {
+      "heading": "Nur für Pro-Mitglieder",
+      "description": "Insider-Käufe von Vorständen und Aufsichtsräten inkl. Insider-Score sind Teil von tradeinsider Pro. Politiker- und Hedgefonds-Trades bleiben kostenlos.",
+      "ctaLoggedIn": "Jetzt upgraden",
+      "ctaLoggedOut": "Kostenlos registrieren"
+    }
+  },
+  "metadata": {
+    "homeTitle": "tradeinsider — Willkommen",
+    "homeDescription": "Deine Plattform für Insider-Käufe, Aktienanalysen und alles rund ums Trading.",
+    "insiderKaeufeTitle": "Insider-Käufe — tradeinsider",
+    "insiderKaeufeDescription": "Insider-Käufe von Vorständen, Aufsichtsräten und Politikern in Echtzeit, auf Basis offizieller Meldungen.",
+    "tradingIntelligenceTitle": "Trading Intelligence — tradeinsider",
+    "tradingAcademyTitle": "Trading Academy — tradeinsider"
+  }
+}
