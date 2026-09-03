@@ -10,7 +10,9 @@
     "menuClose": "Menü schließen"
   },
   "footer": {
-    "disclaimer": "Daten von <link>SEC EDGAR</link> (Form-4-Meldungen). Nur zu Informationszwecken — keine Anlageberatung. Bitte immer die verlinkte Original-Meldung prüfen. Nicht verbunden mit der U.S. Securities and Exchange Commission."
+    "disclaimer": "Daten von <link>SEC EDGAR</link> (Form-4-Meldungen). Nur zu Informationszwecken — keine Anlageberatung. Bitte immer die verlinkte Original-Meldung prüfen. Nicht verbunden mit der U.S. Securities and Exchange Commission.",
+    "impressum": "Impressum",
+    "privacy": "Datenschutz"
   },
   "home": {
     "heroPrefix": "Willkommen bei",

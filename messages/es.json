@@ -10,7 +10,9 @@
     "menuClose": "Cerrar menú"
   },
   "footer": {
-    "disclaimer": "Datos de <link>SEC EDGAR</link> (formularios Form 4). Solo con fines informativos — no es asesoramiento de inversión. Consulta siempre la publicación original enlazada. No afiliado a la U.S. Securities and Exchange Commission."
+    "disclaimer": "Datos de <link>SEC EDGAR</link> (formularios Form 4). Solo con fines informativos — no es asesoramiento de inversión. Consulta siempre la publicación original enlazada. No afiliado a la U.S. Securities and Exchange Commission.",
+    "impressum": "Aviso Legal",
+    "privacy": "Privacidad"
   },
   "home": {
     "heroPrefix": "Bienvenido a",

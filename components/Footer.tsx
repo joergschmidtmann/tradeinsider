@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export function Footer() {
   const t = useTranslations("footer");
@@ -18,6 +19,15 @@ export function Footer() {
             </a>
           ),
         })}
+      </p>
+      <p className="mt-3 flex items-center justify-center gap-3">
+        <Link href="/impressum" className="hover:text-foreground">
+          {t("impressum")}
+        </Link>
+        <span aria-hidden>·</span>
+        <Link href="/datenschutz" className="hover:text-foreground">
+          {t("privacy")}
+        </Link>
       </p>
     </footer>
   );
