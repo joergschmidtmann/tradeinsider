@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { login } from "./actions";
 
-export default function LoginPage() {
+function LoginForm() {
   const t = useTranslations("auth.login");
   const [state, formAction, pending] = useActionState(login, undefined);
   const searchParams = useSearchParams();
@@ -64,5 +65,13 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
