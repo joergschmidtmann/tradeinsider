@@ -162,7 +162,7 @@ export default function Home() {
     <main className="flex-1">
       <section className="mx-auto max-w-4xl px-4 pt-24 pb-16 text-center sm:px-6 sm:pt-32">
         <h1 className="text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
-          {t("heroPrefix")} <span className="text-gradient">tradeinsider</span>
+          {t("heroPrefix")} trade<span className="text-gradient">insider</span>
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-lg text-muted text-balance">{t("subtitle")}</p>
       </section>
