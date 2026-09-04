@@ -12,7 +12,15 @@
   "footer": {
     "disclaimer": "Datos de <link>SEC EDGAR</link> (formularios Form 4). Solo con fines informativos — no es asesoramiento de inversión. Consulta siempre la publicación original enlazada. No afiliado a la U.S. Securities and Exchange Commission.",
     "impressum": "Aviso Legal",
-    "privacy": "Privacidad"
+    "privacy": "Privacidad",
+    "agb": "Términos y Condiciones",
+    "withdrawalNotice": "Derecho de Desistimiento",
+    "riskDisclosures": "Advertencias Financieras y de Riesgo",
+    "methodology": "Metodología y Transparencia",
+    "conflictsOfInterest": "Conflictos de Interés",
+    "cancelContract": "Cancela Contratos Aquí",
+    "withdrawContract": "Desistir del Contrato",
+    "riskNotice": "Invertir en valores conlleva riesgos. El contenido general de TradeInsider no tiene en cuenta las circunstancias financieras individuales, los objetivos de inversión ni la tolerancia al riesgo personal de cada usuario. Los ratings, precios objetivo y previsiones pueden resultar inexactos."
   },
   "home": {
     "heroPrefix": "Bienvenido a",

@@ -154,3 +154,85 @@ create trigger on_auth_user_created
 insert into profiles (id)
 select id from auth.users
 on conflict (id) do nothing;
+
+-- Formal record of cancellation/withdrawal requests submitted via
+-- /vertrag-kuendigen and /vertrag-widerrufen — the fallback, login-independent
+-- channel (relevant for the §312k BGB "Kündigungsbutton" requirement). The
+-- primary, immediately-effective cancellation path for logged-in Pro users
+-- remains the Stripe Billing Portal (see app/[locale]/konto/actions.ts).
+create table if not exists contract_requests (
+  id bigserial primary key,
+  type text not null check (type in ('cancellation', 'withdrawal')),
+  email text not null,
+  name text,
+  plan text,
+  -- Cancellation: 'asap' | 'date' | 'immediate'. Withdrawal: the order date, if given.
+  requested_termination text,
+  reason text,
+  status text not null default 'received',
+  created_at timestamptz not null default now()
+);
+
+alter table contract_requests enable row level security;
+-- No select/insert policy for anon/authenticated: writes happen exclusively
+-- via the Server Actions in app/[locale]/vertrag-kuendigen/actions.ts and
+-- vertrag-widerrufen/actions.ts using the service role key
+-- (lib/supabase/adminClient.ts), same pattern as the Stripe webhook writing
+-- to `profiles`.
+
+-- ============================================================================
+-- ENTWURF, NICHT ANGEWENDET — Vorbereitung für die künftige TradeInsider-
+-- Intelligence-Ratings-Funktion (siehe lib/analysis/types.ts, lib/methodology.ts).
+-- Es gibt aktuell keine Seite, die diese Tabelle liest oder befüllt. Diesen
+-- Block NICHT ausführen, bis die Methodik final festgelegt ist.
+--
+-- TODO – Methodik vor Launch final festlegen
+-- TODO LEGAL REVIEW – Kapitalmarktrecht / MAR
+--
+-- create table if not exists stock_analyses (
+--   analysis_id uuid primary key default gen_random_uuid(),
+--   ticker text not null,
+--   isin text,
+--   company_name text not null,
+--   analyst_name text not null,
+--
+--   methodology_version text not null,
+--   data_timestamp timestamptz not null,
+--   analysis_completed_at timestamptz not null,
+--   published_at timestamptz,
+--   investment_horizon_months smallint not null default 12,
+--
+--   rating text not null check (rating in ('BUY', 'HOLD', 'SELL')),
+--   score_overall smallint not null check (score_overall between 0 and 100),
+--   score_fundamental smallint not null check (score_fundamental between 0 and 100),
+--   score_growth smallint not null check (score_growth between 0 and 100),
+--   score_valuation smallint not null check (score_valuation between 0 and 100),
+--   score_technical smallint not null check (score_technical between 0 and 100),
+--   score_insider smallint not null check (score_insider between 0 and 100),
+--
+--   fair_value numeric,
+--   price_at_analysis numeric not null,
+--   currency text not null default 'USD',
+--
+--   bull_case text,
+--   base_case text,
+--   bear_case text,
+--
+--   source_list text[] not null default '{}',
+--
+--   operator_has_position boolean not null default false,
+--   operator_position_type text check (operator_position_type in ('long', 'short')),
+--   conflict_disclosure text not null,
+--
+--   sponsored_content boolean not null default false,
+--   paid_relationship boolean not null default false,
+--   affiliate_relationship boolean not null default false,
+--
+--   created_at timestamptz not null default now()
+-- );
+--
+-- alter table stock_analyses enable row level security;
+-- create policy "Public can read published analyses"
+--   on stock_analyses for select
+--   using (published_at is not null and published_at <= now());
+-- ============================================================================

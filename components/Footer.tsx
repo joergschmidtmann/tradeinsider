@@ -20,13 +20,34 @@ export function Footer() {
           ),
         })}
       </p>
-      <p className="mt-3 flex items-center justify-center gap-3">
+      <p className="mx-auto mt-2 max-w-2xl px-4">{t("riskNotice")}</p>
+      <p className="mx-auto mt-3 flex max-w-2xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4">
         <Link href="/impressum" className="hover:text-foreground">
           {t("impressum")}
         </Link>
-        <span aria-hidden>·</span>
         <Link href="/datenschutz" className="hover:text-foreground">
           {t("privacy")}
+        </Link>
+        <Link href="/agb" className="hover:text-foreground">
+          {t("agb")}
+        </Link>
+        <Link href="/widerruf" className="hover:text-foreground">
+          {t("withdrawalNotice")}
+        </Link>
+        <Link href="/risikohinweise" className="hover:text-foreground">
+          {t("riskDisclosures")}
+        </Link>
+        <Link href="/methodik" className="hover:text-foreground">
+          {t("methodology")}
+        </Link>
+        <Link href="/interessenkonflikte" className="hover:text-foreground">
+          {t("conflictsOfInterest")}
+        </Link>
+        <Link href="/vertrag-kuendigen" className="hover:text-foreground">
+          {t("cancelContract")}
+        </Link>
+        <Link href="/vertrag-widerrufen" className="hover:text-foreground">
+          {t("withdrawContract")}
         </Link>
       </p>
     </footer>

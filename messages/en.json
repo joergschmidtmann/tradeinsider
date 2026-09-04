@@ -12,7 +12,15 @@
   "footer": {
     "disclaimer": "Data from <link>SEC EDGAR</link> (Form 4 filings). For informational purposes only — not investment advice. Always check the linked original filing. Not affiliated with the U.S. Securities and Exchange Commission.",
     "impressum": "Legal Notice",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "agb": "Terms & Conditions",
+    "withdrawalNotice": "Right of Withdrawal",
+    "riskDisclosures": "Financial & Risk Disclosures",
+    "methodology": "Methodology & Transparency",
+    "conflictsOfInterest": "Conflicts of Interest",
+    "cancelContract": "Cancel Subscriptions Here",
+    "withdrawContract": "Withdraw from Contract",
+    "riskNotice": "Investing in securities involves risk. TradeInsider's general content does not take into account individual users' financial circumstances, investment objectives, or personal risk tolerance. Ratings, price targets, and forecasts may prove inaccurate."
   },
   "home": {
     "heroPrefix": "Welcome to",
