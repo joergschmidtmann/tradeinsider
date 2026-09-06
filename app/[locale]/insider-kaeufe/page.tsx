@@ -5,7 +5,7 @@ import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SearchBar } from "@/components/SearchBar";
 import { RoleToggle } from "@/components/RoleToggle";
-import { TransactionsTable, type TransactionRow } from "@/components/TransactionsTable";
+import { TransactionsTable, type TransactionRow, type StockQuote } from "@/components/TransactionsTable";
 import { PaywallCard } from "@/components/PaywallCard";
 import { applyBaseFilters, fetchDistinctValues } from "@/lib/columnFilters";
 import { getEurRates } from "@/lib/fxRates";
@@ -117,6 +117,18 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
   const rows = (data ?? []) as TransactionRow[];
   const hasNextPage = count !== null && to + 1 < count;
 
+  // Performance-since-purchase badge: only US tickers have a quote (see
+  // scripts/ingest-prices.ts), so this is a no-op extra round trip for the
+  // Vorstand/politician/hedge-fund tabs' non-US rows.
+  const tickers = [...new Set(rows.map((row) => row.issuer_ticker).filter((t): t is string => !!t))];
+  const quotes: Record<string, StockQuote> = {};
+  if (tickers.length > 0) {
+    const { data: quoteRows } = await supabase.from("stock_quotes").select("ticker, price, currency").in("ticker", tickers);
+    for (const q of quoteRows ?? []) {
+      quotes[q.ticker] = { price: q.price, currency: q.currency };
+    }
+  }
+
   return (
     <main className="flex-1">
       <section className="mx-auto max-w-4xl px-4 pt-20 pb-12 text-center sm:px-6 sm:pt-28">
@@ -169,6 +181,7 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
                   showCountry={isVorstand}
                   eurRates={eurRates}
                   locale={locale}
+                  quotes={quotes}
                 />
                 <div className="mt-6 flex items-center justify-between text-sm">
                   {page > 1 ? (

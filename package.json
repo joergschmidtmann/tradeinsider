@@ -15,6 +15,7 @@
     "ingest:se": "tsx scripts/ingest-se.ts",
     "ingest:nl": "tsx scripts/ingest-nl.ts",
     "ingest:be": "tsx scripts/ingest-be.ts",
+    "ingest:prices": "tsx scripts/ingest-prices.ts",
     "backfill:insider-scores": "tsx scripts/backfill-insider-scores.ts",
     "setup:stripe": "tsx scripts/setup-stripe.ts"
   },

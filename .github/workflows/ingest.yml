@@ -10,6 +10,7 @@ on:
     - cron: "45 * * * *" # Sweden (Finansinspektionen) — similar volume to Germany/Spain, offset by 45min to spread load
     - cron: "10 * * * *" # Netherlands (AFM) — low volume, one bulk export request per run, offset by 10min to spread load (avoids the US run's :00/:15/:30/:45 slots)
     - cron: "20 * * * *" # Belgium (FSMA) — low volume, but throttled at 30s/request (robots.txt Crawl-delay), offset by 20min to spread load
+    - cron: "0 5 * * *" # US stock quotes (Twelve Data) — daily is enough for a "since purchase" performance figure
   workflow_dispatch: {}
 
 jobs:
@@ -87,3 +88,11 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+
+      - name: Update US stock quotes (Twelve Data)
+        if: always() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '0 5 * * *')
+        run: npm run ingest:prices
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}

@@ -23,6 +23,11 @@ export interface TransactionRow {
   insider_score: number | null;
 }
 
+export interface StockQuote {
+  price: number;
+  currency: string;
+}
+
 // Maps our app locales to full Intl locale tags for date/number formatting.
 const INTL_LOCALES: Record<Locale, string> = { de: "de-DE", en: "en-US", es: "es-ES" };
 
@@ -67,6 +72,21 @@ function CurrencyCell({
   );
 }
 
+// Only meaningful for a purchase (transaction_code "P") priced in the same
+// currency as the current quote — a sale's price_per_share isn't "money still
+// invested", and a currency mismatch (shouldn't happen for US tickers, but
+// cheap to guard) would silently produce a nonsense percentage.
+function PerformanceBadge({ pctChange }: { pctChange: number }) {
+  const positive = pctChange >= 0;
+  const colorClass = positive ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400";
+  return (
+    <span className={`inline-flex min-w-[3.5rem] justify-center rounded-full px-2.5 py-1 text-xs font-semibold ${colorClass}`}>
+      {positive ? "+" : ""}
+      {pctChange.toFixed(1)}%
+    </span>
+  );
+}
+
 function ScoreBadge({ score, tooltip }: { score: number; tooltip: string }) {
   const colorClass =
     score >= 75
@@ -95,6 +115,7 @@ interface TransactionsTableProps {
   showCountry: boolean;
   eurRates: Record<string, number>;
   locale: Locale;
+  quotes: Record<string, StockQuote>;
 }
 
 export function TransactionsTable({
@@ -111,6 +132,7 @@ export function TransactionsTable({
   showCountry,
   eurRates,
   locale,
+  quotes,
 }: TransactionsTableProps) {
   const t = useTranslations("insiderKaeufe");
   const uiLocale = INTL_LOCALES[locale];
@@ -178,11 +200,18 @@ export function TransactionsTable({
                   {t("table.score")}
                 </th>
               )}
+              <th className="px-5 py-3.5 text-right font-medium">{t("table.performance")}</th>
               <th className="px-5 py-3.5 font-medium">{t("table.filing")}</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {rows.map((row) => {
+              const quote = row.issuer_ticker ? quotes[row.issuer_ticker] : undefined;
+              const pctChange =
+                quote && quote.currency === row.currency && row.price_per_share
+                  ? ((quote.price - row.price_per_share) / row.price_per_share) * 100
+                  : null;
+              return (
               <tr key={row.id} className="border-b border-border/60 last:border-0 hover:bg-surface-2">
                 <td className="px-5 py-3.5">
                   <div className="font-medium text-foreground">{row.issuer_name}</div>
@@ -222,6 +251,9 @@ export function TransactionsTable({
                     )}
                   </td>
                 )}
+                <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                  {pctChange !== null ? <PerformanceBadge pctChange={pctChange} /> : <span className="text-muted">—</span>}
+                </td>
                 <td className="px-5 py-3.5 whitespace-nowrap">
                   <a
                     href={row.filing_url}
@@ -242,7 +274,8 @@ export function TransactionsTable({
                   </a>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

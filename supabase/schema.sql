@@ -65,6 +65,25 @@ create policy "Public can read transactions"
   on transactions for select
   using (true);
 
+-- Latest known price per US ticker, used to show "performance since insider
+-- purchase" next to a transaction (price_per_share on that row is already
+-- the price at purchase time, so no historical price series is needed here —
+-- just the most recent quote). One row per ticker, overwritten on refresh
+-- rather than a time series, since only the current price is ever displayed.
+create table if not exists stock_quotes (
+  ticker text primary key,
+  price numeric not null,
+  currency text not null,
+  quoted_at timestamptz not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table stock_quotes enable row level security;
+
+create policy "Public can read stock_quotes"
+  on stock_quotes for select
+  using (true);
+
 -- Wirtschaftsnews: a separate, much simpler table — general news items don't
 -- fit the transactions shape (no shares/price/role), and `url` alone is a
 -- natural unique dedupe key (unlike transactions, which need a composite key).
