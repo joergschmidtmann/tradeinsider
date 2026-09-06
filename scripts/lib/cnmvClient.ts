@@ -31,20 +31,40 @@ async function throttle(): Promise<void> {
   lastRequestAt = Date.now();
 }
 
-export async function cnmvFetchText(url: string): Promise<string> {
-  await throttle();
-  const res = await fetch(url, { headers: HEADERS });
-  if (!res.ok) {
-    throw new Error(`CNMV request failed: ${res.status} ${res.statusText} for ${url}`);
+// The CNMV site occasionally hangs mid-response for minutes at a time; a bare
+// fetch() then eats Node's default 5-minute headers timeout before failing.
+// Retry a couple of times with a much shorter per-attempt timeout instead, so
+// a single slow response doesn't have to fail the whole ingest run.
+const REQUEST_TIMEOUT_MS = 30_000;
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 5_000;
+
+async function cnmvFetch(url: string): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    await throttle();
+    try {
+      const res = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+      if (!res.ok) {
+        throw new Error(`CNMV request failed: ${res.status} ${res.statusText} for ${url}`);
+      }
+      return res;
+    } catch (err) {
+      lastError = err;
+      if (attempt < MAX_ATTEMPTS) {
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
+    }
   }
+  throw lastError;
+}
+
+export async function cnmvFetchText(url: string): Promise<string> {
+  const res = await cnmvFetch(url);
   return res.text();
 }
 
 export async function cnmvFetchBuffer(url: string): Promise<Buffer> {
-  await throttle();
-  const res = await fetch(url, { headers: HEADERS });
-  if (!res.ok) {
-    throw new Error(`CNMV request failed: ${res.status} ${res.statusText} for ${url}`);
-  }
+  const res = await cnmvFetch(url);
   return Buffer.from(await res.arrayBuffer());
 }
