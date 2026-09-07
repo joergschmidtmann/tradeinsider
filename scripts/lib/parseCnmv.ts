@@ -48,14 +48,31 @@ function parseResultsPage(html: string): CnmvDeclaration[] {
  * through the CNMV's date-range search until a page comes back with fewer
  * than 10 results (its page size). No session/ViewState needed — verified
  * live that a fresh, cookie-less request to this URL returns real results
- * directly, despite the page being an ASP.NET WebForms search form. */
+ * directly, despite the page being an ASP.NET WebForms search form.
+ *
+ * Also stops once a page contributes no registration numbers we haven't
+ * already seen. Seen live (2026-09-07, two runs back to back): under the
+ * ingest workflow's request pattern, CNMV sometimes keeps returning ~10
+ * results per page for hundreds of pages past the real end of a 3-day
+ * window's ~12 results, instead of the expected short final page — until it
+ * 400s around page 1000. A plain ad hoc curl against the same URL paginates
+ * correctly, so this looks like a CNMV-side quirk under repeated/throttled
+ * requests rather than our regex misparsing an error page. The dedupe check
+ * catches that as soon as it starts repeating; MAX_PAGES is a last-resort
+ * cap in case it instead cycles through junk that never repeats. */
+const MAX_PAGES = 50;
+
 export async function findRecentDeclarations(fromDate: string, toDate: string): Promise<CnmvDeclaration[]> {
   const all: CnmvDeclaration[] = [];
-  for (let page = 0; ; page++) {
+  const seen = new Set<string>();
+  for (let page = 0; page < MAX_PAGES; page++) {
     const url = `${RESULTS_URL}?fechad=${fromDate}&fechah=${toDate}&page=${page}`;
     const html = await cnmvFetchText(url);
     const pageResults = parseResultsPage(html);
-    all.push(...pageResults);
+    const newResults = pageResults.filter((d) => !seen.has(d.registrationNumber));
+    if (newResults.length === 0) break;
+    newResults.forEach((d) => seen.add(d.registrationNumber));
+    all.push(...newResults);
     if (pageResults.length < 10) break;
   }
   return all;
