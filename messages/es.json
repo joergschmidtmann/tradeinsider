@@ -23,25 +23,113 @@
     "riskNotice": "Invertir en valores conlleva riesgos. El contenido general de TradeInsider no tiene en cuenta las circunstancias financieras individuales, los objetivos de inversión ni la tolerancia al riesgo personal de cada usuario. Los ratings, precios objetivo y previsiones pueden resultar inexactos."
   },
   "home": {
-    "heroPrefix": "Bienvenido a",
-    "subtitle": "Tu plataforma para compras de insiders, análisis bursátil y todo sobre trading.",
-    "insiderKaeufe": {
-      "live": "En vivo · SEC EDGAR y EQS News",
-      "heading": "Compras de Insiders",
-      "description": "Compras y ventas de insiders de directivos en tiempo real — EE.UU. (SEC) y Alemania. Cuando los directivos invierten su propio dinero en sus propias acciones, vale la pena prestar atención.",
-      "cta": "Ver ahora →"
+    "hero": {
+      "live": "En vivo · Datos de insiders. Tiempo real. Señales relevantes.",
+      "headlinePrefix": "Dinero inteligente.",
+      "headlineHighlight": "Decisiones más inteligentes.",
+      "subtitle": "Descubre qué hacen los CEOs y directivos con su propio dinero — y aprovecha la ventaja.",
+      "cta": "Descubrir compras de insiders →",
+      "trustBullets": ["Datos oficiales de 7 países", "Analizado automáticamente", "Para mejores decisiones"],
+      "topSignal": {
+        "label": "Señal principal de hoy",
+        "buy": "Compra",
+        "sharesAt": "acciones a",
+        "cta": "Ver análisis →",
+        "empty": "Aún no hay señales hoy — echa un vistazo a las últimas compras."
+      }
     },
-    "tradingIntelligence": {
-      "soon": "Pronto",
-      "heading": "Trading Intelligence",
-      "description": "Análisis fundamental y técnico de acciones — métricas, patrones de gráficos e indicadores en un solo lugar, en vez de cinco pestañas distintas.",
-      "cta": "Más información →"
+    "stats": {
+      "purchasesToday": "Compras de insiders hoy",
+      "volumeToday": "Volumen total hoy",
+      "avgScore": "Score medio de insider",
+      "strongSignals": "Señales fuertes (Score ≥ 75)"
     },
-    "tradingAcademy": {
+    "features": {
+      "live": "En vivo",
       "soon": "Pronto",
-      "heading": "Trading Academy",
-      "description": "Cursos y guías sobre trading — desde los fundamentos hasta tu propia estrategia, paso a paso.",
-      "cta": "Más información →"
+      "insiderKaeufe": {
+        "href": "insider-kaeufe",
+        "heading": "Compras de Insiders",
+        "description": "Transacciones de insiders de CEOs y directivos de 7 países en tiempo real. Analizadas y puntuadas automáticamente.",
+        "cta": "Descubrir ahora →"
+      },
+      "tradingIntelligence": {
+        "href": "trading-intelligence",
+        "heading": "Trading Intelligence",
+        "description": "Análisis fundamental y técnico de acciones — métricas, patrones de gráficos e indicadores en un solo lugar.",
+        "cta": "Más información →"
+      },
+      "tradingAcademy": {
+        "href": "trading-academy",
+        "heading": "Trading Academy",
+        "description": "Conocimientos, estrategias y herramientas para traders y para quienes quieren llegar a serlo.",
+        "cta": "Más información →"
+      }
+    },
+    "recent": {
+      "heading": "Compras de insiders recientes",
+      "subheading": "Las últimas compras de CEOs y directivos.",
+      "viewAll": "Ver todas las compras de insiders →",
+      "empty": "Aún no hay datos disponibles.",
+      "table": {
+        "company": "Empresa",
+        "insider": "Insider",
+        "country": "País",
+        "date": "Fecha",
+        "value": "Valor",
+        "score": "Score"
+      }
+    },
+    "why": {
+      "heading": "¿Por qué tradeinsider?",
+      "subheading": "Más que solo datos. Una ventaja clara.",
+      "items": [
+        {
+          "title": "Datos exclusivos",
+          "description": "Directamente de organismos oficiales: SEC, EQS, CNMV y otros reguladores en siete países."
+        },
+        {
+          "title": "Score cuantitativo",
+          "description": "Cada compra se puntúa automáticamente de 0 a 100 — según el cargo, el tamaño de la compra y otros factores."
+        },
+        {
+          "title": "Ventaja más rápida",
+          "description": "Detecta señales fuertes antes de que aparezcan en las noticias."
+        },
+        {
+          "title": "Simple y claro",
+          "description": "Datos de informes complejos presentados de forma comprensible — sin jerga legal."
+        }
+      ]
+    },
+    "quote": {
+      "text": "Cuando los insiders invierten su propio dinero, es una de las señales más honestas que conoce el mercado.",
+      "attribution": "— el equipo de tradeinsider"
+    },
+    "how": {
+      "heading": "Así de sencillo funciona",
+      "subheading": "Tres pasos hacia mejores decisiones.",
+      "steps": [
+        {
+          "title": "Recopilar datos",
+          "description": "Procesamos continuamente nuevos informes de la SEC, EQS y otros organismos reguladores."
+        },
+        {
+          "title": "Puntuar automáticamente",
+          "description": "Cada transacción recibe su propio Insider Score."
+        },
+        {
+          "title": "Aprovechar señales relevantes",
+          "description": "Ves de un vistazo lo que realmente importa."
+        }
+      ],
+      "highlight": "Menos ruido. Más señales relevantes."
+    },
+    "finalCta": {
+      "heading": "¿Listo para la ventaja decisiva?",
+      "subheading": "Descubre lo que saben los insiders — antes de que reaccione el mercado.",
+      "cta": "Regístrate gratis →",
+      "microcopy": "En pocos segundos. Sin tarjeta de crédito."
     }
   },
   "insiderKaeufe": {

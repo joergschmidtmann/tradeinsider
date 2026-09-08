@@ -23,25 +23,113 @@
     "riskNotice": "Investitionen in Wertpapiere sind mit Risiken verbunden. Die allgemeinen Inhalte von TradeInsider berücksichtigen nicht die individuellen finanziellen Verhältnisse, Anlageziele oder die persönliche Risikobereitschaft einzelner Nutzer. Ratings, Kursziele und Prognosen können sich als unzutreffend erweisen."
   },
   "home": {
-    "heroPrefix": "Willkommen bei",
-    "subtitle": "Deine Plattform für Insider-Käufe, Aktienanalysen und alles rund ums Trading.",
-    "insiderKaeufe": {
-      "live": "Live · SEC EDGAR & EQS News",
-      "heading": "Insider Käufe",
-      "description": "Insider-Käufe und -Verkäufe von Vorständen in Echtzeit — USA (SEC) und Deutschland. Wenn Führungskräfte eigenes Geld in die eigene Aktie stecken, lohnt sich ein zweiter Blick.",
-      "cta": "Jetzt ansehen →"
+    "hero": {
+      "live": "Live · Insider-Daten. Echtzeit. Relevante Signale.",
+      "headlinePrefix": "Smartes Geld.",
+      "headlineHighlight": "Smartere Entscheidungen.",
+      "subtitle": "Sieh, was CEOs und Vorstände mit ihrem eigenen Geld machen – und nutze den Vorsprung.",
+      "cta": "Insider-Käufe entdecken →",
+      "trustBullets": ["Echte Meldedaten aus 7 Ländern", "Automatisch analysiert", "Für bessere Entscheidungen"],
+      "topSignal": {
+        "label": "Top Signal heute",
+        "buy": "Kauf",
+        "sharesAt": "Aktien zu",
+        "cta": "Zur Analyse →",
+        "empty": "Noch kein Signal heute — schau dir die neuesten Käufe an."
+      }
     },
-    "tradingIntelligence": {
-      "soon": "Bald",
-      "heading": "Trading Intelligence",
-      "description": "Fundamentale und technische Analysen zu Aktien — Kennzahlen, Chartmuster und Indikatoren an einem Ort, statt in fünf verschiedenen Tabs.",
-      "cta": "Mehr erfahren →"
+    "stats": {
+      "purchasesToday": "Insider-Käufe heute",
+      "volumeToday": "Gesamtvolumen heute",
+      "avgScore": "Ø Insider Score",
+      "strongSignals": "Starke Signale (Score ≥ 75)"
     },
-    "tradingAcademy": {
+    "features": {
+      "live": "Live",
       "soon": "Bald",
-      "heading": "Trading Academy",
-      "description": "Kurse und Guides rund ums Trading — von den Grundlagen bis zur eigenen Strategie, Schritt für Schritt aufgebaut.",
-      "cta": "Mehr erfahren →"
+      "insiderKaeufe": {
+        "href": "insider-kaeufe",
+        "heading": "Insider Käufe",
+        "description": "Echtzeit Insider-Transaktionen von CEOs und Vorständen aus 7 Ländern. Automatisch analysiert und bewertet.",
+        "cta": "Jetzt entdecken →"
+      },
+      "tradingIntelligence": {
+        "href": "trading-intelligence",
+        "heading": "Trading Intelligence",
+        "description": "Fundamentale und technische Analysen zu Aktien — Kennzahlen, Chartmuster und Indikatoren an einem Ort.",
+        "cta": "Mehr erfahren →"
+      },
+      "tradingAcademy": {
+        "href": "trading-academy",
+        "heading": "Trading Academy",
+        "description": "Wissen, Strategien und Tools für Trader und alle, die es werden wollen.",
+        "cta": "Mehr erfahren →"
+      }
+    },
+    "recent": {
+      "heading": "Aktuelle Insider-Käufe",
+      "subheading": "Die neuesten Käufe von CEOs und Vorständen.",
+      "viewAll": "Alle Insider-Käufe anzeigen →",
+      "empty": "Noch keine Daten verfügbar.",
+      "table": {
+        "company": "Unternehmen",
+        "insider": "Insider",
+        "country": "Land",
+        "date": "Datum",
+        "value": "Wert",
+        "score": "Score"
+      }
+    },
+    "why": {
+      "heading": "Warum tradeinsider?",
+      "subheading": "Mehr als nur Daten. Ein klarer Vorteil.",
+      "items": [
+        {
+          "title": "Exklusive Daten",
+          "description": "Direkt von offiziellen Meldestellen: SEC, EQS, CNMV und weiteren Regulierern in sieben Ländern."
+        },
+        {
+          "title": "Quantitativer Score",
+          "description": "Jeder Kauf wird automatisch mit einem Score von 0 bis 100 bewertet — basierend auf Rolle, Kaufgröße und weiteren Faktoren."
+        },
+        {
+          "title": "Schneller Vorteil",
+          "description": "Erkenne starke Signale, bevor sie in den Nachrichten stehen."
+        },
+        {
+          "title": "Einfach & klar",
+          "description": "Komplexe Meldedaten verständlich aufbereitet — keine Juristensprache."
+        }
+      ]
+    },
+    "quote": {
+      "text": "Wenn Insider mit eigenem Geld investieren, ist das eines der ehrlichsten Signale, die der Markt kennt.",
+      "attribution": "— tradeinsider-Redaktion"
+    },
+    "how": {
+      "heading": "So einfach funktioniert es",
+      "subheading": "In drei Schritten zu besseren Entscheidungen.",
+      "steps": [
+        {
+          "title": "Daten erfassen",
+          "description": "Wir werten laufend neue Meldungen aus SEC-, EQS- und weiteren Meldestellen aus."
+        },
+        {
+          "title": "Automatisch bewerten",
+          "description": "Jede Transaktion bekommt einen eigenen Insider Score."
+        },
+        {
+          "title": "Relevante Signale nutzen",
+          "description": "Du siehst auf einen Blick, was wirklich zählt."
+        }
+      ],
+      "highlight": "Weniger Rauschen. Mehr relevante Signale."
+    },
+    "finalCta": {
+      "heading": "Bereit für den entscheidenden Vorteil?",
+      "subheading": "Entdecke, was Insider wissen – bevor der Markt reagiert.",
+      "cta": "Kostenlos registrieren →",
+      "microcopy": "In wenigen Sekunden. Ohne Kreditkarte."
     }
   },
   "insiderKaeufe": {
