@@ -32,10 +32,10 @@
       "trustBullets": ["Datos oficiales de 7 países", "Analizado automáticamente", "Para mejores decisiones"]
     },
     "stats": {
-      "purchasesToday": "Compras de insiders hoy",
-      "volumeToday": "Volumen total hoy",
-      "avgScore": "Score medio de insider",
-      "strongSignals": "Señales fuertes (Score ≥ 75)"
+      "purchasesToday": "Compras de insiders la semana pasada",
+      "volumeToday": "Volumen total la semana pasada",
+      "avgScore": "Score medio de insider (semana pasada)",
+      "strongSignals": "Señales fuertes la semana pasada (Score ≥ 75)"
     },
     "features": {
       "live": "En vivo",

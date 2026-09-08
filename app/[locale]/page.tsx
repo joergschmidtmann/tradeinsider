@@ -30,11 +30,23 @@ interface RecentPurchaseRow {
   insider_score: number | null;
 }
 
-// Berlin, not UTC — the site's primary audience and the "heute" label are
-// German, and the ingest workflow runs on UTC cron slots throughout the day,
-// so anchoring "today" to UTC would flip the stats over at 2am local time.
-function todayInBerlin(): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date());
+// Berlin, not UTC — the site's primary audience is German, and the ingest
+// workflow runs on UTC cron slots throughout the day, so anchoring the week
+// boundary to UTC would shift it by up to two hours from the local calendar.
+// Returns the previous full Monday–Sunday week (not a rolling last-7-days
+// window), so the stats band reads as a completed week rather than a
+// constantly-shifting one.
+function previousWeekRangeInBerlin(): { from: string; to: string } {
+  const berlinToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date());
+  const [y, m, d] = berlinToday.split("-").map(Number);
+  const today = new Date(Date.UTC(y, m - 1, d));
+  const isoWeekday = today.getUTCDay() || 7; // Mon=1 ... Sun=7
+  const lastMonday = new Date(today);
+  lastMonday.setUTCDate(today.getUTCDate() - (isoWeekday - 1) - 7);
+  const lastSunday = new Date(lastMonday);
+  lastSunday.setUTCDate(lastMonday.getUTCDate() + 6);
+  const iso = (dt: Date) => dt.toISOString().slice(0, 10);
+  return { from: iso(lastMonday), to: iso(lastSunday) };
 }
 
 function formatCompactEur(amount: number, uiLocale: string): string {
@@ -110,15 +122,16 @@ export default async function Home({ params }: PageProps) {
   const numberFormatter = new Intl.NumberFormat(uiLocale);
 
   const supabase = createSupabaseReadClient();
-  const today = todayInBerlin();
+  const { from: weekFrom, to: weekTo } = previousWeekRangeInBerlin();
 
-  const [{ data: todayRows }, { data: recentRows }, eurRates] = await Promise.all([
+  const [{ data: weekRows }, { data: recentRows }, eurRates] = await Promise.all([
     supabase
       .from("transactions")
       .select("issuer_name, total_value, currency, insider_score")
       .in("role", ["management_board", "supervisory_board"])
       .eq("transaction_code", "P")
-      .eq("transaction_date", today),
+      .gte("transaction_date", weekFrom)
+      .lte("transaction_date", weekTo),
     supabase
       .from("transactions")
       .select(
@@ -132,13 +145,20 @@ export default async function Home({ params }: PageProps) {
     getEurRates(),
   ]);
 
-  const rows = todayRows ?? [];
-  const purchasesToday = rows.length;
-  const volumeTodayEur = rows.reduce((sum, row) => {
-    if (row.total_value === null) return sum;
-    const eur = row.currency === "EUR" ? row.total_value : convertToEur(row.total_value, row.currency, eurRates);
-    return eur !== null ? sum + eur : sum;
-  }, 0);
+  // Some sources report structural reclassifications (e.g. a share block
+  // moved between an insider and their holding company) as a "purchase" with
+  // the same price/share count as a matching same-day "sale" — technically
+  // real filings, but not a market investment, and large enough to swamp a
+  // simple sum/average. Excluded from this stats band only (not from the
+  // underlying data or the /insider-kaeufe table) above a sanity threshold.
+  const OUTLIER_EUR_THRESHOLD = 50_000_000;
+  const rowsWithEur = (weekRows ?? []).map((row) => ({
+    ...row,
+    eur: row.total_value === null ? null : row.currency === "EUR" ? row.total_value : convertToEur(row.total_value, row.currency, eurRates),
+  }));
+  const rows = rowsWithEur.filter((row) => row.eur === null || row.eur <= OUTLIER_EUR_THRESHOLD);
+  const purchasesLastWeek = rows.length;
+  const volumeLastWeekEur = rows.reduce((sum, row) => sum + (row.eur ?? 0), 0);
   const scoredRows = rows.filter((row): row is typeof row & { insider_score: number } => row.insider_score !== null);
   const avgScore = scoredRows.length > 0 ? Math.round(scoredRows.reduce((sum, row) => sum + row.insider_score, 0) / scoredRows.length) : null;
   const strongSignals = scoredRows.filter((row) => row.insider_score >= 75).length;
@@ -184,11 +204,11 @@ export default async function Home({ params }: PageProps) {
       <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
         <div className="grid grid-cols-2 gap-3 rounded-2xl border border-border bg-surface p-5 sm:grid-cols-4 sm:gap-6 sm:p-6">
           <div>
-            <div className="text-2xl font-bold text-foreground sm:text-3xl">{numberFormatter.format(purchasesToday)}</div>
+            <div className="text-2xl font-bold text-foreground sm:text-3xl">{numberFormatter.format(purchasesLastWeek)}</div>
             <div className="mt-1 text-xs text-muted">{t("stats.purchasesToday")}</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-foreground sm:text-3xl">{formatCompactEur(volumeTodayEur, uiLocale)}</div>
+            <div className="text-2xl font-bold text-foreground sm:text-3xl">{formatCompactEur(volumeLastWeekEur, uiLocale)}</div>
             <div className="mt-1 text-xs text-muted">{t("stats.volumeToday")}</div>
           </div>
           <div>

@@ -32,10 +32,10 @@
       "trustBullets": ["Real filings from 7 countries", "Automatically analyzed", "For better decisions"]
     },
     "stats": {
-      "purchasesToday": "Insider purchases today",
-      "volumeToday": "Total volume today",
-      "avgScore": "Avg. Insider Score",
-      "strongSignals": "Strong signals (Score ≥ 75)"
+      "purchasesToday": "Insider purchases last week",
+      "volumeToday": "Total volume last week",
+      "avgScore": "Avg. Insider Score (last week)",
+      "strongSignals": "Strong signals last week (Score ≥ 75)"
     },
     "features": {
       "live": "Live",
