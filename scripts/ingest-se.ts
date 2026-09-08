@@ -2,6 +2,8 @@ import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { findRecentTransactions } from "./lib/parseFi";
 import { computeInsiderScore } from "./lib/insiderScore";
+import { SWEDISH_INDEX_NAMES } from "./lib/swedishIndices";
+import { normalizeCompanyName, normalizeAll } from "./lib/normalizeCompanyName";
 
 // Finansinspektionen's copyright notice (fi.se/sv/om-fi/om-webbplatsen/) allows
 // free reuse of the site's text material as long as the source is credited —
@@ -33,8 +35,14 @@ async function main() {
   const toIso = isoDate(toDate);
 
   console.log(`Fetching FI Insynsregistret transactions from ${fromIso} to ${toIso}...`);
-  const transactions = await findRecentTransactions(fromIso, toIso);
-  console.log(`Found ${transactions.length} transaction(s).`);
+  const allTransactions = await findRecentTransactions(fromIso, toIso);
+  console.log(`Found ${allTransactions.length} transaction(s).`);
+
+  // Scoped to Nasdaq Stockholm Large Cap constituents (see swedishIndices.ts)
+  // to keep out micro-cap noise — matched by normalized name, since this
+  // list has no ISIN (see swedishIndices.ts header for why).
+  const indexNames = normalizeAll(SWEDISH_INDEX_NAMES);
+  const transactions = allTransactions.filter((tx) => indexNames.has(normalizeCompanyName(tx.issuerName)));
 
   // Scoped by filed_at (matching the Publiceringsdatum window above), same
   // reasoning as Spain's ingest-es.ts: a notification's transaction_date can

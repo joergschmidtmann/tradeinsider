@@ -2,6 +2,8 @@ import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { findRecentDeclarations, fetchDeclarationDetail } from "./lib/parseCnmv";
 import { computeInsiderScore } from "./lib/insiderScore";
+import { SPANISH_INDEX_NAMES } from "./lib/spanishIndices";
+import { normalizeCompanyName, normalizeAll } from "./lib/normalizeCompanyName";
 
 // CNMV's Nota Legal (https://www.cnmv.es/portal/Utilidades/NotaLegal.aspx)
 // allows commercial reuse of this data, on the condition that anyone who
@@ -55,7 +57,13 @@ async function main() {
   if (knownError) throw knownError;
   const knownRegistrationNumbers = new Set((known ?? []).map((row) => row.accession_number.split("-")[1]));
 
-  const newDeclarations = declarations.filter((d) => !knownRegistrationNumbers.has(d.registrationNumber));
+  // Scoped to IBEX 35/Medium/Small Cap constituents (see spanishIndices.ts)
+  // to keep out micro-cap noise — matched by normalized name since CNMV
+  // filings carry a LEI, not the ISIN spanishIndices.ts is keyed by.
+  const indexNames = normalizeAll(SPANISH_INDEX_NAMES);
+  const newDeclarations = declarations.filter(
+    (d) => !knownRegistrationNumbers.has(d.registrationNumber) && indexNames.has(normalizeCompanyName(d.issuerName))
+  );
   console.log(`${newDeclarations.length} declaration(s) not yet processed.`);
 
   let insertedRows = 0;

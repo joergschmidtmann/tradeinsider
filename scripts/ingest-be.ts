@@ -2,6 +2,7 @@ import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { findRecentTransactionUrls, fetchTransactionDetail } from "./lib/parseFsma";
 import { computeInsiderScore } from "./lib/insiderScore";
+import { BELGIAN_INDEX_ISINS } from "./lib/belgianIndices";
 
 // FSMA's Disclaimer & Copyright page (fsma.be/en/disclaimer-copyright) puts
 // this data under CC BY 4.0, with the same condition as Spain's Nota Legal:
@@ -58,6 +59,10 @@ async function main() {
     try {
       const tx = await fetchTransactionDetail(ref);
       if (!tx) continue;
+      // Scoped to BEL 20/Mid/Small constituents (see belgianIndices.ts) to
+      // keep out micro-cap noise — FSMA's ISIN matches this list directly,
+      // no name normalization needed (unlike ES/SE/NL).
+      if (!BELGIAN_INDEX_ISINS.has(tx.isin)) continue;
 
       const dedupeKey = `BE-${tx.slug}`;
       const insiderScore =

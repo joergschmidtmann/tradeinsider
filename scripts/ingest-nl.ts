@@ -2,6 +2,8 @@ import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { fetchAllTransactions } from "./lib/parseAfm";
 import { computeInsiderScore } from "./lib/insiderScore";
+import { DUTCH_INDEX_NAMES } from "./lib/dutchIndices";
+import { normalizeCompanyName, normalizeAll } from "./lib/normalizeCompanyName";
 
 // AFM's copyright notice (afm.nl/nl-nl/over-de-afm/over-deze-website) permits
 // reproducing and distributing this data as long as the AFM is credited as
@@ -20,8 +22,14 @@ async function main() {
   const supabase = supabaseAdmin();
 
   console.log("Fetching AFM bulk export...");
-  const transactions = await fetchAllTransactions();
-  console.log(`Found ${transactions.length} transaction(s).`);
+  const allTransactions = await fetchAllTransactions();
+  console.log(`Found ${allTransactions.length} transaction(s).`);
+
+  // Scoped to AEX/AMX/AScX constituents (see dutchIndices.ts) to keep out
+  // micro-cap noise — matched by normalized name, since AFM's export has no
+  // ISIN/LEI field at all (see dutchIndices.ts header).
+  const indexNames = normalizeAll(DUTCH_INDEX_NAMES);
+  const transactions = allTransactions.filter((tx) => indexNames.has(normalizeCompanyName(tx.issuerName)));
 
   // The export always returns the full history, so — unlike every other
   // European pipeline here — there's no date window to scope the "already
