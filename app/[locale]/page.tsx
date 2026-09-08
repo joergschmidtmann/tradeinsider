@@ -6,6 +6,13 @@ import { translateTitle } from "@/lib/translateTitle";
 import { countryLabel } from "@/lib/countries";
 import type { Locale } from "@/i18n/routing";
 
+// Without this, Next statically prerenders the homepage at build time (no
+// cookies()/headers() call here to trigger dynamic rendering automatically,
+// unlike /insider-kaeufe's auth check) — the "today" stats and recent-
+// purchases table would then freeze at whatever they were during the last
+// deploy instead of reflecting the live database.
+export const revalidate = 60;
+
 const INTL_LOCALES: Record<Locale, string> = { de: "de-DE", en: "en-US", es: "es-ES" };
 
 interface RecentPurchaseRow {
