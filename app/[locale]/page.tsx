@@ -136,38 +136,6 @@ export default async function Home({ params }: PageProps) {
   const avgScore = scoredRows.length > 0 ? Math.round(scoredRows.reduce((sum, row) => sum + row.insider_score, 0) / scoredRows.length) : null;
   const strongSignals = scoredRows.filter((row) => row.insider_score >= 75).length;
 
-  // Today's highest-scored purchase for the hero card; fall back to the most
-  // recent scored purchase overall so the hero never renders empty on a slow
-  // news day (weekends, holidays).
-  let topSignal: RecentPurchaseRow | null = null;
-  const { data: topToday } = await supabase
-    .from("transactions")
-    .select(
-      "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, currency, insider_score"
-    )
-    .in("role", ["management_board", "supervisory_board"])
-    .eq("transaction_code", "P")
-    .eq("transaction_date", today)
-    .not("insider_score", "is", null)
-    .order("insider_score", { ascending: false })
-    .limit(1);
-  if (topToday && topToday.length > 0) {
-    topSignal = topToday[0];
-  } else {
-    const { data: topRecent } = await supabase
-      .from("transactions")
-      .select(
-        "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, currency, insider_score"
-      )
-      .in("role", ["management_board", "supervisory_board"])
-      .eq("transaction_code", "P")
-      .not("insider_score", "is", null)
-      .order("transaction_date", { ascending: false })
-      .order("insider_score", { ascending: false })
-      .limit(1);
-    if (topRecent && topRecent.length > 0) topSignal = topRecent[0];
-  }
-
   const recent = (recentRows ?? []) as RecentPurchaseRow[];
   const featureKeys = ["insiderKaeufe", "tradingIntelligence", "tradingAcademy"] as const;
   const whyItems = t.raw("why.items") as { title: string; description: string }[];
@@ -176,89 +144,33 @@ export default async function Home({ params }: PageProps) {
   return (
     <main className="flex-1">
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-4 pt-16 pb-10 sm:px-6 sm:pt-24">
-        <div className="grid min-w-0 items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
-          <div className="min-w-0">
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs tracking-wide text-muted uppercase">
-              <LiveDot />
-              {t("hero.live")}
-            </p>
-            <h1 className="text-4xl font-extrabold tracking-tight text-balance break-words sm:text-5xl md:text-6xl">
-              {t("hero.headlinePrefix")}
-              <br />
-              <span className="text-gradient">{t("hero.headlineHighlight")}</span>
-            </h1>
-            <p className="mt-5 max-w-lg text-lg text-muted text-balance">{t("hero.subtitle")}</p>
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Link
-                href="/insider-kaeufe"
-                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-accent px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_-8px_rgba(168,85,247,0.55)] transition hover:-translate-y-px hover:opacity-90"
-              >
-                {t("hero.cta")}
-              </Link>
-            </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted">
-              {(t.raw("hero.trustBullets") as string[]).map((bullet) => (
-                <li key={bullet} className="flex items-center gap-1.5">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-3.5 w-3.5 shrink-0">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
-                  </svg>
-                  {bullet}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="relative min-w-0">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-x-[20%] -inset-y-[20%] -z-10 blur-[80px]"
-              style={{ background: "radial-gradient(ellipse 55% 60% at 50% 40%, rgba(168,85,247,0.22), transparent 70%)" }}
-            />
-            {topSignal ? (
-              <div className="rounded-3xl border border-white/[0.14] bg-surface p-6 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]">
-                <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-border px-2.5 py-1 text-[11px] font-medium tracking-wide text-muted uppercase">
-                  {t("hero.topSignal.label")}
-                </p>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="text-lg font-semibold text-foreground break-words">{topSignal.issuer_name}</div>
-                    <div className="text-sm text-muted">
-                      {topSignal.owner_name}
-                      {topSignal.owner_title && <> · {translateTitle(topSignal.owner_title, locale)}</>}
-                    </div>
-                  </div>
-                  {topSignal.insider_score !== null && <ScoreRing score={topSignal.insider_score} size="lg" />}
-                </div>
-                <span className="mt-4 inline-flex items-center rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-400">
-                  {t("hero.topSignal.buy")}
-                </span>
-                {topSignal.total_value !== null && (
-                  <div className="mt-4 text-3xl font-bold tracking-tight text-foreground">
-                    {new Intl.NumberFormat(uiLocale, { style: "currency", currency: topSignal.currency, maximumFractionDigits: 0 }).format(
-                      topSignal.total_value
-                    )}
-                  </div>
-                )}
-                {topSignal.shares !== null && topSignal.price_per_share !== null && (
-                  <div className="mt-1 text-sm text-muted">
-                    {numberFormatter.format(topSignal.shares)}{" "}
-                    {t("hero.topSignal.sharesAt")}{" "}
-                    {new Intl.NumberFormat(uiLocale, { style: "currency", currency: topSignal.currency }).format(topSignal.price_per_share)}
-                  </div>
-                )}
-                <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
-                  <span className="text-xs text-muted">{dateFormatter.format(new Date(topSignal.transaction_date))}</span>
-                  <Link href="/insider-kaeufe" className="text-sm font-medium text-gradient hover:opacity-80">
-                    {t("hero.topSignal.cta")}
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-3xl border border-white/[0.14] bg-surface p-6 text-sm text-muted">{t("hero.topSignal.empty")}</div>
-            )}
-          </div>
+      <section className="mx-auto max-w-3xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
+        <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs tracking-wide text-muted uppercase">
+          <LiveDot />
+          {t("hero.live")}
+        </p>
+        <h1 className="text-4xl font-extrabold tracking-tight text-balance break-words sm:text-5xl md:text-6xl">
+          {t("hero.headlinePrefix")} <span className="text-gradient">{t("hero.headlineHighlight")}</span>
+        </h1>
+        <p className="mx-auto mt-5 max-w-lg text-lg text-muted text-balance">{t("hero.subtitle")}</p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+          <Link
+            href="/insider-kaeufe"
+            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-accent px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_-8px_rgba(168,85,247,0.55)] transition hover:-translate-y-px hover:opacity-90"
+          >
+            {t("hero.cta")}
+          </Link>
         </div>
+        <ul className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted">
+          {(t.raw("hero.trustBullets") as string[]).map((bullet) => (
+            <li key={bullet} className="flex items-center gap-1.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-3.5 w-3.5 shrink-0">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
+              </svg>
+              {bullet}
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Stats band */}

@@ -29,14 +29,7 @@
       "headlineHighlight": "Smarter decisions.",
       "subtitle": "See what CEOs and executives are doing with their own money — and use the edge.",
       "cta": "Explore insider trades →",
-      "trustBullets": ["Real filings from 7 countries", "Automatically analyzed", "For better decisions"],
-      "topSignal": {
-        "label": "Top signal today",
-        "buy": "Buy",
-        "sharesAt": "shares at",
-        "cta": "View analysis →",
-        "empty": "No signal yet today — check out the latest purchases."
-      }
+      "trustBullets": ["Real filings from 7 countries", "Automatically analyzed", "For better decisions"]
     },
     "stats": {
       "purchasesToday": "Insider purchases today",

@@ -29,14 +29,7 @@
       "headlineHighlight": "Smartere Entscheidungen.",
       "subtitle": "Sieh, was CEOs und Vorstände mit ihrem eigenen Geld machen – und nutze den Vorsprung.",
       "cta": "Insider-Käufe entdecken →",
-      "trustBullets": ["Echte Meldedaten aus 7 Ländern", "Automatisch analysiert", "Für bessere Entscheidungen"],
-      "topSignal": {
-        "label": "Top Signal heute",
-        "buy": "Kauf",
-        "sharesAt": "Aktien zu",
-        "cta": "Zur Analyse →",
-        "empty": "Noch kein Signal heute — schau dir die neuesten Käufe an."
-      }
+      "trustBullets": ["Echte Meldedaten aus 7 Ländern", "Automatisch analysiert", "Für bessere Entscheidungen"]
     },
     "stats": {
       "purchasesToday": "Insider-Käufe heute",

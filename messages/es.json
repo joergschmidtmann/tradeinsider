@@ -29,14 +29,7 @@
       "headlineHighlight": "Decisiones más inteligentes.",
       "subtitle": "Descubre qué hacen los CEOs y directivos con su propio dinero — y aprovecha la ventaja.",
       "cta": "Descubrir compras de insiders →",
-      "trustBullets": ["Datos oficiales de 7 países", "Analizado automáticamente", "Para mejores decisiones"],
-      "topSignal": {
-        "label": "Señal principal de hoy",
-        "buy": "Compra",
-        "sharesAt": "acciones a",
-        "cta": "Ver análisis →",
-        "empty": "Aún no hay señales hoy — echa un vistazo a las últimas compras."
-      }
+      "trustBullets": ["Datos oficiales de 7 países", "Analizado automáticamente", "Para mejores decisiones"]
     },
     "stats": {
       "purchasesToday": "Compras de insiders hoy",
