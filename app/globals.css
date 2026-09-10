@@ -7,9 +7,9 @@
   --foreground: #f5f5f7;
   --muted: #86868b;
   --border: rgba(255, 255, 255, 0.1);
-  --accent-from: #c026d3;
-  --accent-via: #a855f7;
-  --accent-to: #3b82f6;
+  --accent-from: #4ecb3c;
+  --accent-via: #8ada4d;
+  --accent-to: #c6e94f;
 }
 
 @theme inline {

@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { ColumnFilterDropdown } from "./ColumnFilterDropdown";
+import { ScoreRing } from "./ScoreRing";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
 import { convertToEur } from "@/lib/fxRates";
 import { translateTitle } from "@/lib/translateTitle";
@@ -83,20 +84,6 @@ function PerformanceBadge({ pctChange }: { pctChange: number }) {
     <span className={`inline-flex min-w-[3.5rem] justify-center rounded-full px-2.5 py-1 text-xs font-semibold ${colorClass}`}>
       {positive ? "+" : ""}
       {pctChange.toFixed(1)}%
-    </span>
-  );
-}
-
-function ScoreBadge({ score, tooltip }: { score: number; tooltip: string }) {
-  const colorClass =
-    score >= 75
-      ? "bg-emerald-500/15 text-emerald-400"
-      : score >= 50
-        ? "bg-amber-500/15 text-amber-400"
-        : "bg-surface-2 text-muted";
-  return (
-    <span title={tooltip} className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-2.5 py-1 text-xs font-semibold ${colorClass}`}>
-      {score}
     </span>
   );
 }
@@ -245,7 +232,7 @@ export function TransactionsTable({
                 {showScore && (
                   <td className="px-5 py-3.5 text-right whitespace-nowrap">
                     {row.insider_score !== null ? (
-                      <ScoreBadge score={row.insider_score} tooltip={t("table.scoreTooltip")} />
+                      <ScoreRing score={row.insider_score} tooltip={t("table.scoreTooltip")} />
                     ) : (
                       <span className="text-muted">—</span>
                     )}

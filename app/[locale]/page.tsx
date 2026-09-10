@@ -4,6 +4,7 @@ import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { getEurRates, convertToEur } from "@/lib/fxRates";
 import { translateTitle } from "@/lib/translateTitle";
 import { countryLabel } from "@/lib/countries";
+import { ScoreRing } from "@/components/ScoreRing";
 import type { Locale } from "@/i18n/routing";
 
 // Without this, Next statically prerenders the homepage at build time (no
@@ -52,16 +53,6 @@ function previousWeekRangeInBerlin(): { from: string; to: string } {
 function formatCompactEur(amount: number, uiLocale: string): string {
   return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR", notation: "compact", maximumFractionDigits: 1 }).format(
     amount
-  );
-}
-
-function ScoreRing({ score, size = "md" }: { score: number; size?: "md" | "lg" }) {
-  const colorClass = score >= 75 ? "border-emerald-400 text-emerald-400" : score >= 50 ? "border-amber-400 text-amber-400" : "border-white/20 text-muted";
-  const sizeClass = size === "lg" ? "h-16 w-16 text-xl" : "h-10 w-10 text-sm";
-  return (
-    <span className={`inline-flex shrink-0 items-center justify-center rounded-full border-2 font-bold ${colorClass} ${sizeClass}`}>
-      {score}
-    </span>
   );
 }
 
