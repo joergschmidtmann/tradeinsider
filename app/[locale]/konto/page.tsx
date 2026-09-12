@@ -13,6 +13,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { StatTile, type StatDelta } from "@/components/dashboard/StatTile";
 import { TickerBadge } from "@/components/dashboard/TickerBadge";
 import { ActivityChart, type ActivityDay } from "@/components/dashboard/ActivityChart";
+import { EditNameForm } from "@/components/dashboard/EditNameForm";
 import { UpgradeSection } from "./UpgradeSection";
 import { logout, openBillingPortal } from "./actions";
 
@@ -113,6 +114,13 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
   const isPro = profile?.tier === "pro";
   const subscription = isPro && profile?.stripe_subscription_id ? await loadSubscriptionSummary(profile.stripe_subscription_id, locale) : null;
 
+  // Queried separately from the tier/subscription lookup above so that, until
+  // the `display_name` column migration (supabase/schema.sql) has been
+  // applied, this query failing on its own doesn't take Pro-tier detection
+  // down with it — it just falls back to the email-derived name below.
+  const { data: nameRow } = await supabaseAuth.from("profiles").select("display_name").eq("id", user.id).single();
+  const savedName = nameRow?.display_name?.trim() || "";
+
   const currentWeek = weekRangeInBerlin(0);
   const previousWeek = weekRangeInBerlin(1);
   const activityFrom = daysAgoInBerlin(ACTIVITY_WINDOW_DAYS - 1);
@@ -190,12 +198,10 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
   const tickDateFormatter = new Intl.DateTimeFormat(uiLocale, { day: "numeric", month: "short" });
   const dateFormatter = new Intl.DateTimeFormat(uiLocale, { year: "numeric", month: "short", day: "numeric" });
 
-  const berlinHour = Number(
-    new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Berlin", hour: "2-digit", hour12: false }).format(new Date())
-  );
-  const greetingKey = berlinHour < 12 ? "morning" : berlinHour < 18 ? "afternoon" : "evening";
-  const displayName = user.email?.split("@")[0] ?? "";
-  const headline = justUpgraded ? t("justUpgraded") : t(`greeting.${greetingKey}`, { name: displayName });
+  const emailName = user.email?.split("@")[0]?.split(/[._+-]/)[0] ?? "";
+  const emailDerivedName = emailName ? emailName[0].toUpperCase() + emailName.slice(1) : "";
+  const displayName = savedName || emailDerivedName;
+  const headline = justUpgraded ? t("justUpgraded") : t("greeting.hello", { name: displayName });
   const todayLabel = new Intl.DateTimeFormat(uiLocale, { timeZone: "Europe/Berlin", weekday: "long", year: "numeric", month: "long", day: "numeric" }).format(
     new Date()
   );
@@ -230,7 +236,16 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-balance text-foreground sm:text-4xl">{headline}</h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-bold text-balance text-foreground sm:text-4xl">{headline}</h1>
+              <EditNameForm
+                currentName={displayName}
+                label={t("editName.label")}
+                placeholder={t("editName.placeholder")}
+                saveLabel={t("editName.save")}
+                cancelLabel={t("editName.cancel")}
+              />
+            </div>
             <p className="mt-2 text-sm text-muted">{t("subtitle")}</p>
           </div>
           <div className="sm:text-right">

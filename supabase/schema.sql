@@ -140,8 +140,16 @@ create table if not exists profiles (
   tier text not null default 'free' check (tier in ('free', 'pro')),
   stripe_customer_id text unique,
   stripe_subscription_id text,
+  -- User-editable display name shown by the dashboard greeting (falls back
+  -- to a name derived from the email address when unset).
+  display_name text,
   updated_at timestamptz not null default now()
 );
+
+-- Safe to re-run against a database that already has `profiles` without
+-- this column (this file otherwise only runs once via `create table if not
+-- exists`, which won't retrofit new columns onto an existing table).
+alter table profiles add column if not exists display_name text;
 
 alter table profiles enable row level security;
 
@@ -149,9 +157,22 @@ create policy "Users can read their own profile"
   on profiles for select
   using (auth.uid() = id);
 
--- No insert/update/delete policy: rows are created by the trigger below and
+-- Users may update only their own display_name — never tier or the Stripe
+-- identifiers, which stay exclusively under service-role control via the
+-- trigger/webhook below. The RLS policy alone only scopes *rows*, not
+-- columns, so the actual column restriction comes from the grants: revoke
+-- Supabase's default broad UPDATE grant, then grant back just this column.
+create policy "Users can update their own display name"
+  on profiles for update
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+revoke update on profiles from authenticated;
+grant update (display_name) on profiles to authenticated;
+
+-- No insert/delete policy: rows are created by the trigger below and
 -- kept in sync exclusively by the Stripe webhook using the service role key,
--- which bypasses RLS. Users never write their own tier.
+-- which bypasses RLS. Users never write their own tier or Stripe fields.
 
 -- search_path during an auth.users insert doesn't include `public`, so the
 -- target table must be schema-qualified here or the insert silently can't

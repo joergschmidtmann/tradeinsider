@@ -275,9 +275,13 @@
     "tagline": "Los insiders no operan por opinión, sino por conocimiento.",
     "justUpgraded": "Bienvenido a TradeInsider Pro",
     "greeting": {
-      "morning": "Buenos días, {name}.",
-      "afternoon": "Buenas tardes, {name}.",
-      "evening": "Buenas noches, {name}."
+      "hello": "Hola {name}."
+    },
+    "editName": {
+      "label": "Editar nombre",
+      "placeholder": "Tu nombre",
+      "save": "Guardar",
+      "cancel": "Cancelar"
     },
     "viewAll": "Ver todo",
     "stats": {

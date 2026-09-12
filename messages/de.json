@@ -275,9 +275,13 @@
     "tagline": "Insider handeln nicht aus Meinung, sondern aus Wissen.",
     "justUpgraded": "Willkommen bei TradeInsider Pro",
     "greeting": {
-      "morning": "Guten Morgen, {name}.",
-      "afternoon": "Guten Tag, {name}.",
-      "evening": "Guten Abend, {name}."
+      "hello": "Hallo {name}."
+    },
+    "editName": {
+      "label": "Namen ändern",
+      "placeholder": "Dein Name",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
     },
     "viewAll": "Alle anzeigen",
     "stats": {

@@ -275,9 +275,13 @@
     "tagline": "Insiders don't trade on opinion — they trade on knowledge.",
     "justUpgraded": "Welcome to TradeInsider Pro",
     "greeting": {
-      "morning": "Good morning, {name}.",
-      "afternoon": "Good afternoon, {name}.",
-      "evening": "Good evening, {name}."
+      "hello": "Hi {name}."
+    },
+    "editName": {
+      "label": "Edit name",
+      "placeholder": "Your name",
+      "save": "Save",
+      "cancel": "Cancel"
     },
     "viewAll": "View all",
     "stats": {

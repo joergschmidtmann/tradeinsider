@@ -1,10 +1,26 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getLocale } from "next-intl/server";
 import { redirect as localizedRedirect, getPathname } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { stripe, PRO_MONTHLY_LOOKUP_KEY, PRO_YEARLY_LOOKUP_KEY } from "@/lib/stripe";
+
+export async function updateDisplayName(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const name = String(formData.get("displayName") ?? "").trim().slice(0, 60);
+  // RLS (see supabase/schema.sql) restricts this update to the caller's own
+  // row and, via a column grant, to this one column — never tier or the
+  // Stripe fields.
+  await supabase.from("profiles").update({ display_name: name || null }).eq("id", user.id);
+  revalidatePath("/konto");
+}
 
 export async function logout() {
   const supabase = await createSupabaseServerClient();
