@@ -7,7 +7,8 @@
     "login": "Acceder",
     "konto": "Cuenta",
     "menuOpen": "Abrir menú",
-    "menuClose": "Cerrar menú"
+    "menuClose": "Cerrar menú",
+    "signup": "Regístrate gratis"
   },
   "footer": {
     "disclaimer": "Datos de <link>SEC EDGAR</link> (formularios Form 4). Solo con fines informativos — no es asesoramiento de inversión. Consulta siempre la publicación original enlazada. No afiliado a la U.S. Securities and Exchange Commission.",
@@ -24,18 +25,19 @@
   },
   "home": {
     "hero": {
-      "live": "En vivo · Datos de insiders. Tiempo real. Señales relevantes.",
-      "headlinePrefix": "Dinero inteligente.",
-      "headlineHighlight": "Decisiones más inteligentes.",
-      "subtitle": "Descubre qué hacen los CEOs y directivos con su propio dinero — y aprovecha la ventaja.",
+      "status": "En vivo · Datos reales · Actividad global de insiders",
+      "headlineLine1": "Los insiders",
+      "headlineLine2": "mueven",
+      "headlineHighlight": "el mercado.",
+      "subtitle": "Datos reales de insiders. Señales claras. Mejores decisiones.",
       "cta": "Descubrir compras de insiders →",
-      "trustBullets": ["Datos oficiales de 7 países", "Analizado automáticamente", "Para mejores decisiones"]
-    },
-    "stats": {
-      "purchasesToday": "Compras de insiders la semana pasada",
-      "volumeToday": "Volumen total la semana pasada",
-      "strongSignals": "Señales de compra fuertes la semana pasada (≥ 500.000 $)",
-      "mediumSignals": "Señales de compra medias la semana pasada (100.000–499.999 $)"
+      "secondaryCta": "Cómo funciona",
+      "kpis": {
+        "purchases": "Compras de insiders",
+        "volume": "Volumen",
+        "countries": "Países",
+        "strongSignals": "Señales de compra fuertes"
+      }
     },
     "features": {
       "live": "En vivo",
@@ -312,7 +314,7 @@
         "insider": "Insider",
         "date": "Fecha",
         "value": "Valor",
-        "score": "Puntuación"
+        "buySignal": "Señal"
       }
     },
     "activity": {

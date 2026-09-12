@@ -7,7 +7,8 @@
     "login": "Login",
     "konto": "Account",
     "menuOpen": "Open menu",
-    "menuClose": "Close menu"
+    "menuClose": "Close menu",
+    "signup": "Get started free"
   },
   "footer": {
     "disclaimer": "Data from <link>SEC EDGAR</link> (Form 4 filings). For informational purposes only — not investment advice. Always check the linked original filing. Not affiliated with the U.S. Securities and Exchange Commission.",
@@ -24,18 +25,19 @@
   },
   "home": {
     "hero": {
-      "live": "Live · Insider data. Real time. Relevant signals.",
-      "headlinePrefix": "Smart money.",
-      "headlineHighlight": "Smarter decisions.",
-      "subtitle": "See what CEOs and executives are doing with their own money — and use the edge.",
+      "status": "Live · Real data · Global insider activity",
+      "headlineLine1": "Insider",
+      "headlineLine2": "moves",
+      "headlineHighlight": "the market.",
+      "subtitle": "Real insider data. Clear signals. Better decisions.",
       "cta": "Explore insider trades →",
-      "trustBullets": ["Real filings from 7 countries", "Automatically analyzed", "For better decisions"]
-    },
-    "stats": {
-      "purchasesToday": "Insider purchases last week",
-      "volumeToday": "Total volume last week",
-      "strongSignals": "Strong buy signals last week (≥ $500,000)",
-      "mediumSignals": "Medium buy signals last week ($100,000–$499,999)"
+      "secondaryCta": "How it works",
+      "kpis": {
+        "purchases": "Insider trades",
+        "volume": "Volume",
+        "countries": "Countries",
+        "strongSignals": "Strong buy signals"
+      }
     },
     "features": {
       "live": "Live",

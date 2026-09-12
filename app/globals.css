@@ -49,3 +49,25 @@ body {
   0% { transform: scale(0.7); opacity: 0.9; }
   100% { transform: scale(2.4); opacity: 0; }
 }
+
+/* Homepage hero (app/[locale]/page.tsx) and its components under
+   components/hero/ — scoped to that section only. */
+.hero-surface {
+  background:
+    radial-gradient(120% 100% at 85% 0%, rgba(78, 203, 60, 0.1), transparent 55%),
+    linear-gradient(180deg, #030706 0%, #06100b 100%);
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes hero-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-6px, 4px); }
+}
+
+@keyframes hero-line-draw {
+  to { stroke-dashoffset: 0; }
+}

@@ -7,7 +7,8 @@
     "login": "Login",
     "konto": "Konto",
     "menuOpen": "Menü öffnen",
-    "menuClose": "Menü schließen"
+    "menuClose": "Menü schließen",
+    "signup": "Kostenlos starten"
   },
   "footer": {
     "disclaimer": "Daten von <link>SEC EDGAR</link> (Form-4-Meldungen). Nur zu Informationszwecken — keine Anlageberatung. Bitte immer die verlinkte Original-Meldung prüfen. Nicht verbunden mit der U.S. Securities and Exchange Commission.",
@@ -24,18 +25,19 @@
   },
   "home": {
     "hero": {
-      "live": "Live · Insider-Daten. Echtzeit. Relevante Signale.",
-      "headlinePrefix": "Smartes Geld.",
-      "headlineHighlight": "Smartere Entscheidungen.",
-      "subtitle": "Sieh, was CEOs und Vorstände mit ihrem eigenen Geld machen – und nutze den Vorsprung.",
+      "status": "Live · Echte Daten · Globale Insider-Aktivität",
+      "headlineLine1": "Insider",
+      "headlineLine2": "bewegen",
+      "headlineHighlight": "den Markt.",
+      "subtitle": "Echte Insider-Daten. Klare Signale. Bessere Entscheidungen.",
       "cta": "Insider-Käufe entdecken →",
-      "trustBullets": ["Echte Meldedaten aus 7 Ländern", "Automatisch analysiert", "Für bessere Entscheidungen"]
-    },
-    "stats": {
-      "purchasesToday": "Insider-Käufe letzte Woche",
-      "volumeToday": "Gesamtvolumen letzte Woche",
-      "strongSignals": "Starke Kaufsignale letzte Woche (≥ 500.000 $)",
-      "mediumSignals": "Mittelstarke Kaufsignale letzte Woche (100.000–499.999 $)"
+      "secondaryCta": "So funktioniert's",
+      "kpis": {
+        "purchases": "Insider-Käufe",
+        "volume": "Volumen",
+        "countries": "Länder",
+        "strongSignals": "Starke Kaufsignale"
+      }
     },
     "features": {
       "live": "Live",

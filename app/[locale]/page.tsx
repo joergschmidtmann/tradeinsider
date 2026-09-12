@@ -4,9 +4,13 @@ import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { getEurRates, convertToEur, convertToUsd } from "@/lib/fxRates";
 import { buySignalTier } from "@/lib/buySignal";
 import { translateTitle } from "@/lib/translateTitle";
-import { countryLabel } from "@/lib/countries";
+import { countryLabel, COUNTRIES } from "@/lib/countries";
 import { weekRangeInBerlin } from "@/lib/weekRange";
 import { BuySignalIcon } from "@/components/BuySignalIcon";
+import { LiveStatus } from "@/components/hero/LiveStatus";
+import { HeroStats } from "@/components/hero/HeroStats";
+import { HeroSignalCard } from "@/components/hero/HeroSignalCard";
+import { GlobalActivityMap } from "@/components/hero/GlobalActivityMap";
 import type { Locale } from "@/i18n/routing";
 
 // Without this, Next statically prerenders the homepage at build time (no
@@ -35,14 +39,6 @@ interface RecentPurchaseRow {
 function formatCompactEur(amount: number, uiLocale: string): string {
   return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR", notation: "compact", maximumFractionDigits: 1 }).format(
     amount
-  );
-}
-
-function LiveDot() {
-  return (
-    <span className="relative h-[7px] w-[7px] rounded-full bg-gradient-accent">
-      <span className="absolute -inset-[5px] animate-[home-livepulse_2.2s_ease-out_infinite] rounded-full border border-[#a855f7] motion-reduce:animate-none" />
-    </span>
   );
 }
 
@@ -136,63 +132,141 @@ export default async function Home({ params }: PageProps) {
   const volumeLastWeekEur = rows.reduce((sum, row) => sum + (row.eur ?? 0), 0);
   const tiers = rows.map((row) => buySignalTier(row.usd));
   const strongSignals = tiers.filter((tier) => tier === "strong").length;
-  const mediumSignals = tiers.filter((tier) => tier === "medium").length;
 
   const recent = (recentRows ?? []) as RecentPurchaseRow[];
   const featureKeys = ["insiderKaeufe", "tradingIntelligence", "tradingAcademy"] as const;
   const whyItems = t.raw("why.items") as { title: string; description: string }[];
   const steps = t.raw("how.steps") as { title: string; description: string }[];
 
+  // Hero floating signal cards: the 2-3 biggest of the same recent purchases
+  // already fetched above, by USD value — no separate query for the picks
+  // themselves. A "since purchase" percentage is only shown where a real
+  // quote exists (US tickers only, see scripts/ingest-prices.ts); never
+  // fabricated for the rest.
+  const heroCandidates = recent
+    .map((row) => ({ ...row, usdValue: row.total_value !== null ? convertToUsd(row.total_value, row.currency, eurRates) : null }))
+    .filter((row): row is typeof row & { usdValue: number } => row.usdValue !== null && row.usdValue > 0)
+    .sort((a, b) => b.usdValue - a.usdValue)
+    .slice(0, 3);
+
+  const heroTickers = [...new Set(heroCandidates.map((row) => row.issuer_ticker).filter((ticker): ticker is string => !!ticker))];
+  const { data: heroQuoteRows } =
+    heroTickers.length > 0
+      ? await supabase.from("stock_quotes").select("ticker, price, currency").in("ticker", heroTickers)
+      : { data: [] as { ticker: string; price: number; currency: string }[] };
+  const heroQuotes = new Map((heroQuoteRows ?? []).map((q) => [q.ticker, q]));
+
+  const heroSignals = heroCandidates.map((row) => {
+    const quote = row.issuer_ticker ? heroQuotes.get(row.issuer_ticker) : undefined;
+    const pctChange =
+      quote && quote.currency === row.currency && row.price_per_share
+        ? ((quote.price - row.price_per_share) / row.price_per_share) * 100
+        : null;
+    return {
+      id: row.id,
+      ticker: row.issuer_ticker ?? row.issuer_name,
+      issuerName: row.issuer_name,
+      roleLabel: translateTitle(row.owner_title, locale),
+      amountLabel:
+        row.total_value !== null
+          ? new Intl.NumberFormat(uiLocale, { style: "currency", currency: row.currency, maximumFractionDigits: 0 }).format(row.total_value)
+          : "—",
+      tier: buySignalTier(row.usdValue)!,
+      sourceCountry: row.source_country,
+      pctChange,
+    };
+  });
+
+  const countriesLive = COUNTRIES.length;
+
+  function toCardProps(signal: (typeof heroSignals)[number]) {
+    return {
+      ticker: signal.ticker,
+      issuerName: signal.issuerName,
+      roleLabel: signal.roleLabel,
+      amountLabel: signal.amountLabel,
+      tier: signal.tier,
+      tierLabel: tBuySignal(signal.tier),
+      pctChange: signal.pctChange,
+    };
+  }
+
   return (
     <main className="flex-1">
       {/* Hero */}
-      <section className="mx-auto max-w-3xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
-        <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs tracking-wide text-muted uppercase">
-          <LiveDot />
-          {t("hero.live")}
-        </p>
-        <h1 className="text-4xl font-extrabold tracking-tight text-balance break-words sm:text-5xl md:text-6xl">
-          {t("hero.headlinePrefix")} <span className="text-gradient">{t("hero.headlineHighlight")}</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-lg text-lg text-muted text-balance">{t("hero.subtitle")}</p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-          <Link
-            href="/insider-kaeufe"
-            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-accent px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_-8px_rgba(168,85,247,0.55)] transition hover:-translate-y-px hover:opacity-90"
-          >
-            {t("hero.cta")}
-          </Link>
-        </div>
-        <ul className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted">
-          {(t.raw("hero.trustBullets") as string[]).map((bullet) => (
-            <li key={bullet} className="flex items-center gap-1.5">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-3.5 w-3.5 shrink-0">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
-              </svg>
-              {bullet}
-            </li>
-          ))}
-        </ul>
-      </section>
+      <section className="hero-surface relative overflow-hidden border-b border-border">
+        <div className="mx-auto max-w-[1440px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+          <div className="grid gap-12 lg:grid-cols-[45%_55%] lg:items-center lg:gap-10">
+            {/* Left: headline */}
+            <div className="text-center lg:text-left">
+              <LiveStatus label={t("hero.status")} />
+              <h1 className="mt-6 text-5xl leading-[0.95] font-extrabold tracking-tight text-balance sm:text-6xl lg:text-7xl">
+                <span className="block text-foreground">{t("hero.headlineLine1")}</span>
+                <span className="block text-foreground">{t("hero.headlineLine2")}</span>
+                <span className="block text-gradient">{t("hero.headlineHighlight")}</span>
+              </h1>
+              <p className="mx-auto mt-6 max-w-md text-lg text-muted text-balance lg:mx-0">{t("hero.subtitle")}</p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:justify-start">
+                <Link
+                  href="/insider-kaeufe"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-gradient-accent px-6 py-3 text-sm font-semibold text-black shadow-[0_0_24px_-6px_rgba(120,255,70,0.55)] transition hover:-translate-y-px hover:shadow-[0_0_32px_-4px_rgba(120,255,70,0.7)]"
+                >
+                  {t("hero.cta")}
+                </Link>
+                <Link href="#how-it-works" className="inline-flex items-center gap-2.5 text-sm font-medium text-foreground transition hover:text-muted">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="ml-0.5 h-3 w-3">
+                      <path d="M6 4v16l14-8-14-8Z" />
+                    </svg>
+                  </span>
+                  {t("hero.secondaryCta")}
+                </Link>
+              </div>
+            </div>
 
-      {/* Stats band */}
-      <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
-        <div className="grid grid-cols-2 gap-3 rounded-2xl border border-border bg-surface p-5 sm:grid-cols-4 sm:gap-6 sm:p-6">
-          <div>
-            <div className="text-2xl font-bold text-foreground sm:text-3xl">{numberFormatter.format(purchasesLastWeek)}</div>
-            <div className="mt-1 text-xs text-muted">{t("stats.purchasesToday")}</div>
+            {/* Right: global activity visualization */}
+            <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+              <GlobalActivityMap locale={locale} highlightCodes={heroSignals.map((s) => s.sourceCountry)} />
+
+              {heroSignals[0] && (
+                <div className="absolute top-0 left-0 hidden animate-[hero-float_7s_ease-in-out_infinite] motion-reduce:animate-none sm:block">
+                  <HeroSignalCard {...toCardProps(heroSignals[0])} />
+                </div>
+              )}
+              {heroSignals[2] && (
+                <div
+                  className="absolute top-2 right-0 hidden animate-[hero-float_9s_ease-in-out_infinite] motion-reduce:animate-none xl:block"
+                  style={{ animationDelay: "2.6s" }}
+                >
+                  <HeroSignalCard {...toCardProps(heroSignals[2])} size="sm" />
+                </div>
+              )}
+              {heroSignals[1] && (
+                <div
+                  className="absolute right-8 bottom-0 hidden animate-[hero-float_8s_ease-in-out_infinite] motion-reduce:animate-none md:block"
+                  style={{ animationDelay: "1.4s" }}
+                >
+                  <HeroSignalCard {...toCardProps(heroSignals[1])} size="sm" />
+                </div>
+              )}
+
+              {heroSignals[0] && (
+                <div className="mt-4 flex justify-center sm:hidden">
+                  <HeroSignalCard {...toCardProps(heroSignals[0])} />
+                </div>
+              )}
+            </div>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-foreground sm:text-3xl">{formatCompactEur(volumeLastWeekEur, uiLocale)}</div>
-            <div className="mt-1 text-xs text-muted">{t("stats.volumeToday")}</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-foreground sm:text-3xl">{numberFormatter.format(strongSignals)}</div>
-            <div className="mt-1 text-xs text-muted">{t("stats.strongSignals")}</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-foreground sm:text-3xl">{numberFormatter.format(mediumSignals)}</div>
-            <div className="mt-1 text-xs text-muted">{t("stats.mediumSignals")}</div>
+
+          <div className="mt-14 border-t border-white/10 pt-8 lg:mt-16">
+            <HeroStats
+              stats={[
+                { value: numberFormatter.format(purchasesLastWeek), label: t("hero.kpis.purchases") },
+                { value: formatCompactEur(volumeLastWeekEur, uiLocale), label: t("hero.kpis.volume") },
+                { value: String(countriesLive), label: t("hero.kpis.countries") },
+                { value: numberFormatter.format(strongSignals), label: t("hero.kpis.strongSignals") },
+              ]}
+            />
           </div>
         </div>
       </section>
@@ -326,7 +400,7 @@ export default async function Home({ params }: PageProps) {
       </section>
 
       {/* How it works */}
-      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+      <section id="how-it-works" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-20 sm:px-6">
         <div className="mb-10">
           <h2 className="text-2xl font-semibold sm:text-3xl">{t("how.heading")}</h2>
           <p className="mt-2 text-muted">{t("how.subheading")}</p>

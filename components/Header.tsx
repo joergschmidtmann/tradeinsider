@@ -81,6 +81,15 @@ export function Header() {
             {isLoggedIn ? t("konto") : t("login")}
           </Link>
 
+          {!isLoggedIn && (
+            <Link
+              href="/signup"
+              className="hidden rounded-full bg-gradient-accent px-4 py-1.5 text-sm font-semibold text-black transition hover:opacity-90 lg:block"
+            >
+              {t("signup")}
+            </Link>
+          )}
+
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
@@ -129,6 +138,15 @@ export function Header() {
           >
             {isLoggedIn ? t("konto") : t("login")}
           </Link>
+          {!isLoggedIn && (
+            <Link
+              href="/signup"
+              onClick={() => setMenuOpen(false)}
+              className="mt-1 rounded-full bg-gradient-accent px-3 py-2.5 text-center text-base font-semibold text-black"
+            >
+              {t("signup")}
+            </Link>
+          )}
           <div className="mt-2 border-t border-border px-3 pt-3">
             <LocaleSwitcher onNavigate={() => setMenuOpen(false)} />
           </div>
