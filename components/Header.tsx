@@ -84,7 +84,7 @@ export function Header() {
           {!isLoggedIn && (
             <Link
               href="/signup"
-              className="hidden rounded-full bg-gradient-accent px-4 py-1.5 text-sm font-semibold text-black transition hover:opacity-90 lg:block"
+              className="hidden rounded-full bg-gradient-accent px-4 py-1.5 text-sm font-semibold whitespace-nowrap text-black transition hover:opacity-90 lg:block"
             >
               {t("signup")}
             </Link>
