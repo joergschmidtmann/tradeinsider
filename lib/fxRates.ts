@@ -27,3 +27,18 @@ export function convertToEur(amount: number, currency: string, rates: Record<str
   if (!rate) return null;
   return amount / rate;
 }
+
+/** Converts an amount in `currency` to USD, bridging through the EUR-based
+ * `rates` table (unlike `convertToEur`, this always returns a value —
+ * including when `currency` already is USD or EUR — since callers use it to
+ * classify a purchase's size, not to show an optional "≈" hint). Returns null
+ * only when the conversion genuinely can't be done (rate unavailable). */
+export function convertToUsd(amount: number, currency: string, rates: Record<string, number>): number | null {
+  if (currency === "USD") return amount;
+  const usdPerEur = rates.USD;
+  if (!usdPerEur) return null;
+  if (currency === "EUR") return amount * usdPerEur;
+  const rate = rates[currency];
+  if (!rate) return null;
+  return (amount / rate) * usdPerEur;
+}

@@ -34,8 +34,8 @@
     "stats": {
       "purchasesToday": "Insider-Käufe letzte Woche",
       "volumeToday": "Gesamtvolumen letzte Woche",
-      "avgScore": "Ø Insider Score (letzte Woche)",
-      "strongSignals": "Starke Signale letzte Woche (Score ≥ 75)"
+      "strongSignals": "Starke Kaufsignale letzte Woche (≥ 500.000 $)",
+      "mediumSignals": "Mittelstarke Kaufsignale letzte Woche (100.000–499.999 $)"
     },
     "features": {
       "live": "Live",
@@ -70,7 +70,7 @@
         "country": "Land",
         "date": "Datum",
         "value": "Wert",
-        "score": "Score"
+        "buySignal": "Signal"
       }
     },
     "why": {
@@ -82,8 +82,8 @@
           "description": "Direkt von offiziellen Meldestellen: SEC, EQS, CNMV und weiteren Regulierern in sieben Ländern."
         },
         {
-          "title": "Quantitativer Score",
-          "description": "Jeder Kauf wird automatisch mit einem Score von 0 bis 100 bewertet — basierend auf Rolle, Kaufgröße und weiteren Faktoren."
+          "title": "Klares Kaufsignal",
+          "description": "Jeder Kauf wird automatisch nach Volumen eingeordnet — stark, mittelstark oder schwach, auf einen Blick erkennbar."
         },
         {
           "title": "Schneller Vorteil",
@@ -109,7 +109,7 @@
         },
         {
           "title": "Automatisch bewerten",
-          "description": "Jede Transaktion bekommt einen eigenen Insider Score."
+          "description": "Jede Transaktion bekommt ein Kaufsignal-Symbol nach Kaufvolumen."
         },
         {
           "title": "Relevante Signale nutzen",
@@ -166,12 +166,12 @@
       "shares": "Aktien",
       "price": "Preis",
       "totalValue": "Gesamtwert",
-      "score": "Score",
+      "buySignal": "Signal",
       "performance": "Seit Kauf",
       "filing": "Meldung",
       "view": "Ansehen",
       "news": "News",
-      "scoreTooltip": "Automatisch berechneter Indikator (0–100) aus Rolle, Kaufgröße relativ zum Bestand, Gesamtsumme und weiteren Insidern derselben Firma. Keine Anlageempfehlung.",
+      "buySignalTooltip": "Kaufsignal nach Kaufvolumen: stark ab 500.000 $, mittelstark ab 100.000 $, sonst schwach.",
       "showAll": "Alle anzeigen",
       "noValues": "Keine Werte gefunden."
     }
@@ -245,20 +245,25 @@
       "heading": "Mein Konto",
       "loggedInAs": "Angemeldet als {email}",
       "proBadge": "Pro",
-      "proDescription": "Voller Zugriff auf alle Insider-Käufe inkl. Insider-Score.",
+      "proDescription": "Voller Zugriff auf alle Insider-Käufe inkl. Kaufsignal.",
       "manageSubscription": "Abo verwalten",
       "upgradeHeading": "Auf Pro upgraden",
-      "upgradeDescription": "Insider-Käufe von Vorständen und Aufsichtsräten inkl. Insider-Score freischalten.",
+      "upgradeDescription": "Insider-Käufe von Vorständen und Aufsichtsräten inkl. Kaufsignal freischalten.",
       "monthly": "Monatlich — €14,99",
       "yearly": "Jährlich — €149",
       "logout": "Abmelden"
     },
     "paywall": {
       "heading": "Nur für Pro-Mitglieder",
-      "description": "Insider-Käufe von Vorständen und Aufsichtsräten inkl. Insider-Score sind Teil von tradeinsider Pro. Politiker- und Hedgefonds-Trades bleiben kostenlos.",
+      "description": "Insider-Käufe von Vorständen und Aufsichtsräten inkl. Kaufsignal sind Teil von tradeinsider Pro. Politiker- und Hedgefonds-Trades bleiben kostenlos.",
       "ctaLoggedIn": "Jetzt upgraden",
       "ctaLoggedOut": "Kostenlos registrieren"
     }
+  },
+  "buySignal": {
+    "strong": "Starkes Kaufsignal (≥ 500.000 $)",
+    "medium": "Mittelstarkes Kaufsignal (100.000–499.999 $)",
+    "weak": "Schwaches Kaufsignal (< 100.000 $)"
   },
   "dashboard": {
     "sidebar": {
@@ -287,10 +292,9 @@
     "stats": {
       "purchases": "Insider-Käufe (letzte Woche)",
       "volume": "Gesamtvolumen",
-      "avgScore": "Ø Insider Score",
-      "strongSignals": "Starke Signale (Score ≥ 75)",
+      "strongSignals": "Starke Kaufsignale (≥ 500.000 $)",
+      "mediumSignals": "Mittelstarke Kaufsignale (100.000–499.999 $)",
       "vsPreviousWeek": "vs. Vorwoche",
-      "points": "Punkte",
       "new": "Neu"
     },
     "topSignals": {
@@ -308,7 +312,7 @@
         "insider": "Insider",
         "date": "Datum",
         "value": "Wert",
-        "score": "Score"
+        "buySignal": "Signal"
       }
     },
     "activity": {

@@ -1,11 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createSupabaseReadClient } from "@/lib/supabaseClient";
-import { getEurRates, convertToEur } from "@/lib/fxRates";
+import { getEurRates, convertToEur, convertToUsd } from "@/lib/fxRates";
+import { buySignalTier } from "@/lib/buySignal";
 import { translateTitle } from "@/lib/translateTitle";
 import { countryLabel } from "@/lib/countries";
 import { weekRangeInBerlin } from "@/lib/weekRange";
-import { ScoreRing } from "@/components/ScoreRing";
+import { BuySignalIcon } from "@/components/BuySignalIcon";
 import type { Locale } from "@/i18n/routing";
 
 // Without this, Next statically prerenders the homepage at build time (no
@@ -29,7 +30,6 @@ interface RecentPurchaseRow {
   price_per_share: number | null;
   total_value: number | null;
   currency: string;
-  insider_score: number | null;
 }
 
 function formatCompactEur(amount: number, uiLocale: string): string {
@@ -90,6 +90,7 @@ interface PageProps {
 export default async function Home({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations("home");
+  const tBuySignal = await getTranslations("buySignal");
   const uiLocale = INTL_LOCALES[locale];
   const dateFormatter = new Intl.DateTimeFormat(uiLocale, { year: "numeric", month: "short", day: "numeric" });
   const numberFormatter = new Intl.NumberFormat(uiLocale);
@@ -100,7 +101,7 @@ export default async function Home({ params }: PageProps) {
   const [{ data: weekRows }, { data: recentRows }, eurRates] = await Promise.all([
     supabase
       .from("transactions")
-      .select("issuer_name, total_value, currency, insider_score")
+      .select("issuer_name, total_value, currency")
       .in("role", ["management_board", "supervisory_board"])
       .eq("transaction_code", "P")
       .gte("transaction_date", weekFrom)
@@ -108,7 +109,7 @@ export default async function Home({ params }: PageProps) {
     supabase
       .from("transactions")
       .select(
-        "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, currency, insider_score"
+        "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, currency"
       )
       .in("role", ["management_board", "supervisory_board"])
       .eq("transaction_code", "P")
@@ -128,13 +129,14 @@ export default async function Home({ params }: PageProps) {
   const rowsWithEur = (weekRows ?? []).map((row) => ({
     ...row,
     eur: row.total_value === null ? null : row.currency === "EUR" ? row.total_value : convertToEur(row.total_value, row.currency, eurRates),
+    usd: row.total_value === null ? null : convertToUsd(row.total_value, row.currency, eurRates),
   }));
   const rows = rowsWithEur.filter((row) => row.eur === null || row.eur <= OUTLIER_EUR_THRESHOLD);
   const purchasesLastWeek = rows.length;
   const volumeLastWeekEur = rows.reduce((sum, row) => sum + (row.eur ?? 0), 0);
-  const scoredRows = rows.filter((row): row is typeof row & { insider_score: number } => row.insider_score !== null);
-  const avgScore = scoredRows.length > 0 ? Math.round(scoredRows.reduce((sum, row) => sum + row.insider_score, 0) / scoredRows.length) : null;
-  const strongSignals = scoredRows.filter((row) => row.insider_score >= 75).length;
+  const tiers = rows.map((row) => buySignalTier(row.usd));
+  const strongSignals = tiers.filter((tier) => tier === "strong").length;
+  const mediumSignals = tiers.filter((tier) => tier === "medium").length;
 
   const recent = (recentRows ?? []) as RecentPurchaseRow[];
   const featureKeys = ["insiderKaeufe", "tradingIntelligence", "tradingAcademy"] as const;
@@ -185,12 +187,12 @@ export default async function Home({ params }: PageProps) {
             <div className="mt-1 text-xs text-muted">{t("stats.volumeToday")}</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-foreground sm:text-3xl">{avgScore ?? "—"}</div>
-            <div className="mt-1 text-xs text-muted">{t("stats.avgScore")}</div>
-          </div>
-          <div>
             <div className="text-2xl font-bold text-foreground sm:text-3xl">{numberFormatter.format(strongSignals)}</div>
             <div className="mt-1 text-xs text-muted">{t("stats.strongSignals")}</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-foreground sm:text-3xl">{numberFormatter.format(mediumSignals)}</div>
+            <div className="mt-1 text-xs text-muted">{t("stats.mediumSignals")}</div>
           </div>
         </div>
       </section>
@@ -255,11 +257,14 @@ export default async function Home({ params }: PageProps) {
                     <th className="px-5 py-3.5 font-medium">{t("recent.table.country")}</th>
                     <th className="px-5 py-3.5 font-medium">{t("recent.table.date")}</th>
                     <th className="px-5 py-3.5 text-right font-medium">{t("recent.table.value")}</th>
-                    <th className="px-5 py-3.5 text-right font-medium">{t("recent.table.score")}</th>
+                    <th className="px-5 py-3.5 text-right font-medium">{t("recent.table.buySignal")}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recent.map((row) => (
+                  {recent.map((row) => {
+                    const valueUsd = row.total_value !== null ? convertToUsd(row.total_value, row.currency, eurRates) : null;
+                    const tier = buySignalTier(valueUsd);
+                    return (
                     <tr key={row.id} className="border-b border-border/60 last:border-0 hover:bg-surface-2">
                       <td className="px-5 py-3.5">
                         <div className="font-medium text-foreground">{row.issuer_name}</div>
@@ -279,14 +284,15 @@ export default async function Home({ params }: PageProps) {
                           : "—"}
                       </td>
                       <td className="px-5 py-3.5 text-right whitespace-nowrap">
-                        {row.insider_score !== null ? (
-                          <ScoreRing score={row.insider_score} />
+                        {tier !== null ? (
+                          <BuySignalIcon tier={tier} label={tBuySignal(tier)} />
                         ) : (
                           <span className="text-muted">—</span>
                         )}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

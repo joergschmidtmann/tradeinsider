@@ -34,8 +34,8 @@
     "stats": {
       "purchasesToday": "Compras de insiders la semana pasada",
       "volumeToday": "Volumen total la semana pasada",
-      "avgScore": "Score medio de insider (semana pasada)",
-      "strongSignals": "Señales fuertes la semana pasada (Score ≥ 75)"
+      "strongSignals": "Señales de compra fuertes la semana pasada (≥ 500.000 $)",
+      "mediumSignals": "Señales de compra medias la semana pasada (100.000–499.999 $)"
     },
     "features": {
       "live": "En vivo",
@@ -70,7 +70,7 @@
         "country": "País",
         "date": "Fecha",
         "value": "Valor",
-        "score": "Score"
+        "buySignal": "Señal"
       }
     },
     "why": {
@@ -82,8 +82,8 @@
           "description": "Directamente de organismos oficiales: SEC, EQS, CNMV y otros reguladores en siete países."
         },
         {
-          "title": "Score cuantitativo",
-          "description": "Cada compra se puntúa automáticamente de 0 a 100 — según el cargo, el tamaño de la compra y otros factores."
+          "title": "Señal de compra clara",
+          "description": "Cada compra se clasifica automáticamente por volumen — fuerte, media o débil, reconocible de un vistazo."
         },
         {
           "title": "Ventaja más rápida",
@@ -109,7 +109,7 @@
         },
         {
           "title": "Puntuar automáticamente",
-          "description": "Cada transacción recibe su propio Insider Score."
+          "description": "Cada transacción recibe un icono de señal de compra según su volumen."
         },
         {
           "title": "Aprovechar señales relevantes",
@@ -166,12 +166,12 @@
       "shares": "Acciones",
       "price": "Precio",
       "totalValue": "Valor Total",
-      "score": "Puntuación",
+      "buySignal": "Señal",
       "performance": "Desde la Compra",
       "filing": "Informe",
       "view": "Ver",
       "news": "Noticias",
-      "scoreTooltip": "Indicador calculado automáticamente (0–100) según el cargo, el tamaño de la compra en relación con la posición, el importe total y otros insiders de la misma empresa. No es asesoramiento de inversión.",
+      "buySignalTooltip": "Señal de compra según el volumen: fuerte desde 500.000 $, media desde 100.000 $, en caso contrario débil.",
       "showAll": "Mostrar todos",
       "noValues": "No se encontraron valores."
     }
@@ -245,20 +245,25 @@
       "heading": "Mi Cuenta",
       "loggedInAs": "Sesión iniciada como {email}",
       "proBadge": "Pro",
-      "proDescription": "Acceso completo a todas las compras de insiders, incluida la puntuación de insider.",
+      "proDescription": "Acceso completo a todas las compras de insiders, incluida la señal de compra.",
       "manageSubscription": "Gestionar suscripción",
       "upgradeHeading": "Mejorar a Pro",
-      "upgradeDescription": "Desbloquea las compras de insiders de directivos y consejos de supervisión, incluida la puntuación de insider.",
+      "upgradeDescription": "Desbloquea las compras de insiders de directivos y consejos de supervisión, incluida la señal de compra.",
       "monthly": "Mensual — 14,99 €",
       "yearly": "Anual — 149 €",
       "logout": "Cerrar sesión"
     },
     "paywall": {
       "heading": "Solo para miembros Pro",
-      "description": "Las compras de insiders de directivos y consejos de supervisión, incluida la puntuación de insider, forman parte de tradeinsider Pro. Las operaciones de políticos y fondos de cobertura siguen siendo gratuitas.",
+      "description": "Las compras de insiders de directivos y consejos de supervisión, incluida la señal de compra, forman parte de tradeinsider Pro. Las operaciones de políticos y fondos de cobertura siguen siendo gratuitas.",
       "ctaLoggedIn": "Mejorar ahora",
       "ctaLoggedOut": "Regístrate gratis"
     }
+  },
+  "buySignal": {
+    "strong": "Señal de compra fuerte (≥ 500.000 $)",
+    "medium": "Señal de compra media (100.000–499.999 $)",
+    "weak": "Señal de compra débil (< 100.000 $)"
   },
   "dashboard": {
     "sidebar": {
@@ -287,10 +292,9 @@
     "stats": {
       "purchases": "Compras de insiders (última semana)",
       "volume": "Volumen total",
-      "avgScore": "Puntuación media de insider",
-      "strongSignals": "Señales fuertes (puntuación ≥ 75)",
+      "strongSignals": "Señales de compra fuertes (≥ 500.000 $)",
+      "mediumSignals": "Señales de compra medias (100.000–499.999 $)",
       "vsPreviousWeek": "vs. semana anterior",
-      "points": "puntos",
       "new": "Nuevo"
     },
     "topSignals": {

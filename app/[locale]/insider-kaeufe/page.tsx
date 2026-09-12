@@ -92,7 +92,7 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
     supabase
       .from("transactions")
       .select(
-        "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, amount_range, currency, filing_url, insider_score",
+        "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, amount_range, currency, filing_url",
         { count: "exact" }
       ),
     baseFilters
@@ -177,7 +177,7 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
                   company={company}
                   insider={insider}
                   country={country}
-                  showScore={isVorstand}
+                  showBuySignal={isVorstand}
                   showCountry={isVorstand}
                   eurRates={eurRates}
                   locale={locale}

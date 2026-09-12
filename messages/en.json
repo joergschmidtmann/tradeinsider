@@ -34,8 +34,8 @@
     "stats": {
       "purchasesToday": "Insider purchases last week",
       "volumeToday": "Total volume last week",
-      "avgScore": "Avg. Insider Score (last week)",
-      "strongSignals": "Strong signals last week (Score ≥ 75)"
+      "strongSignals": "Strong buy signals last week (≥ $500,000)",
+      "mediumSignals": "Medium buy signals last week ($100,000–$499,999)"
     },
     "features": {
       "live": "Live",
@@ -70,7 +70,7 @@
         "country": "Country",
         "date": "Date",
         "value": "Value",
-        "score": "Score"
+        "buySignal": "Signal"
       }
     },
     "why": {
@@ -82,8 +82,8 @@
           "description": "Straight from official filing bodies: SEC, EQS, CNMV, and other regulators across seven countries."
         },
         {
-          "title": "Quantitative score",
-          "description": "Every purchase is automatically scored from 0 to 100 — based on role, purchase size, and other factors."
+          "title": "Clear buy signal",
+          "description": "Every purchase is automatically classified by size — strong, medium, or weak, recognizable at a glance."
         },
         {
           "title": "A faster edge",
@@ -109,7 +109,7 @@
         },
         {
           "title": "Score automatically",
-          "description": "Every transaction gets its own Insider Score."
+          "description": "Every transaction gets a buy-signal icon based on purchase size."
         },
         {
           "title": "Act on relevant signals",
@@ -166,12 +166,12 @@
       "shares": "Shares",
       "price": "Price",
       "totalValue": "Total Value",
-      "score": "Score",
+      "buySignal": "Signal",
       "performance": "Since Purchase",
       "filing": "Filing",
       "view": "View",
       "news": "News",
-      "scoreTooltip": "Automatically calculated indicator (0–100) based on role, purchase size relative to holdings, total amount, and other insiders at the same company. Not investment advice.",
+      "buySignalTooltip": "Buy signal based on purchase size: strong from $500,000, medium from $100,000, otherwise weak.",
       "showAll": "Show all",
       "noValues": "No values found."
     }
@@ -245,20 +245,25 @@
       "heading": "My Account",
       "loggedInAs": "Signed in as {email}",
       "proBadge": "Pro",
-      "proDescription": "Full access to all insider trades incl. insider score.",
+      "proDescription": "Full access to all insider trades incl. buy signal.",
       "manageSubscription": "Manage subscription",
       "upgradeHeading": "Upgrade to Pro",
-      "upgradeDescription": "Unlock insider trades by executives and supervisory board members incl. insider score.",
+      "upgradeDescription": "Unlock insider trades by executives and supervisory board members incl. buy signal.",
       "monthly": "Monthly — €14.99",
       "yearly": "Yearly — €149",
       "logout": "Sign out"
     },
     "paywall": {
       "heading": "Pro members only",
-      "description": "Insider trades by executives and supervisory board members incl. insider score are part of tradeinsider Pro. Politician and hedge fund trades remain free.",
+      "description": "Insider trades by executives and supervisory board members incl. buy signal are part of tradeinsider Pro. Politician and hedge fund trades remain free.",
       "ctaLoggedIn": "Upgrade now",
       "ctaLoggedOut": "Sign up for free"
     }
+  },
+  "buySignal": {
+    "strong": "Strong buy signal (≥ $500,000)",
+    "medium": "Medium buy signal ($100,000–$499,999)",
+    "weak": "Weak buy signal (< $100,000)"
   },
   "dashboard": {
     "sidebar": {
@@ -287,10 +292,9 @@
     "stats": {
       "purchases": "Insider trades (last week)",
       "volume": "Total volume",
-      "avgScore": "Avg. insider score",
-      "strongSignals": "Strong signals (score ≥ 75)",
+      "strongSignals": "Strong buy signals (≥ $500,000)",
+      "mediumSignals": "Medium buy signals ($100,000–$499,999)",
       "vsPreviousWeek": "vs. previous week",
-      "points": "points",
       "new": "New"
     },
     "topSignals": {
@@ -308,7 +312,7 @@
         "insider": "Insider",
         "date": "Date",
         "value": "Value",
-        "score": "Score"
+        "buySignal": "Signal"
       }
     },
     "activity": {

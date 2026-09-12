@@ -4,11 +4,12 @@ import type { Locale } from "@/i18n/routing";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { stripe, PRO_MONTHLY_LOOKUP_KEY } from "@/lib/stripe";
-import { getEurRates, convertToEur } from "@/lib/fxRates";
+import { getEurRates, convertToEur, convertToUsd } from "@/lib/fxRates";
+import { buySignalTier } from "@/lib/buySignal";
 import { translateTitle } from "@/lib/translateTitle";
 import { countryLabel } from "@/lib/countries";
 import { weekRangeInBerlin, daysAgoInBerlin } from "@/lib/weekRange";
-import { ScoreRing } from "@/components/ScoreRing";
+import { BuySignalIcon } from "@/components/BuySignalIcon";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { StatTile, type StatDelta } from "@/components/dashboard/StatTile";
 import { TickerBadge } from "@/components/dashboard/TickerBadge";
@@ -26,7 +27,6 @@ const INTL_LOCALES: Record<Locale, string> = { de: "de-DE", en: "en-US", es: "es
 // sum/average. Excluded from the stats/signals below only, above a sanity
 // threshold (same one used on the homepage).
 const OUTLIER_EUR_THRESHOLD = 50_000_000;
-const STRONG_SIGNAL_THRESHOLD = 75;
 const ACTIVITY_WINDOW_DAYS = 30;
 
 interface SubscriptionSummary {
@@ -71,7 +71,6 @@ interface BoardPurchaseRow {
   price_per_share: number | null;
   total_value: number | null;
   currency: string;
-  insider_score: number | null;
 }
 
 function formatCompactEur(amount: number, uiLocale: string): string {
@@ -80,13 +79,13 @@ function formatCompactEur(amount: number, uiLocale: string): string {
   );
 }
 
-function summarizeWeek(rows: (BoardPurchaseRow & { eurValue: number })[]) {
+function summarizeWeek(rows: (BoardPurchaseRow & { eurValue: number; usdValue: number | null })[]) {
   const count = rows.length;
   const volumeEur = rows.reduce((sum, row) => sum + row.eurValue, 0);
-  const scored = rows.filter((row): row is typeof row & { insider_score: number } => row.insider_score !== null);
-  const avgScore = scored.length > 0 ? Math.round(scored.reduce((sum, row) => sum + row.insider_score, 0) / scored.length) : null;
-  const strongSignals = scored.filter((row) => row.insider_score >= STRONG_SIGNAL_THRESHOLD).length;
-  return { count, volumeEur, avgScore, strongSignals };
+  const tiers = rows.map((row) => buySignalTier(row.usdValue));
+  const strongSignals = tiers.filter((tier) => tier === "strong").length;
+  const mediumSignals = tiers.filter((tier) => tier === "medium").length;
+  return { count, volumeEur, strongSignals, mediumSignals };
 }
 
 export default async function KontoPage({ searchParams }: { searchParams: Promise<{ upgraded?: string }> }) {
@@ -105,6 +104,7 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
   const tKonto = await getTranslations("auth.konto");
   const tFooter = await getTranslations("footer");
   const tHome = await getTranslations("home");
+  const tBuySignal = await getTranslations("buySignal");
   const locale = (await getLocale()) as Locale;
   const uiLocale = INTL_LOCALES[locale];
   const sp = await searchParams;
@@ -130,7 +130,7 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
     supabase
       .from("transactions")
       .select(
-        "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, currency, insider_score"
+        "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, currency"
       )
       .in("role", ["management_board", "supervisory_board"])
       .eq("transaction_code", "P")
@@ -150,6 +150,7 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
   const rows = ((twoWeekRows ?? []) as BoardPurchaseRow[]).map((row) => ({
     ...row,
     eurValue: row.total_value === null ? 0 : row.currency === "EUR" ? row.total_value : (convertToEur(row.total_value, row.currency, eurRates) ?? 0),
+    usdValue: row.total_value === null ? null : convertToUsd(row.total_value, row.currency, eurRates),
   }));
   const filtered = rows.filter((row) => row.eurValue <= OUTLIER_EUR_THRESHOLD);
   const currentRows = filtered.filter((row) => row.transaction_date >= currentWeek.from);
@@ -169,16 +170,10 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
     if (diff === 0) return null;
     return { text: `${diff >= 0 ? "+" : ""}${diff} ${t("stats.vsPreviousWeek")}`, positive: diff >= 0 };
   }
-  function deltaPoints(curr: number | null, prev: number | null): StatDelta | null {
-    if (curr === null || prev === null) return null;
-    const diff = curr - prev;
-    if (diff === 0) return null;
-    return { text: `${diff >= 0 ? "+" : ""}${diff} ${t("stats.points")} ${t("stats.vsPreviousWeek")}`, positive: diff >= 0 };
-  }
 
   const topSignals = [...currentRows]
-    .filter((row): row is typeof row & { insider_score: number } => row.insider_score !== null)
-    .sort((a, b) => b.insider_score - a.insider_score)
+    .filter((row): row is typeof row & { usdValue: number } => row.usdValue !== null && row.usdValue > 0)
+    .sort((a, b) => b.usdValue - a.usdValue)
     .slice(0, 3);
 
   const recentPurchases = filtered.slice(0, 8);
@@ -216,17 +211,6 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className="h-5 w-5">
         <circle cx="12" cy="12" r="8.5" />
         <path strokeLinecap="round" d="M12 7.5v9M9.5 15c0 1.1 1.1 2 2.5 2s2.5-.7 2.5-1.75-1-1.75-2.5-2-2.5-.9-2.5-1.75S10.6 10 12 10s2.5.6 2.5 1.5" />
-      </svg>
-    ),
-    score: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className="h-5 w-5">
-        <circle cx="12" cy="12" r="3.5" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M6 6l1.5 1.5M16.5 16.5 18 18M18 6l-1.5 1.5M7.5 16.5 6 18" />
-      </svg>
-    ),
-    signals: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className="h-5 w-5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 19h3v-6H4v6Zm6.5 0h3V8h-3v11Zm6.5 0h3V4h-3v15Z" />
       </svg>
     ),
   };
@@ -268,16 +252,16 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
             delta={deltaPercent(current.volumeEur, previous.volumeEur)}
           />
           <StatTile
-            icon={STAT_ICONS.score}
-            value={current.avgScore !== null ? String(current.avgScore) : "—"}
-            label={t("stats.avgScore")}
-            delta={deltaPoints(current.avgScore, previous.avgScore)}
-          />
-          <StatTile
-            icon={STAT_ICONS.signals}
+            icon={<BuySignalIcon tier="strong" label={tBuySignal("strong")} size={20} />}
             value={numberFormatter.format(current.strongSignals)}
             label={t("stats.strongSignals")}
             delta={deltaCount(current.strongSignals, previous.strongSignals)}
+          />
+          <StatTile
+            icon={<BuySignalIcon tier="medium" label={tBuySignal("medium")} size={20} />}
+            value={numberFormatter.format(current.mediumSignals)}
+            label={t("stats.mediumSignals")}
+            delta={deltaCount(current.mediumSignals, previous.mediumSignals)}
           />
         </div>
 
@@ -298,7 +282,9 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
                 <p className="mt-6 text-sm text-muted">{t("topSignals.empty")}</p>
               ) : (
                 <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {topSignals.map((row) => (
+                  {topSignals.map((row) => {
+                    const tier = buySignalTier(row.usdValue);
+                    return (
                     <div key={row.id} className="rounded-xl border border-border bg-surface-2 p-4">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2.5">
@@ -308,7 +294,7 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
                             <div className="truncate text-xs text-muted">{row.issuer_name}</div>
                           </div>
                         </div>
-                        <ScoreRing score={row.insider_score} />
+                        {tier !== null && <BuySignalIcon tier={tier} label={tBuySignal(tier)} />}
                       </div>
                       <div className="mt-3 truncate text-xs text-muted">{row.owner_name}</div>
                       <div className="mt-1 text-lg font-bold text-foreground">
@@ -335,7 +321,8 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
                         </span>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </section>
@@ -362,11 +349,13 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
                         <th className="py-2.5 pr-4 font-medium">{t("recent.table.insider")}</th>
                         <th className="py-2.5 pr-4 font-medium">{t("recent.table.date")}</th>
                         <th className="py-2.5 pr-4 text-right font-medium">{t("recent.table.value")}</th>
-                        <th className="py-2.5 pl-4 text-right font-medium">{t("recent.table.score")}</th>
+                        <th className="py-2.5 pl-4 text-right font-medium">{t("recent.table.buySignal")}</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {recentPurchases.map((row) => (
+                      {recentPurchases.map((row) => {
+                        const tier = buySignalTier(row.usdValue);
+                        return (
                         <tr key={row.id} className="border-b border-border/60 last:border-0">
                           <td className="py-3 pr-4">
                             <div className="font-medium text-foreground">{row.issuer_name}</div>
@@ -388,10 +377,11 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
                               : "—"}
                           </td>
                           <td className="py-3 pl-4 text-right whitespace-nowrap">
-                            {row.insider_score !== null ? <ScoreRing score={row.insider_score} /> : <span className="text-muted">—</span>}
+                            {tier !== null ? <BuySignalIcon tier={tier} label={tBuySignal(tier)} /> : <span className="text-muted">—</span>}
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

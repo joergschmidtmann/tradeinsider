@@ -1,8 +1,9 @@
 import { useTranslations } from "next-intl";
 import { ColumnFilterDropdown } from "./ColumnFilterDropdown";
-import { ScoreRing } from "./ScoreRing";
+import { BuySignalIcon } from "./BuySignalIcon";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
-import { convertToEur } from "@/lib/fxRates";
+import { convertToEur, convertToUsd } from "@/lib/fxRates";
+import { buySignalTier } from "@/lib/buySignal";
 import { translateTitle } from "@/lib/translateTitle";
 import { countryLabel } from "@/lib/countries";
 import type { Locale } from "@/i18n/routing";
@@ -21,7 +22,6 @@ export interface TransactionRow {
   amount_range: string | null;
   currency: string;
   filing_url: string;
-  insider_score: number | null;
 }
 
 export interface StockQuote {
@@ -98,7 +98,7 @@ interface TransactionsTableProps {
   company?: string;
   insider?: string;
   country?: string;
-  showScore: boolean;
+  showBuySignal: boolean;
   showCountry: boolean;
   eurRates: Record<string, number>;
   locale: Locale;
@@ -115,13 +115,14 @@ export function TransactionsTable({
   company,
   insider,
   country,
-  showScore,
+  showBuySignal,
   showCountry,
   eurRates,
   locale,
   quotes,
 }: TransactionsTableProps) {
   const t = useTranslations("insiderKaeufe");
+  const tBuySignal = useTranslations("buySignal");
   const uiLocale = INTL_LOCALES[locale];
   const dateFormatter = new Intl.DateTimeFormat(uiLocale, { year: "numeric", month: "short", day: "numeric" });
   const numberFormatter = new Intl.NumberFormat(uiLocale);
@@ -182,9 +183,9 @@ export function TransactionsTable({
               <th className="px-5 py-3.5 text-right font-medium">{t("table.shares")}</th>
               <th className="px-5 py-3.5 text-right font-medium">{t("table.price")}</th>
               <th className="px-5 py-3.5 text-right font-medium">{t("table.totalValue")}</th>
-              {showScore && (
-                <th className="px-5 py-3.5 text-right font-medium" title={t("table.scoreTooltip")}>
-                  {t("table.score")}
+              {showBuySignal && (
+                <th className="px-5 py-3.5 text-right font-medium" title={t("table.buySignalTooltip")}>
+                  {t("table.buySignal")}
                 </th>
               )}
               <th className="px-5 py-3.5 text-right font-medium">{t("table.performance")}</th>
@@ -198,6 +199,8 @@ export function TransactionsTable({
                 quote && quote.currency === row.currency && row.price_per_share
                   ? ((quote.price - row.price_per_share) / row.price_per_share) * 100
                   : null;
+              const valueUsd = row.total_value !== null ? convertToUsd(row.total_value, row.currency, eurRates) : null;
+              const tier = buySignalTier(valueUsd);
               return (
               <tr key={row.id} className="border-b border-border/60 last:border-0 hover:bg-surface-2">
                 <td className="px-5 py-3.5">
@@ -229,10 +232,10 @@ export function TransactionsTable({
                     fallback={row.amount_range ?? "—"}
                   />
                 </td>
-                {showScore && (
+                {showBuySignal && (
                   <td className="px-5 py-3.5 text-right whitespace-nowrap">
-                    {row.insider_score !== null ? (
-                      <ScoreRing score={row.insider_score} tooltip={t("table.scoreTooltip")} />
+                    {tier !== null ? (
+                      <BuySignalIcon tier={tier} label={tBuySignal(tier)} />
                     ) : (
                       <span className="text-muted">—</span>
                     )}
