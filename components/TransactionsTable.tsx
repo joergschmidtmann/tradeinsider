@@ -166,7 +166,7 @@ export function TransactionsTable({
                 />
               </th>
               {showCountry && (
-                <th className="px-5 py-3.5 font-medium">
+                <th className="px-5 py-3.5 text-center font-medium">
                   <ColumnFilterDropdown
                     label={t("table.country")}
                     paramName="country"
@@ -179,12 +179,12 @@ export function TransactionsTable({
                   />
                 </th>
               )}
-              <th className="px-5 py-3.5 font-medium">{t("table.date")}</th>
-              <th className="px-5 py-3.5 text-right font-medium">{t("table.shares")}</th>
-              <th className="px-5 py-3.5 text-right font-medium">{t("table.price")}</th>
-              <th className="px-5 py-3.5 text-right font-medium">{t("table.totalValue")}</th>
+              <th className="px-5 py-3.5 text-center font-medium">{t("table.date")}</th>
+              <th className="px-5 py-3.5 text-center font-medium">{t("table.shares")}</th>
+              <th className="px-5 py-3.5 text-center font-medium">{t("table.price")}</th>
+              <th className="px-5 py-3.5 text-center font-medium">{t("table.totalValue")}</th>
               {showBuySignal && (
-                <th className="px-5 py-3.5 text-right font-medium" title={t("table.buySignalTooltip")}>
+                <th className="px-5 py-3.5 text-center font-medium" title={t("table.buySignalTooltip")}>
                   {t("table.buySignal")}
                 </th>
               )}
@@ -211,18 +211,18 @@ export function TransactionsTable({
                   {row.owner_title && <div className="text-xs text-muted">{translateTitle(row.owner_title, locale)}</div>}
                 </td>
                 {showCountry && (
-                  <td className="px-5 py-3.5 whitespace-nowrap text-foreground">{countryLabel(row.source_country, locale)}</td>
+                  <td className="px-5 py-3.5 text-center whitespace-nowrap text-foreground">{countryLabel(row.source_country, locale)}</td>
                 )}
-                <td className="px-5 py-3.5 whitespace-nowrap text-muted">
+                <td className="px-5 py-3.5 text-center whitespace-nowrap text-muted">
                   {dateFormatter.format(new Date(row.transaction_date))}
                 </td>
-                <td className="px-5 py-3.5 text-right whitespace-nowrap text-foreground">
+                <td className="px-5 py-3.5 text-center whitespace-nowrap text-foreground">
                   {row.shares !== null ? numberFormatter.format(row.shares) : "—"}
                 </td>
-                <td className="px-5 py-3.5 text-right whitespace-nowrap text-foreground">
+                <td className="px-5 py-3.5 text-center whitespace-nowrap text-foreground">
                   <CurrencyCell amount={row.price_per_share} currency={row.currency} eurRates={eurRates} uiLocale={uiLocale} />
                 </td>
-                <td className="px-5 py-3.5 text-right whitespace-nowrap font-medium text-foreground">
+                <td className="px-5 py-3.5 text-center whitespace-nowrap font-medium text-foreground">
                   <CurrencyCell
                     amount={row.total_value}
                     currency={row.currency}
@@ -232,7 +232,7 @@ export function TransactionsTable({
                   />
                 </td>
                 {showBuySignal && (
-                  <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                  <td className="px-5 py-3.5 text-center whitespace-nowrap">
                     {tier !== null ? (
                       <BuySignalIcon tier={tier} label={tBuySignal(tier)} />
                     ) : (
