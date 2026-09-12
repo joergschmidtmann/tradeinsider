@@ -189,7 +189,6 @@ export function TransactionsTable({
                 </th>
               )}
               <th className="px-5 py-3.5 text-right font-medium">{t("table.performance")}</th>
-              <th className="px-5 py-3.5 font-medium">{t("table.filing")}</th>
             </tr>
           </thead>
           <tbody>
@@ -243,25 +242,6 @@ export function TransactionsTable({
                 )}
                 <td className="px-5 py-3.5 text-right whitespace-nowrap">
                   {pctChange !== null ? <PerformanceBadge pctChange={pctChange} /> : <span className="text-muted">—</span>}
-                </td>
-                <td className="px-5 py-3.5 whitespace-nowrap">
-                  <a
-                    href={row.filing_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gradient font-medium hover:opacity-80"
-                  >
-                    {t("table.view")}
-                  </a>
-                  <span className="text-muted"> · </span>
-                  <a
-                    href={`https://news.google.com/search?q=${encodeURIComponent(row.issuer_name)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted hover:text-foreground"
-                  >
-                    {t("table.news")}
-                  </a>
                 </td>
               </tr>
               );
