@@ -261,9 +261,9 @@
     }
   },
   "buySignal": {
-    "strong": "Starkes Kaufsignal (≥ 500.000 $)",
-    "medium": "Mittelstarkes Kaufsignal (100.000–499.999 $)",
-    "weak": "Schwaches Kaufsignal (< 100.000 $)"
+    "strong": "Starkes Kaufsignal",
+    "medium": "Mittelstarkes Kaufsignal",
+    "weak": "Schwaches Kaufsignal"
   },
   "dashboard": {
     "sidebar": {

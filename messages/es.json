@@ -261,9 +261,9 @@
     }
   },
   "buySignal": {
-    "strong": "Señal de compra fuerte (≥ 500.000 $)",
-    "medium": "Señal de compra media (100.000–499.999 $)",
-    "weak": "Señal de compra débil (< 100.000 $)"
+    "strong": "Señal de compra fuerte",
+    "medium": "Señal de compra media",
+    "weak": "Señal de compra débil"
   },
   "dashboard": {
     "sidebar": {

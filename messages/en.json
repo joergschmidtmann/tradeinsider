@@ -261,9 +261,9 @@
     }
   },
   "buySignal": {
-    "strong": "Strong buy signal (≥ $500,000)",
-    "medium": "Medium buy signal ($100,000–$499,999)",
-    "weak": "Weak buy signal (< $100,000)"
+    "strong": "Strong buy signal",
+    "medium": "Medium buy signal",
+    "weak": "Weak buy signal"
   },
   "dashboard": {
     "sidebar": {
