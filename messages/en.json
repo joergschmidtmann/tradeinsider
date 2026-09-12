@@ -260,6 +260,76 @@
       "ctaLoggedOut": "Sign up for free"
     }
   },
+  "dashboard": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "insiderKaeufe": "Insider Trades",
+      "watchlist": "Watchlist",
+      "screener": "Screener",
+      "news": "News",
+      "academy": "Trading Academy",
+      "intelligence": "Trading Intelligence",
+      "comingSoon": "Soon"
+    },
+    "subtitle": "Here are the most important insider trades and signals from the past week.",
+    "tagline": "Insiders don't trade on opinion — they trade on knowledge.",
+    "justUpgraded": "Welcome to TradeInsider Pro",
+    "greeting": {
+      "morning": "Good morning, {name}.",
+      "afternoon": "Good afternoon, {name}.",
+      "evening": "Good evening, {name}."
+    },
+    "viewAll": "View all",
+    "stats": {
+      "purchases": "Insider trades (last week)",
+      "volume": "Total volume",
+      "avgScore": "Avg. insider score",
+      "strongSignals": "Strong signals (score ≥ 75)",
+      "vsPreviousWeek": "vs. previous week",
+      "points": "points",
+      "new": "New"
+    },
+    "topSignals": {
+      "heading": "Top signals (last week)",
+      "subheading": "The strongest insider trades from the past week.",
+      "empty": "No signals in the past week.",
+      "buy": "Buy"
+    },
+    "recent": {
+      "heading": "Latest insider trades",
+      "subheading": "All current transactions, automatically analyzed and scored.",
+      "empty": "No insider trades recorded yet.",
+      "table": {
+        "company": "Company",
+        "insider": "Insider",
+        "date": "Date",
+        "value": "Value",
+        "score": "Score"
+      }
+    },
+    "activity": {
+      "heading": "Insider activity (30 days)",
+      "buys": "Buys",
+      "sells": "Sells",
+      "empty": "No activity in the past 30 days yet."
+    },
+    "sector": {
+      "heading": "Breakdown by sector",
+      "unavailable": "Sector classification isn't available yet."
+    },
+    "markets": {
+      "heading": "Markets to watch",
+      "unavailable": "Market data isn't available yet."
+    },
+    "subscription": {
+      "openInsiderKaeufe": "Open insider trades"
+    },
+    "cta": {
+      "heading": "Get more out of insider data.",
+      "description": "Trading Intelligence and the Trading Academy will soon turn insider signals into concrete strategies.",
+      "cta": "Learn more →"
+    }
+  },
   "metadata": {
     "homeTitle": "tradeinsider — Welcome",
     "homeDescription": "Your platform for insider trades, stock analysis, and everything trading.",

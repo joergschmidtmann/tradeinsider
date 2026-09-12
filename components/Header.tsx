@@ -36,6 +36,10 @@ export function Header() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // The dashboard at /konto has its own sidebar navigation instead of the
+  // marketing site's top nav.
+  if (pathname === "/konto") return null;
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-black/70 backdrop-blur-xl">
       <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">

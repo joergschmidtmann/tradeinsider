@@ -260,6 +260,76 @@
       "ctaLoggedOut": "Kostenlos registrieren"
     }
   },
+  "dashboard": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "insiderKaeufe": "Insider-Käufe",
+      "watchlist": "Watchlist",
+      "screener": "Screener",
+      "news": "News",
+      "academy": "Trading Academy",
+      "intelligence": "Trading Intelligence",
+      "comingSoon": "Bald"
+    },
+    "subtitle": "Hier sind die wichtigsten Insider-Aktivitäten und Signale der vergangenen Woche.",
+    "tagline": "Insider handeln nicht aus Meinung, sondern aus Wissen.",
+    "justUpgraded": "Willkommen bei TradeInsider Pro",
+    "greeting": {
+      "morning": "Guten Morgen, {name}.",
+      "afternoon": "Guten Tag, {name}.",
+      "evening": "Guten Abend, {name}."
+    },
+    "viewAll": "Alle anzeigen",
+    "stats": {
+      "purchases": "Insider-Käufe (letzte Woche)",
+      "volume": "Gesamtvolumen",
+      "avgScore": "Ø Insider Score",
+      "strongSignals": "Starke Signale (Score ≥ 75)",
+      "vsPreviousWeek": "vs. Vorwoche",
+      "points": "Punkte",
+      "new": "Neu"
+    },
+    "topSignals": {
+      "heading": "Top Signale (letzte Woche)",
+      "subheading": "Die stärksten Insider-Käufe der vergangenen Woche.",
+      "empty": "In der vergangenen Woche gab es keine Signale.",
+      "buy": "Kauf"
+    },
+    "recent": {
+      "heading": "Neueste Insider-Käufe",
+      "subheading": "Alle aktuellen Transaktionen, automatisch analysiert und bewertet.",
+      "empty": "Noch keine Insider-Käufe erfasst.",
+      "table": {
+        "company": "Unternehmen",
+        "insider": "Insider",
+        "date": "Datum",
+        "value": "Wert",
+        "score": "Score"
+      }
+    },
+    "activity": {
+      "heading": "Insider-Aktivität (30 Tage)",
+      "buys": "Käufe",
+      "sells": "Verkäufe",
+      "empty": "In den letzten 30 Tagen gab es noch keine Aktivität."
+    },
+    "sector": {
+      "heading": "Verteilung nach Sektor",
+      "unavailable": "Sektor-Klassifizierung ist noch nicht verfügbar."
+    },
+    "markets": {
+      "heading": "Märkte im Blick",
+      "unavailable": "Marktdaten sind noch nicht verfügbar."
+    },
+    "subscription": {
+      "openInsiderKaeufe": "Insider-Käufe öffnen"
+    },
+    "cta": {
+      "heading": "Noch mehr aus Insider-Daten herausholen.",
+      "description": "Trading Intelligence und die Trading Academy verwandeln Insider-Signale schon bald in konkrete Strategien.",
+      "cta": "Mehr erfahren →"
+    }
+  },
   "metadata": {
     "homeTitle": "tradeinsider — Willkommen",
     "homeDescription": "Deine Plattform für Insider-Käufe, Aktienanalysen und alles rund ums Trading.",

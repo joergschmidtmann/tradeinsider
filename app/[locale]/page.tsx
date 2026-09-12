@@ -4,6 +4,7 @@ import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { getEurRates, convertToEur } from "@/lib/fxRates";
 import { translateTitle } from "@/lib/translateTitle";
 import { countryLabel } from "@/lib/countries";
+import { weekRangeInBerlin } from "@/lib/weekRange";
 import { ScoreRing } from "@/components/ScoreRing";
 import type { Locale } from "@/i18n/routing";
 
@@ -29,25 +30,6 @@ interface RecentPurchaseRow {
   total_value: number | null;
   currency: string;
   insider_score: number | null;
-}
-
-// Berlin, not UTC — the site's primary audience is German, and the ingest
-// workflow runs on UTC cron slots throughout the day, so anchoring the week
-// boundary to UTC would shift it by up to two hours from the local calendar.
-// Returns the previous full Monday–Sunday week (not a rolling last-7-days
-// window), so the stats band reads as a completed week rather than a
-// constantly-shifting one.
-function previousWeekRangeInBerlin(): { from: string; to: string } {
-  const berlinToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date());
-  const [y, m, d] = berlinToday.split("-").map(Number);
-  const today = new Date(Date.UTC(y, m - 1, d));
-  const isoWeekday = today.getUTCDay() || 7; // Mon=1 ... Sun=7
-  const lastMonday = new Date(today);
-  lastMonday.setUTCDate(today.getUTCDate() - (isoWeekday - 1) - 7);
-  const lastSunday = new Date(lastMonday);
-  lastSunday.setUTCDate(lastMonday.getUTCDate() + 6);
-  const iso = (dt: Date) => dt.toISOString().slice(0, 10);
-  return { from: iso(lastMonday), to: iso(lastSunday) };
 }
 
 function formatCompactEur(amount: number, uiLocale: string): string {
@@ -113,7 +95,7 @@ export default async function Home({ params }: PageProps) {
   const numberFormatter = new Intl.NumberFormat(uiLocale);
 
   const supabase = createSupabaseReadClient();
-  const { from: weekFrom, to: weekTo } = previousWeekRangeInBerlin();
+  const { from: weekFrom, to: weekTo } = weekRangeInBerlin(0);
 
   const [{ data: weekRows }, { data: recentRows }, eurRates] = await Promise.all([
     supabase
