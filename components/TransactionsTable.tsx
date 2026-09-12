@@ -188,7 +188,7 @@ export function TransactionsTable({
                   {t("table.buySignal")}
                 </th>
               )}
-              <th className="px-5 py-3.5 text-right font-medium">{t("table.performance")}</th>
+              <th className="px-5 py-3.5 text-center font-medium">{t("table.performance")}</th>
             </tr>
           </thead>
           <tbody>
