@@ -240,7 +240,7 @@ export function TransactionsTable({
                     )}
                   </td>
                 )}
-                <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                <td className="px-5 py-3.5 text-center whitespace-nowrap">
                   {pctChange !== null ? <PerformanceBadge pctChange={pctChange} /> : <span className="text-muted">—</span>}
                 </td>
               </tr>
