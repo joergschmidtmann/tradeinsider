@@ -275,7 +275,7 @@
     "tagline": "Insider handeln nicht aus Meinung, sondern aus Wissen.",
     "justUpgraded": "Willkommen bei TradeInsider Pro",
     "greeting": {
-      "hello": "Hallo {name}."
+      "hello": "Hallo {name}"
     },
     "editName": {
       "label": "Namen ändern",

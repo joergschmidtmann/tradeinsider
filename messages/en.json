@@ -275,7 +275,7 @@
     "tagline": "Insiders don't trade on opinion — they trade on knowledge.",
     "justUpgraded": "Welcome to TradeInsider Pro",
     "greeting": {
-      "hello": "Hi {name}."
+      "hello": "Hi {name}"
     },
     "editName": {
       "label": "Edit name",
