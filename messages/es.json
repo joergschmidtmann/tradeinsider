@@ -39,61 +39,53 @@
         "strongSignals": "Señales de compra fuertes"
       }
     },
-    "features": {
-      "live": "En vivo",
-      "soon": "Pronto",
-      "insiderKaeufe": {
-        "href": "insider-kaeufe",
-        "heading": "Compras de Insiders",
-        "description": "Transacciones de insiders de CEOs y directivos de 7 países en tiempo real. Analizadas y puntuadas automáticamente.",
-        "cta": "Descubrir ahora →"
-      },
-      "tradingIntelligence": {
-        "href": "trading-intelligence",
-        "heading": "Trading Intelligence",
-        "description": "Análisis fundamental y técnico de acciones — métricas, patrones de gráficos e indicadores en un solo lugar.",
-        "cta": "Más información →"
-      },
-      "tradingAcademy": {
-        "href": "trading-academy",
-        "heading": "Trading Academy",
-        "description": "Conocimientos, estrategias y herramientas para traders y para quienes quieren llegar a serlo.",
-        "cta": "Más información →"
-      }
+    "ticker": {
+      "label": "Actividad de Insiders en Vivo"
     },
     "recent": {
-      "heading": "Compras de insiders recientes",
-      "subheading": "Las últimas compras de CEOs y directivos.",
+      "headingLine1": "Compras de Insiders",
+      "headingLine2": "Recientes.",
+      "subheading": "Las últimas transacciones de directivos, consejeros y altos cargos.",
       "viewAll": "Ver todas las compras de insiders →",
       "empty": "Aún no hay datos disponibles.",
+      "filters": {
+        "all": "Todas",
+        "strong": "Señal Fuerte",
+        "medium": "Señal Media",
+        "weak": "Señal Débil"
+      },
       "table": {
-        "company": "Empresa",
-        "insider": "Insider",
-        "country": "País",
         "date": "Fecha",
-        "value": "Valor",
-        "buySignal": "Señal"
+        "company": "Empresa",
+        "ticker": "Ticker",
+        "insider": "Insider",
+        "position": "Cargo",
+        "value": "Volumen",
+        "buySignal": "Señal",
+        "details": "Detalles"
       }
     },
     "why": {
-      "heading": "¿Por qué tradeinsider?",
-      "subheading": "Más que solo datos. Una ventaja clara.",
+      "headingLine1": "Más que solo datos.",
+      "headingLine2": "Tu ventaja.",
+      "subheading": "TradeInsider te ofrece la información de insiders que importa — simple, clara y lista para usar.",
+      "cta": "Más información →",
       "items": [
         {
-          "title": "Datos exclusivos",
-          "description": "Directamente de organismos oficiales: SEC, EQS, CNMV y otros reguladores en siete países."
+          "title": "Datos en tiempo real",
+          "description": "Transacciones de insiders actuales de fuentes internacionales."
         },
         {
-          "title": "Señal de compra clara",
-          "description": "Cada compra se clasifica automáticamente por volumen — fuerte, media o débil, reconocible de un vistazo."
+          "title": "Señales claras",
+          "description": "Nuestro análisis te muestra de un vistazo las oportunidades más importantes."
         },
         {
-          "title": "Ventaja más rápida",
-          "description": "Detecta señales fuertes antes de que aparezcan en las noticias."
+          "title": "Enfoque global",
+          "description": "Actividad de insiders de los mercados más importantes del mundo."
         },
         {
-          "title": "Simple y claro",
-          "description": "Datos de informes complejos presentados de forma comprensible — sin jerga legal."
+          "title": "Conocimiento y estrategia",
+          "description": "Aprende a usar los datos de insiders con éxito en tus propias inversiones."
         }
       ]
     },
@@ -101,29 +93,18 @@
       "text": "Cuando los insiders invierten su propio dinero, es una de las señales más honestas que conoce el mercado.",
       "attribution": "— el equipo de tradeinsider"
     },
-    "how": {
-      "heading": "Así de sencillo funciona",
-      "subheading": "Tres pasos hacia mejores decisiones.",
-      "steps": [
-        {
-          "title": "Recopilar datos",
-          "description": "Procesamos continuamente nuevos informes de la SEC, EQS y otros organismos reguladores."
-        },
-        {
-          "title": "Puntuar automáticamente",
-          "description": "Cada transacción recibe un icono de señal de compra según su volumen."
-        },
-        {
-          "title": "Aprovechar señales relevantes",
-          "description": "Ves de un vistazo lo que realmente importa."
-        }
-      ],
-      "highlight": "Menos ruido. Más señales relevantes."
-    },
     "finalCta": {
-      "heading": "¿Listo para la ventaja decisiva?",
-      "subheading": "Descubre lo que saben los insiders — antes de que reaccione el mercado.",
-      "cta": "Regístrate gratis →",
+      "eyebrow": "Smart Money. Smarter Decisions.",
+      "headingLine1": "¿Listo para invertir",
+      "headingLine2": "de forma más inteligente?",
+      "subheading": "Descubre ahora todas las funciones de TradeInsider y obtén acceso a análisis exclusivos de insiders, señales fuertes y valioso know-how.",
+      "stats": {
+        "trades": "insider trades analizados",
+        "markets": "mercados en todo el mundo",
+        "sources": "fuentes de datos"
+      },
+      "cta": "Empezar gratis →",
+      "secondaryCta": "Más información →",
       "microcopy": "En pocos segundos. Sin tarjeta de crédito."
     }
   },

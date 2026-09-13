@@ -39,61 +39,53 @@
         "strongSignals": "Strong buy signals"
       }
     },
-    "features": {
-      "live": "Live",
-      "soon": "Soon",
-      "insiderKaeufe": {
-        "href": "insider-kaeufe",
-        "heading": "Insider Trades",
-        "description": "Real-time insider transactions from CEOs and executives across 7 countries. Automatically analyzed and scored.",
-        "cta": "Explore now →"
-      },
-      "tradingIntelligence": {
-        "href": "trading-intelligence",
-        "heading": "Trading Intelligence",
-        "description": "Fundamental and technical stock analysis — metrics, chart patterns, and indicators in one place.",
-        "cta": "Learn more →"
-      },
-      "tradingAcademy": {
-        "href": "trading-academy",
-        "heading": "Trading Academy",
-        "description": "Knowledge, strategies, and tools for traders and anyone looking to become one.",
-        "cta": "Learn more →"
-      }
+    "ticker": {
+      "label": "Live Insider Activity"
     },
     "recent": {
-      "heading": "Recent insider purchases",
-      "subheading": "The latest buys by CEOs and executives.",
+      "headingLine1": "Recent",
+      "headingLine2": "Insider Purchases.",
+      "subheading": "The latest transactions from executives, board members, and officers.",
       "viewAll": "View all insider trades →",
       "empty": "No data available yet.",
+      "filters": {
+        "all": "All",
+        "strong": "Strong Signal",
+        "medium": "Medium Signal",
+        "weak": "Weak Signal"
+      },
       "table": {
-        "company": "Company",
-        "insider": "Insider",
-        "country": "Country",
         "date": "Date",
-        "value": "Value",
-        "buySignal": "Signal"
+        "company": "Company",
+        "ticker": "Ticker",
+        "insider": "Insider",
+        "position": "Position",
+        "value": "Volume",
+        "buySignal": "Signal",
+        "details": "Details"
       }
     },
     "why": {
-      "heading": "Why tradeinsider?",
-      "subheading": "More than just data. A clear edge.",
+      "headingLine1": "More than just data.",
+      "headingLine2": "Your edge.",
+      "subheading": "TradeInsider gives you the insider information that matters — simple, clear, and ready to use.",
+      "cta": "Learn more →",
       "items": [
         {
-          "title": "Exclusive data",
-          "description": "Straight from official filing bodies: SEC, EQS, CNMV, and other regulators across seven countries."
+          "title": "Real-time data",
+          "description": "Current insider transactions from international sources."
         },
         {
-          "title": "Clear buy signal",
-          "description": "Every purchase is automatically classified by size — strong, medium, or weak, recognizable at a glance."
+          "title": "Clear signals",
+          "description": "Our analysis shows you the most important opportunities at a glance."
         },
         {
-          "title": "A faster edge",
-          "description": "Spot strong signals before they hit the headlines."
+          "title": "Global focus",
+          "description": "Insider activity from the world's most important markets."
         },
         {
-          "title": "Simple & clear",
-          "description": "Complex filing data made understandable — no legal jargon."
+          "title": "Knowledge & strategy",
+          "description": "Learn how to use insider data successfully for your own investments."
         }
       ]
     },
@@ -101,29 +93,18 @@
       "text": "When insiders invest their own money, it's one of the most honest signals the market has.",
       "attribution": "— the tradeinsider team"
     },
-    "how": {
-      "heading": "It's this simple",
-      "subheading": "Three steps to better decisions.",
-      "steps": [
-        {
-          "title": "Collect data",
-          "description": "We continuously process new filings from the SEC, EQS, and other filing bodies."
-        },
-        {
-          "title": "Score automatically",
-          "description": "Every transaction gets a buy-signal icon based on purchase size."
-        },
-        {
-          "title": "Act on relevant signals",
-          "description": "See at a glance what actually matters."
-        }
-      ],
-      "highlight": "Less noise. More relevant signals."
-    },
     "finalCta": {
-      "heading": "Ready for the edge that matters?",
-      "subheading": "Discover what insiders know — before the market reacts.",
-      "cta": "Sign up for free →",
+      "eyebrow": "Smart Money. Smarter Decisions.",
+      "headingLine1": "Ready to invest",
+      "headingLine2": "more cleverly?",
+      "subheading": "Discover every feature of TradeInsider now and get access to exclusive insider analysis, strong signals, and valuable know-how.",
+      "stats": {
+        "trades": "insider trades analyzed",
+        "markets": "markets worldwide",
+        "sources": "data sources"
+      },
+      "cta": "Start for free →",
+      "secondaryCta": "Learn more →",
       "microcopy": "Takes seconds. No credit card."
     }
   },
