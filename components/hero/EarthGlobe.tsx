@@ -41,7 +41,24 @@ const LANDMASSES: [number, number][][] = [
   ],
 ];
 
-const DOT_PATTERN_SIZE = 7;
+const DOT_PATTERN_SIZE = 3.5;
+
+// Traces a smooth closed loop through every point instead of straight
+// segments between them — the hand-picked coastline vertices above are
+// sparse enough that connecting them with plain lines reads as an angular,
+// low-poly blob rather than a coastline.
+function smoothClosedPath(points: { x: number; y: number }[]): string {
+  const mid = (a: { x: number; y: number }, b: { x: number; y: number }) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+  const start = mid(points[points.length - 1], points[0]);
+  let d = `M ${start.x.toFixed(1)} ${start.y.toFixed(1)}`;
+  for (let i = 0; i < points.length; i++) {
+    const cur = points[i];
+    const next = points[(i + 1) % points.length];
+    const m = mid(cur, next);
+    d += ` Q ${cur.x.toFixed(1)} ${cur.y.toFixed(1)} ${m.x.toFixed(1)} ${m.y.toFixed(1)}`;
+  }
+  return d + " Z";
+}
 
 /** Dot-matrix world map for the hero — the connecting hub is the first
  * `isHub` marker (or markers[0]); every other marker gets an animated arc
@@ -51,22 +68,14 @@ export function EarthGlobe({ markers }: { markers: GlobeMarker[] }) {
   const hub = markers.find((m) => m.isHub) ?? markers[0];
   const projected = markers.map((m) => ({ ...m, ...project(m.lat, m.lng) }));
   const hubPoint = projected.find((m) => m.id === hub?.id);
-  const landPaths = LANDMASSES.map(
-    (vertices) =>
-      vertices
-        .map(([lat, lon], i) => {
-          const { x, y } = project(lat, lon);
-          return `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`;
-        })
-        .join(" ") + " Z"
-  );
+  const landPaths = LANDMASSES.map((vertices) => smoothClosedPath(vertices.map(([lat, lon]) => project(lat, lon))));
 
   return (
     <div className="relative w-full animate-[hero-drift_20s_ease-in-out_infinite] motion-reduce:animate-none">
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="presentation" aria-hidden="true">
         <defs>
           <pattern id="hero-map-dots" width={DOT_PATTERN_SIZE} height={DOT_PATTERN_SIZE} patternUnits="userSpaceOnUse">
-            <circle cx={1} cy={1} r={1} fill="rgba(180,255,170,0.4)" />
+            <circle cx={0.6} cy={0.6} r={0.6} fill="rgba(180,255,170,0.4)" />
           </pattern>
         </defs>
 
