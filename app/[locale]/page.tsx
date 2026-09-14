@@ -5,7 +5,7 @@ import { getEurRates, convertToEur, convertToUsd } from "@/lib/fxRates";
 import { buySignalTier } from "@/lib/buySignal";
 import { translateTitle } from "@/lib/translateTitle";
 import { daysAgoInBerlin } from "@/lib/weekRange";
-import { EarthGlobe, type GlobeMarker } from "@/components/hero/EarthGlobe";
+import { EarthGlobe, type GlobeMarker, type LabelDirection } from "@/components/hero/EarthGlobe";
 import { ExampleCarousel, type CarouselExample } from "@/components/ExampleCarousel";
 import type { Locale } from "@/i18n/routing";
 
@@ -35,10 +35,10 @@ interface RecentPurchaseRow {
 // The globe only spotlights cities in countries we actually have live data
 // for (see memory: France/Switzerland/Poland/UK are not licensed) — New York
 // doubles as the hub, with arcs drawn from it to the other three.
-const GLOBE_CITIES: { code: string; city: string; lat: number; lng: number; isHub?: boolean }[] = [
+const GLOBE_CITIES: { code: string; city: string; lat: number; lng: number; isHub?: boolean; labelDir?: LabelDirection }[] = [
   { code: "US", city: "New York", lat: 40.7128, lng: -74.006, isHub: true },
-  { code: "DE", city: "Frankfurt", lat: 50.1109, lng: 8.6821 },
-  { code: "ES", city: "Madrid", lat: 40.4168, lng: -3.7038 },
+  { code: "DE", city: "Frankfurt", lat: 50.1109, lng: 8.6821, labelDir: "up-left" },
+  { code: "ES", city: "Madrid", lat: 40.4168, lng: -3.7038, labelDir: "down-right" },
   { code: "SE", city: "Stockholm", lat: 59.3293, lng: 18.0686 },
 ];
 
@@ -110,6 +110,7 @@ export default async function Home({ params }: PageProps) {
     lat: c.lat,
     lng: c.lng,
     isHub: c.isHub,
+    labelDir: c.labelDir,
   }));
 
   const recent = (recentRows ?? []) as RecentPurchaseRow[];
@@ -192,12 +193,15 @@ export default async function Home({ params }: PageProps) {
 
             {/* Right: world map */}
             <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-              <EarthGlobe markers={globeMarkers} />
-
-              <div className="pointer-events-none absolute right-2 bottom-2 flex items-center gap-2 sm:right-4 sm:bottom-4">
-                <span className="h-6 w-px bg-white/25" />
-                <span className="text-[10px] font-medium tracking-wide text-muted uppercase">{t("hero.mapCaption")}</span>
-              </div>
+              <EarthGlobe
+                markers={globeMarkers}
+                legend={{
+                  title: t("hero.mapCaption"),
+                  subtitle: t("hero.eyebrow"),
+                  activityLabel: t("hero.legendActivity"),
+                  connectionsLabel: t("hero.legendConnections"),
+                }}
+              />
             </div>
           </div>
 

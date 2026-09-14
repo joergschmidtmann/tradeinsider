@@ -34,6 +34,8 @@
       "cta": "Insider Trades entdecken →",
       "secondaryCta": "So funktioniert's",
       "mapCaption": "Globale Insider-Aktivität in Echtzeit",
+      "legendActivity": "Insider-Aktivität",
+      "legendConnections": "Globale Verbindungen",
       "scrollHint": "Scroll",
       "purchasesShort": "Käufe"
     },

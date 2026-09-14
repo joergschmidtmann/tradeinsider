@@ -34,6 +34,8 @@
       "cta": "Descubrir compras de insiders →",
       "secondaryCta": "Cómo funciona",
       "mapCaption": "Actividad global de insiders en tiempo real",
+      "legendActivity": "Actividad de Insiders",
+      "legendConnections": "Conexiones Globales",
       "scrollHint": "Scroll",
       "purchasesShort": "compras"
     },
