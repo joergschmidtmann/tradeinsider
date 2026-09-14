@@ -25,44 +25,67 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Real Data. Real People. Real Opportunities.",
-      "headlineLine1": "Follow",
-      "headlinePrefix": "The",
-      "headlineHighlight": "Smart",
-      "headlineLine3": "Money.",
-      "subtitle": "Descubre en qué acciones invierten los CEOs e insiders — antes de que el mercado lo note.",
+      "status": "En vivo · Datos reales · Actividad global de insiders",
+      "headlineLine1": "Los insiders",
+      "headlineLine2": "mueven",
+      "headlineHighlight": "el mercado.",
+      "subtitle": "Datos reales de insiders. Señales claras. Mejores decisiones.",
       "cta": "Descubrir compras de insiders →",
       "secondaryCta": "Cómo funciona",
-      "mapCaption": "Actividad global de insiders en tiempo real",
-      "legendActivity": "Actividad de Insiders",
-      "legendConnections": "Conexiones Globales",
-      "scrollHint": "Scroll",
-      "purchasesShort": "compras"
+      "kpis": {
+        "purchases": "Compras de insiders",
+        "volume": "Volumen",
+        "countries": "Países",
+        "strongSignals": "Señales de compra fuertes"
+      }
     },
-    "example": {
-      "eyebrow": "Ejemplo Actual",
-      "headingLine1": "Los insiders compran.",
-      "headingLine2": "Te lo mostramos.",
-      "subheading": "Transacciones reales. Señales claras. Mejores decisiones.",
+    "ticker": {
+      "label": "Actividad de Insiders en Vivo"
+    },
+    "recent": {
+      "headingLine1": "Compras de Insiders",
+      "headingLine2": "Recientes.",
+      "subheading": "Las últimas transacciones de directivos, consejeros y altos cargos.",
       "viewAll": "Ver todas las compras de insiders →",
-      "sincePurchase": "desde la compra del insider"
+      "empty": "Aún no hay datos disponibles.",
+      "filters": {
+        "all": "Todas",
+        "strong": "Señal Fuerte",
+        "medium": "Señal Media",
+        "weak": "Señal Débil"
+      },
+      "table": {
+        "date": "Fecha",
+        "company": "Empresa",
+        "ticker": "Ticker",
+        "insider": "Insider",
+        "position": "Cargo",
+        "value": "Volumen",
+        "buySignal": "Señal",
+        "details": "Detalles"
+      }
     },
-    "steps": {
-      "eyebrow": "Así de sencillo funciona",
-      "headingLine1": "Tres pasos hacia",
-      "headingLine2": "mejores decisiones.",
+    "why": {
+      "headingLine1": "Más que solo datos.",
+      "headingLine2": "Tu ventaja.",
+      "subheading": "TradeInsider te ofrece la información de insiders que importa — simple, clara y lista para usar.",
+      "cta": "Más información →",
       "items": [
         {
-          "title": "Datos Reales",
-          "description": "Analizamos transacciones de insiders de fuentes internacionales."
+          "title": "Datos en tiempo real",
+          "description": "Transacciones de insiders actuales de fuentes internacionales."
         },
         {
-          "title": "Señales Claras",
-          "description": "Nuestro análisis te muestra las señales de compra más relevantes."
+          "title": "Señales claras",
+          "description": "Nuestro análisis te muestra de un vistazo las oportunidades más importantes."
         },
         {
-          "title": "Nuevas Oportunidades",
-          "description": "Descubre acciones interesantes — antes de que reaccione el mercado."
+          "title": "Enfoque global",
+          "description": "Actividad de insiders de los mercados más importantes del mundo."
+        },
+        {
+          "title": "Conocimiento y estrategia",
+          "description": "Aprende a usar los datos de insiders con éxito en tus propias inversiones."
         }
       ]
     },
@@ -70,7 +93,20 @@
       "text": "Cuando los insiders invierten su propio dinero, es una de las señales más honestas que conoce el mercado.",
       "attribution": "— el equipo de tradeinsider"
     },
-    "tagline": "Smart Money. Smarter Decisions."
+    "finalCta": {
+      "eyebrow": "Smart Money. Smarter Decisions.",
+      "headingLine1": "¿Listo para invertir",
+      "headingLine2": "de forma más inteligente?",
+      "subheading": "Descubre ahora todas las funciones de TradeInsider y obtén acceso a análisis exclusivos de insiders, señales fuertes y valioso know-how.",
+      "stats": {
+        "trades": "insider trades analizados",
+        "markets": "mercados en todo el mundo",
+        "sources": "fuentes de datos"
+      },
+      "cta": "Empezar gratis →",
+      "secondaryCta": "Más información →",
+      "microcopy": "En pocos segundos. Sin tarjeta de crédito."
+    }
   },
   "insiderKaeufe": {
     "roles": {

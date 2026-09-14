@@ -3,8 +3,8 @@ export type BuySignalTier = "strong" | "medium" | "weak";
 const STRONG_THRESHOLD_USD = 500_000;
 const MEDIUM_THRESHOLD_USD = 100_000;
 
-/** Single source of truth for tier colors, shared by every buy-signal UI so
- * they never drift apart. */
+/** Single source of truth for tier colors, shared by BuySignalIcon and
+ * BuySignalBadge so they never drift apart. */
 export const BUY_SIGNAL_COLOR: Record<BuySignalTier, string> = {
   strong: "#22c55e",
   medium: "#eab308",
