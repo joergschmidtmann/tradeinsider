@@ -190,7 +190,7 @@ export default async function Home({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Right: interactive 3D globe */}
+            {/* Right: world map */}
             <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
               <EarthGlobe markers={globeMarkers} />
 
