@@ -87,7 +87,7 @@ export default async function Home({ params }: PageProps) {
 
   return (
     <main className="flex-1">
-      {/* Hero — photo: Kanan Khasmammadov via Unsplash (unsplash.com/photos/b0445ee6073c) */}
+      {/* Hero — photo: Unsplash, photo-1694846119962 (Empire State Building) */}
       <section className="border-b border-border">
         <div className="grid lg:grid-cols-2">
           <div className="flex flex-col justify-center px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
@@ -126,7 +126,7 @@ export default async function Home({ params }: PageProps) {
 
           <div className="relative min-h-[420px] lg:min-h-[680px]">
             <Image
-              src="/images/hero-skyline-lounge.jpg"
+              src="/images/hero-nyc-empire-state.jpg"
               alt=""
               fill
               priority
@@ -176,11 +176,11 @@ export default async function Home({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Final CTA — photo: Nubelson Fernandes via Unsplash (unsplash.com/photos/87ec38d01b9f) */}
+      {/* Final CTA — photo: Unsplash, photo-1543071509 (café window sill) */}
       <section className="relative overflow-hidden">
         <div className="relative min-h-[560px]">
           <Image
-            src="/images/cta-desk-scene.jpg"
+            src="/images/cta-cafe-window.jpg"
             alt=""
             fill
             sizes="100vw"
