@@ -132,7 +132,11 @@ export default async function Home({ params }: PageProps) {
               priority
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
+              style={{ filter: "grayscale(0.45) saturate(0.85) brightness(0.9)" }}
             />
+            {/* Cools the photo's warm sunset cast toward the brand's dark
+                green/teal instead of the raw orange it was shot in. */}
+            <div className="absolute inset-0" style={{ backgroundColor: "#0a2e22", mixBlendMode: "color", opacity: 0.55 }} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/40" />
             <div className="absolute top-6 right-6 text-right sm:top-8 sm:right-8">
               {overlayTop.map((line) => (
@@ -175,7 +179,15 @@ export default async function Home({ params }: PageProps) {
       {/* Final CTA — photo: Nubelson Fernandes via Unsplash (unsplash.com/photos/87ec38d01b9f) */}
       <section className="relative overflow-hidden">
         <div className="relative min-h-[560px]">
-          <Image src="/images/cta-desk-scene.jpg" alt="" fill sizes="100vw" className="object-cover object-center" />
+          <Image
+            src="/images/cta-desk-scene.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+            style={{ filter: "grayscale(0.4) saturate(0.85) brightness(0.9)" }}
+          />
+          <div className="absolute inset-0" style={{ backgroundColor: "#0a2e22", mixBlendMode: "color", opacity: 0.5 }} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/45" />
 
           <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-4 py-20 sm:px-6">
