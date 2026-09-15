@@ -25,87 +25,45 @@
   },
   "home": {
     "hero": {
-      "status": "Live · Real data · Global insider activity",
-      "headlineLine1": "Insider",
-      "headlineLine2": "moves",
-      "headlineHighlight": "the market.",
-      "subtitle": "Real insider data. Clear signals. Better decisions.",
+      "eyebrowLine1": "Insights for your",
+      "eyebrowLine2": "next decision.",
+      "headlineLine1": "Same",
+      "headlineLine2": "Information.",
+      "headlineLine3": "A Higher",
+      "headlineLine4": "Perspective.",
+      "subtitle": "See the market through the eyes of insiders and spot opportunities before they become obvious.",
       "cta": "Explore insider trades →",
       "secondaryCta": "How it works",
-      "kpis": {
-        "purchases": "Insider trades",
-        "volume": "Volume",
-        "countries": "Countries",
-        "strongSignals": "Strong buy signals"
-      }
+      "overlayTop": ["Discover", "Analyze", "Invest", "Ahead."],
+      "overlayBottom": ["Real People.", "Real Trades.", "Real Opportunities."]
     },
-    "ticker": {
-      "label": "Live Insider Activity"
-    },
-    "recent": {
-      "headingLine1": "Recent",
-      "headingLine2": "Insider Purchases.",
-      "subheading": "The latest transactions from executives, board members, and officers.",
-      "viewAll": "View all insider trades →",
-      "empty": "No data available yet.",
-      "filters": {
-        "all": "All",
-        "strong": "Strong Signal",
-        "medium": "Medium Signal",
-        "weak": "Weak Signal"
-      },
-      "table": {
-        "date": "Date",
-        "company": "Company",
-        "ticker": "Ticker",
-        "insider": "Insider",
-        "position": "Position",
-        "value": "Volume",
-        "buySignal": "Signal",
-        "details": "Details"
-      }
-    },
-    "why": {
-      "headingLine1": "More than just data.",
-      "headingLine2": "Your edge.",
-      "subheading": "TradeInsider gives you the insider information that matters — simple, clear, and ready to use.",
-      "cta": "Learn more →",
+    "features": {
       "items": [
-        {
-          "title": "Real-time data",
-          "description": "Current insider transactions from international sources."
-        },
-        {
-          "title": "Clear signals",
-          "description": "Our analysis shows you the most important opportunities at a glance."
-        },
-        {
-          "title": "Global focus",
-          "description": "Insider activity from the world's most important markets."
-        },
-        {
-          "title": "Knowledge & strategy",
-          "description": "Learn how to use insider data successfully for your own investments."
-        }
+        { "title": "Real Data", "description": "Insider transactions from SEC & EQS." },
+        { "title": "Clear Signals", "description": "Our analysis shows you the most relevant opportunities." },
+        { "title": "Global Markets", "description": "Insider activity worldwide on one platform." }
       ]
     },
     "quote": {
-      "text": "When insiders invest their own money, it's one of the most honest signals the market has.",
+      "text": "Insiders don't invest in stories. They invest in the future.",
       "attribution": "— the tradeinsider team"
     },
     "finalCta": {
-      "eyebrow": "Smart Money. Smarter Decisions.",
-      "headingLine1": "Ready to invest",
-      "headingLine2": "more cleverly?",
-      "subheading": "Discover every feature of TradeInsider now and get access to exclusive insider analysis, strong signals, and valuable know-how.",
+      "label": "TradeInsider",
+      "headingLine1": "Ready for",
+      "headingLine2": "a better view?",
+      "subheading": "Harness the power of insider data to make better investment decisions.",
+      "cta": "Start for free now →",
+      "overlayBadge": "A Brighter Perspective",
+      "tagline": "Insights Today. Opportunities Tomorrow.",
       "stats": {
-        "trades": "insider trades analyzed",
-        "markets": "markets worldwide",
-        "sources": "data sources"
-      },
-      "cta": "Start for free →",
-      "secondaryCta": "Learn more →",
-      "microcopy": "Takes seconds. No credit card."
+        "purchasesLabel": "Insider Trades",
+        "purchasesSub": "this week",
+        "volumeLabel": "Volume Invested",
+        "volumeSub": "this week",
+        "countriesLabel": "Countries",
+        "countriesSub": "worldwide"
+      }
     }
   },
   "insiderKaeufe": {

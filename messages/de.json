@@ -25,87 +25,45 @@
   },
   "home": {
     "hero": {
-      "status": "Live · Echte Daten · Globale Insider-Aktivität",
-      "headlineLine1": "Insider",
-      "headlineLine2": "bewegen",
-      "headlineHighlight": "den Markt.",
-      "subtitle": "Echte Insider-Daten. Klare Signale. Bessere Entscheidungen.",
-      "cta": "Insider-Käufe entdecken →",
+      "eyebrowLine1": "Insights für deine",
+      "eyebrowLine2": "nächste Entscheidung.",
+      "headlineLine1": "Same",
+      "headlineLine2": "Information.",
+      "headlineLine3": "A Higher",
+      "headlineLine4": "Perspective.",
+      "subtitle": "Sieh den Markt durch die Augen der Insider und entdecke Chancen, bevor sie offensichtlich werden.",
+      "cta": "Insider Trades entdecken →",
       "secondaryCta": "So funktioniert's",
-      "kpis": {
-        "purchases": "Insider-Käufe",
-        "volume": "Volumen",
-        "countries": "Länder",
-        "strongSignals": "Starke Kaufsignale"
-      }
+      "overlayTop": ["Discover", "Analyze", "Invest", "Ahead."],
+      "overlayBottom": ["Real People.", "Real Trades.", "Real Opportunities."]
     },
-    "ticker": {
-      "label": "Live Insider-Aktivität"
-    },
-    "recent": {
-      "headingLine1": "Aktuelle",
-      "headingLine2": "Insider-Käufe.",
-      "subheading": "Die neuesten Transaktionen von Vorständen, Aufsichtsräten und Führungskräften.",
-      "viewAll": "Alle Insider-Trades ansehen →",
-      "empty": "Noch keine Daten verfügbar.",
-      "filters": {
-        "all": "Alle",
-        "strong": "Starkes Signal",
-        "medium": "Mittelstarkes Signal",
-        "weak": "Schwaches Signal"
-      },
-      "table": {
-        "date": "Datum",
-        "company": "Unternehmen",
-        "ticker": "Ticker",
-        "insider": "Insider",
-        "position": "Position",
-        "value": "Volumen",
-        "buySignal": "Signal",
-        "details": "Details"
-      }
-    },
-    "why": {
-      "headingLine1": "Mehr als nur Daten.",
-      "headingLine2": "Deine Vorteile.",
-      "subheading": "TradeInsider liefert dir die relevanten Insider-Informationen – einfach, verständlich und sofort nutzbar.",
-      "cta": "Mehr erfahren →",
+    "features": {
       "items": [
-        {
-          "title": "Echtzeit-Daten",
-          "description": "Aktuelle Insider-Transaktionen aus internationalen Quellen."
-        },
-        {
-          "title": "Klare Signale",
-          "description": "Unsere Analyse zeigt dir auf einen Blick die wichtigsten Chancen."
-        },
-        {
-          "title": "Globaler Fokus",
-          "description": "Insider-Aktivitäten aus den wichtigsten Märkten weltweit."
-        },
-        {
-          "title": "Wissen & Strategie",
-          "description": "Lerne, wie du Insider-Daten erfolgreich für deine Investments nutzt."
-        }
+        { "title": "Echte Daten", "description": "Insider-Transaktionen aus SEC & EQS." },
+        { "title": "Klare Signale", "description": "Unsere Analyse zeigt dir die relevantesten Chancen." },
+        { "title": "Globale Märkte", "description": "Insider-Aktivitäten weltweit in einer Plattform." }
       ]
     },
     "quote": {
-      "text": "Wenn Insider mit eigenem Geld investieren, ist das eines der ehrlichsten Signale, die der Markt kennt.",
+      "text": "Insider investieren nicht in Geschichten. Sondern in die Zukunft.",
       "attribution": "— tradeinsider-Redaktion"
     },
     "finalCta": {
-      "eyebrow": "Smart Money. Smarter Decisions.",
-      "headingLine1": "Bereit, cleverer",
-      "headingLine2": "zu investieren?",
-      "subheading": "Entdecke jetzt alle Funktionen von TradeInsider und erhalte Zugang zu exklusiven Insider-Analysen, starken Signalen und wertvollem Know-how.",
+      "label": "TradeInsider",
+      "headingLine1": "Bereit für",
+      "headingLine2": "einen besseren Blick?",
+      "subheading": "Nutze die Kraft von Insider-Daten, um bessere Investment-Entscheidungen zu treffen.",
+      "cta": "Jetzt kostenlos starten →",
+      "overlayBadge": "A Brighter Perspective",
+      "tagline": "Insights Today. Opportunities Tomorrow.",
       "stats": {
-        "trades": "analysierte Insider-Trades",
-        "markets": "Märkte weltweit",
-        "sources": "Datenquellen"
-      },
-      "cta": "Kostenlos starten →",
-      "secondaryCta": "Mehr erfahren →",
-      "microcopy": "In wenigen Sekunden. Ohne Kreditkarte."
+        "purchasesLabel": "Insider-Käufe",
+        "purchasesSub": "diese Woche",
+        "volumeLabel": "Investiertes Volumen",
+        "volumeSub": "diese Woche",
+        "countriesLabel": "Länder",
+        "countriesSub": "weltweit"
+      }
     }
   },
   "insiderKaeufe": {
