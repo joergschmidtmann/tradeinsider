@@ -48,20 +48,20 @@ async function main() {
     };
   });
 
-  const dedupeKeys = rows.map((r) => r.dedupe_key);
-  const { data: known, error: knownError } = await supabase.from("transactions").select("dedupe_key").in("dedupe_key", dedupeKeys);
-  if (knownError) throw knownError;
-  const knownKeys = new Set((known ?? []).map((row) => row.dedupe_key));
+  // No separate "which of these are already known" pre-check: with a large
+  // batch (e.g. 300+ disclosures), building a `.in("dedupe_key", [...])`
+  // query from that many keys can push the request URL past Supabase's
+  // ~16KB header limit (HeadersOverflowError, seen in production once the
+  // batch size grew). The unique constraint on dedupe_key plus
+  // ignoreDuplicates already does the same dedup server-side in one upsert
+  // call, with no list of keys ever built.
+  const { data: inserted, error } = await supabase
+    .from("transactions")
+    .upsert(rows, { onConflict: "dedupe_key", ignoreDuplicates: true })
+    .select("id");
+  if (error) throw error;
 
-  const newRows = rows.filter((r) => !knownKeys.has(r.dedupe_key));
-  console.log(`${newRows.length} disclosures are new (not yet in the database).`);
-
-  if (newRows.length > 0) {
-    const { error } = await supabase.from("transactions").upsert(newRows, { onConflict: "dedupe_key", ignoreDuplicates: true });
-    if (error) throw error;
-  }
-
-  console.log(`Done. ${newRows.length} row(s) upserted.`);
+  console.log(`Done. ${inserted?.length ?? 0} new row(s) upserted (of ${rows.length} fetched).`);
 }
 
 main().catch((err) => {
