@@ -10,18 +10,21 @@ function isNavItemActive(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-// Mirrors the display-name fallback in app/konto/page.tsx (saved display_name,
-// else a name derived from the email's local part) so the header's avatar and
-// the dashboard's greeting agree on who the user is. Two-letter initials from
-// a space-separated name ("Jörg Schmidtmann" -> "JS"), else the first two
-// characters of the single word we do have.
+// Two-letter initials from a saved display_name ("Jörg Schmidtmann" -> "JS"),
+// else from the email's local part treated as first.last ("joerg.schmidtmann@..."
+// -> "JS") — unlike the single-first-name fallback used for the dashboard
+// greeting in app/konto/page.tsx, initials want both name parts when the
+// address has them, not just the first.
 function deriveInitials(email: string | undefined, displayName: string | undefined): string {
-  const emailName = email?.split("@")[0]?.split(/[._+-]/)[0] ?? "";
-  const name = displayName?.trim() || emailName;
-  if (!name) return "";
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-  return name.slice(0, 2).toUpperCase();
+  if (displayName?.trim()) {
+    const parts = displayName.trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  const emailParts = (email?.split("@")[0] ?? "").split(/[._+-]/).filter(Boolean);
+  if (emailParts.length >= 2) return (emailParts[0][0] + emailParts[1][0]).toUpperCase();
+  if (emailParts.length === 1) return emailParts[0].slice(0, 2).toUpperCase();
+  return "";
 }
 
 function AccountAvatar({ initials, className }: { initials: string; className?: string }) {
