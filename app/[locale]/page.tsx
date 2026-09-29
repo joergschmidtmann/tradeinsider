@@ -89,7 +89,7 @@ export default async function Home({ params }: PageProps) {
 
   return (
     <main className="flex-1">
-      {/* Hero — photo: Unsplash, photo-1694846119962 (Empire State Building) */}
+      {/* Hero — photo: Unsplash, photo-1712111878737 (home office, dusk skyline) */}
       <section className="border-b border-border">
         <div className="grid lg:grid-cols-2">
           <div className="flex flex-col justify-center px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
@@ -123,7 +123,7 @@ export default async function Home({ params }: PageProps) {
 
           <div className="relative min-h-[420px] lg:min-h-[680px]">
             <Image
-              src="/images/hero-nyc-empire-state.jpg"
+              src="/images/hero-office-dusk.jpg"
               alt=""
               fill
               priority
@@ -173,16 +173,16 @@ export default async function Home({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Final CTA — photo: Unsplash, photo-1543071509 (café window sill) */}
+      {/* Final CTA — photo: robotic bull statue, provided by user */}
       <section className="relative overflow-hidden">
         <div className="relative min-h-[560px]">
           <Image
-            src="/images/cta-cafe-window.jpg"
+            src="/images/cta-bull-statue.jpg"
             alt=""
             fill
             sizes="100vw"
-            className="object-cover object-center"
-            style={{ filter: "grayscale(0.4) saturate(0.85) brightness(0.9)" }}
+            className="object-cover"
+            style={{ objectPosition: "50% 60%", filter: "grayscale(0.4) saturate(0.85) brightness(0.9)" }}
           />
           <div className="absolute inset-0" style={{ backgroundColor: "#0a2e22", mixBlendMode: "color", opacity: 0.5 }} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/45" />
