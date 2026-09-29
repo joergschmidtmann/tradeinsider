@@ -27,10 +27,31 @@
     "hero": {
       "eyebrowLine1": "Insights für deine",
       "eyebrowLine2": "nächste Entscheidung.",
-      "headlineLine1": "Same",
-      "headlineLine2": "Information.",
-      "headlineLine3": "A Higher",
-      "headlineLine4": "Perspective.",
+      "headlineVariants": [
+        [
+          { "text": "Same", "accent": false },
+          { "text": "Information.", "accent": false },
+          { "text": "A Higher", "accent": true },
+          { "text": "Perspective.", "accent": true }
+        ],
+        [
+          { "text": "Follow The", "accent": false },
+          { "text": "Smart Money.", "accent": true }
+        ],
+        [
+          { "text": "Insider Moves", "accent": false },
+          { "text": "The Market.", "accent": true }
+        ],
+        [
+          { "text": "Insider Trades.", "accent": false },
+          { "text": "Clear. Simple.", "accent": true },
+          { "text": "Powerful.", "accent": true }
+        ],
+        [
+          { "text": "Insider Shape", "accent": false },
+          { "text": "Tomorrow.", "accent": true }
+        ]
+      ],
       "subtitle": "Sieh den Markt durch die Augen der Insider und entdecke Chancen, bevor sie offensichtlich werden.",
       "cta": "Insider Trades entdecken →",
       "secondaryCta": "So funktioniert's",

@@ -5,6 +5,7 @@ import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { getEurRates, convertToEur } from "@/lib/fxRates";
 import { COUNTRIES } from "@/lib/countries";
 import { weekRangeInBerlin } from "@/lib/weekRange";
+import { HeroHeadline, type HeroHeadlineLine } from "@/components/HeroHeadline";
 import type { Locale } from "@/i18n/routing";
 
 // Without this, Next statically prerenders the homepage at build time (no
@@ -84,6 +85,7 @@ export default async function Home({ params }: PageProps) {
   const featureItems = t.raw("features.items") as { title: string; description: string }[];
   const overlayTop = t.raw("hero.overlayTop") as string[];
   const overlayBottom = t.raw("hero.overlayBottom") as string[];
+  const headlineVariants = t.raw("hero.headlineVariants") as HeroHeadlineLine[][];
 
   return (
     <main className="flex-1">
@@ -98,12 +100,7 @@ export default async function Home({ params }: PageProps) {
                 {t("hero.eyebrowLine2")}
               </p>
               <span className="mx-auto mt-3 block h-px w-8 bg-gradient-accent lg:mx-0" />
-              <h1 className="mt-6 text-5xl leading-[0.95] font-extrabold tracking-tight text-balance uppercase sm:text-6xl">
-                <span className="block text-foreground">{t("hero.headlineLine1")}</span>
-                <span className="block text-foreground">{t("hero.headlineLine2")}</span>
-                <span className="block text-gradient">{t("hero.headlineLine3")}</span>
-                <span className="block text-gradient">{t("hero.headlineLine4")}</span>
-              </h1>
+              <HeroHeadline variants={headlineVariants} />
               <p className="mx-auto mt-6 max-w-md text-lg text-muted text-balance lg:mx-0">{t("hero.subtitle")}</p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:justify-start">
                 <Link

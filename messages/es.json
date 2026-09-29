@@ -27,10 +27,31 @@
     "hero": {
       "eyebrowLine1": "Insights para tu",
       "eyebrowLine2": "próxima decisión.",
-      "headlineLine1": "Same",
-      "headlineLine2": "Information.",
-      "headlineLine3": "A Higher",
-      "headlineLine4": "Perspective.",
+      "headlineVariants": [
+        [
+          { "text": "Same", "accent": false },
+          { "text": "Information.", "accent": false },
+          { "text": "A Higher", "accent": true },
+          { "text": "Perspective.", "accent": true }
+        ],
+        [
+          { "text": "Follow The", "accent": false },
+          { "text": "Smart Money.", "accent": true }
+        ],
+        [
+          { "text": "Insider Moves", "accent": false },
+          { "text": "The Market.", "accent": true }
+        ],
+        [
+          { "text": "Insider Trades.", "accent": false },
+          { "text": "Clear. Simple.", "accent": true },
+          { "text": "Powerful.", "accent": true }
+        ],
+        [
+          { "text": "Insider Shape", "accent": false },
+          { "text": "Tomorrow.", "accent": true }
+        ]
+      ],
       "subtitle": "Mira el mercado a través de los ojos de los insiders y descubre oportunidades antes de que sean evidentes.",
       "cta": "Descubrir compras de insiders →",
       "secondaryCta": "Cómo funciona",

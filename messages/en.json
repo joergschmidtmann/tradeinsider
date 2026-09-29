@@ -27,10 +27,31 @@
     "hero": {
       "eyebrowLine1": "Insights for your",
       "eyebrowLine2": "next decision.",
-      "headlineLine1": "Same",
-      "headlineLine2": "Information.",
-      "headlineLine3": "A Higher",
-      "headlineLine4": "Perspective.",
+      "headlineVariants": [
+        [
+          { "text": "Same", "accent": false },
+          { "text": "Information.", "accent": false },
+          { "text": "A Higher", "accent": true },
+          { "text": "Perspective.", "accent": true }
+        ],
+        [
+          { "text": "Follow The", "accent": false },
+          { "text": "Smart Money.", "accent": true }
+        ],
+        [
+          { "text": "Insider Moves", "accent": false },
+          { "text": "The Market.", "accent": true }
+        ],
+        [
+          { "text": "Insider Trades.", "accent": false },
+          { "text": "Clear. Simple.", "accent": true },
+          { "text": "Powerful.", "accent": true }
+        ],
+        [
+          { "text": "Insider Shape", "accent": false },
+          { "text": "Tomorrow.", "accent": true }
+        ]
+      ],
       "subtitle": "See the market through the eyes of insiders and spot opportunities before they become obvious.",
       "cta": "Explore insider trades →",
       "secondaryCta": "How it works",
