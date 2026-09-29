@@ -10,11 +10,38 @@ function isNavItemActive(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
+// Mirrors the display-name fallback in app/konto/page.tsx (saved display_name,
+// else a name derived from the email's local part) so the header's avatar and
+// the dashboard's greeting agree on who the user is. Two-letter initials from
+// a space-separated name ("Jörg Schmidtmann" -> "JS"), else the first two
+// characters of the single word we do have.
+function deriveInitials(email: string | undefined, displayName: string | undefined): string {
+  const emailName = email?.split("@")[0]?.split(/[._+-]/)[0] ?? "";
+  const name = displayName?.trim() || emailName;
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
+
+function AccountAvatar({ initials, className }: { initials: string; className?: string }) {
+  return (
+    <span
+      className={
+        "flex shrink-0 items-center justify-center rounded-full bg-gradient-accent font-semibold text-black " + (className ?? "")
+      }
+    >
+      {initials}
+    </span>
+  );
+}
+
 export function Header() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [initials, setInitials] = useState("");
 
   const NAV_ITEMS = [
     { href: "/", label: t("home") },
@@ -25,12 +52,23 @@ export function Header() {
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
-    supabase.auth.getUser().then(({ data }) => setIsLoggedIn(!!data.user));
+
+    async function loadUser(userId: string | undefined, email: string | undefined) {
+      setIsLoggedIn(!!userId);
+      if (!userId) {
+        setInitials("");
+        return;
+      }
+      const { data: profile } = await supabase.from("profiles").select("display_name").eq("id", userId).single();
+      setInitials(deriveInitials(email, profile?.display_name ?? undefined));
+    }
+
+    supabase.auth.getUser().then(({ data }) => loadUser(data.user?.id, data.user?.email));
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session?.user);
+      loadUser(session?.user?.id, session?.user?.email);
     });
 
     return () => subscription.unsubscribe();
@@ -74,12 +112,18 @@ export function Header() {
             <LocaleSwitcher />
           </div>
 
-          <Link
-            href={isLoggedIn ? "/konto" : "/login"}
-            className="hidden rounded-full px-3.5 py-1.5 text-sm font-medium text-muted transition-colors hover:text-foreground lg:block"
-          >
-            {isLoggedIn ? t("konto") : t("login")}
-          </Link>
+          {isLoggedIn ? (
+            <Link href="/konto" aria-label={t("konto")} className="hidden transition-opacity hover:opacity-85 lg:block">
+              <AccountAvatar initials={initials} className="h-8 w-8 text-xs" />
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="hidden rounded-full px-3.5 py-1.5 text-sm font-medium text-muted transition-colors hover:text-foreground lg:block"
+            >
+              {t("login")}
+            </Link>
+          )}
 
           {!isLoggedIn && (
             <Link
@@ -130,12 +174,13 @@ export function Header() {
             href={isLoggedIn ? "/konto" : "/login"}
             onClick={() => setMenuOpen(false)}
             className={
-              "rounded-lg px-3 py-2.5 text-base font-medium transition-colors " +
+              "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-base font-medium transition-colors " +
               (isNavItemActive(pathname, isLoggedIn ? "/konto" : "/login")
                 ? "bg-surface-2 text-foreground"
                 : "text-muted hover:text-foreground")
             }
           >
+            {isLoggedIn && <AccountAvatar initials={initials} className="h-7 w-7 text-[11px]" />}
             {isLoggedIn ? t("konto") : t("login")}
           </Link>
           {!isLoggedIn && (
