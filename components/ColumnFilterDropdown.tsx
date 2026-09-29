@@ -5,7 +5,9 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { ColumnFilterOption } from "@/lib/columnFilters";
 
-type FilterParam = "company" | "insider" | "country";
+type FilterParam = "company" | "insider" | "country" | "date" | "signal";
+
+const FILTER_PARAMS: readonly FilterParam[] = ["company", "insider", "country", "date", "signal"];
 
 interface ColumnFilterDropdownProps {
   label: string;
@@ -16,6 +18,8 @@ interface ColumnFilterDropdownProps {
   company?: string;
   insider?: string;
   country?: string;
+  date?: string;
+  signal?: string;
 }
 
 /** Column-header filter, styled as a <details>/<summary> disclosure rather
@@ -28,15 +32,19 @@ interface ColumnFilterDropdownProps {
  * (RoleToggle/SearchBar are plain links/forms) — needed only for the
  * click-outside-to-close behavior below, which native <details> doesn't
  * provide (it only closes on a second click on <summary>). */
-export function ColumnFilterDropdown({ label, paramName, values, role, q, company, insider, country }: ColumnFilterDropdownProps) {
+export function ColumnFilterDropdown({ label, paramName, values, role, q, company, insider, country, date, signal }: ColumnFilterDropdownProps) {
   const t = useTranslations("insiderKaeufe.table");
-  const activeValues: Record<FilterParam, string | undefined> = { company, insider, country };
+  const tBuySignal = useTranslations("buySignal");
+  // The signal tier's stored value ("strong"/"medium"/"weak") isn't display
+  // text like the other columns' — translate it the same way the buy-signal
+  // icon's own tooltip does, instead of relying on ColumnFilterOption.label
+  // (which the other columns' server-side fetchers already set directly).
+  const optionLabel = (value: string) => (paramName === "signal" ? tBuySignal(value) : value);
+  const activeValues: Record<FilterParam, string | undefined> = { company, insider, country, date, signal };
   const activeValue = activeValues[paramName];
-  const activeLabel = values.find((option) => option.value === activeValue)?.label ?? activeValue;
+  const activeLabel = values.find((option) => option.value === activeValue)?.label ?? (activeValue ? optionLabel(activeValue) : undefined);
   const otherFilters = Object.fromEntries(
-    (["company", "insider", "country"] as const)
-      .filter((key) => key !== paramName && activeValues[key])
-      .map((key) => [key, activeValues[key]])
+    FILTER_PARAMS.filter((key) => key !== paramName && activeValues[key]).map((key) => [key, activeValues[key]])
   );
   const baseQuery = { ...(q ? { q } : {}), role, ...otherFilters };
 
@@ -78,7 +86,7 @@ export function ColumnFilterDropdown({ label, paramName, values, role, q, compan
                 : "block truncate rounded-lg px-2.5 py-1.5 text-muted hover:bg-surface hover:text-foreground"
             }
           >
-            {option.label ?? option.value} <span className="text-muted">({option.count})</span>
+            {option.label ?? optionLabel(option.value)} <span className="text-muted">({option.count})</span>
           </Link>
         ))}
       </div>

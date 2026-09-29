@@ -93,11 +93,15 @@ interface TransactionsTableProps {
   companyOptions: ColumnFilterOption[];
   insiderOptions: ColumnFilterOption[];
   countryOptions: ColumnFilterOption[];
+  dateOptions: ColumnFilterOption[];
+  signalOptions: ColumnFilterOption[];
   role: string;
   q: string;
   company?: string;
   insider?: string;
   country?: string;
+  date?: string;
+  signal?: string;
   showBuySignal: boolean;
   showCountry: boolean;
   eurRates: Record<string, number>;
@@ -110,11 +114,15 @@ export function TransactionsTable({
   companyOptions,
   insiderOptions,
   countryOptions,
+  dateOptions,
+  signalOptions,
   role,
   q,
   company,
   insider,
   country,
+  date,
+  signal,
   showBuySignal,
   showCountry,
   eurRates,
@@ -151,6 +159,8 @@ export function TransactionsTable({
                   company={company}
                   insider={insider}
                   country={country}
+                  date={date}
+                  signal={signal}
                 />
               </th>
               <th className="px-5 py-3.5 font-medium">
@@ -163,6 +173,8 @@ export function TransactionsTable({
                   company={company}
                   insider={insider}
                   country={country}
+                  date={date}
+                  signal={signal}
                 />
               </th>
               {showCountry && (
@@ -176,16 +188,42 @@ export function TransactionsTable({
                     company={company}
                     insider={insider}
                     country={country}
+                    date={date}
+                    signal={signal}
                   />
                 </th>
               )}
-              <th className="px-5 py-3.5 text-center font-medium">{t("table.date")}</th>
+              <th className="px-5 py-3.5 text-center font-medium">
+                <ColumnFilterDropdown
+                  label={t("table.date")}
+                  paramName="date"
+                  values={dateOptions}
+                  role={role}
+                  q={q}
+                  company={company}
+                  insider={insider}
+                  country={country}
+                  date={date}
+                  signal={signal}
+                />
+              </th>
               <th className="px-5 py-3.5 text-center font-medium">{t("table.shares")}</th>
               <th className="px-5 py-3.5 text-center font-medium">{t("table.price")}</th>
               <th className="px-5 py-3.5 text-center font-medium">{t("table.totalValue")}</th>
               {showBuySignal && (
                 <th className="px-5 py-3.5 text-center font-medium" title={t("table.buySignalTooltip")}>
-                  {t("table.buySignal")}
+                  <ColumnFilterDropdown
+                    label={t("table.buySignal")}
+                    paramName="signal"
+                    values={signalOptions}
+                    role={role}
+                    q={q}
+                    company={company}
+                    insider={insider}
+                    country={country}
+                    date={date}
+                    signal={signal}
+                  />
                 </th>
               )}
               <th className="px-5 py-3.5 text-center font-medium">{t("table.performance")}</th>

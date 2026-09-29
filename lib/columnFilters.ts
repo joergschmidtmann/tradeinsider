@@ -48,7 +48,7 @@ export interface ColumnFilterOption {
  * case gets an exact-count query instead of this scan-and-dedupe approach. */
 export async function fetchDistinctValues(
   supabase: SupabaseClient,
-  column: "issuer_name" | "owner_name" | "source_country",
+  column: "issuer_name" | "owner_name" | "source_country" | "transaction_date",
   filters: BaseTransactionFilters,
   locale: Locale
 ): Promise<ColumnFilterOption[]> {
@@ -57,6 +57,9 @@ export async function fetchDistinctValues(
   }
   if (column === "source_country") {
     return fetchCountryCounts(supabase, filters, locale);
+  }
+  if (column === "transaction_date") {
+    return fetchDateCounts(supabase, filters, locale);
   }
 
   const query = applyBaseFilters(supabase.from("transactions").select(column), filters).range(0, 999);
@@ -73,7 +76,10 @@ export async function fetchDistinctValues(
   return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
 }
 
-function isHedgeFundOwnerQuery(column: "issuer_name" | "owner_name" | "source_country", filters: BaseTransactionFilters): boolean {
+function isHedgeFundOwnerQuery(
+  column: "issuer_name" | "owner_name" | "source_country" | "transaction_date",
+  filters: BaseTransactionFilters
+): boolean {
   return column === "owner_name" && filters.roles.length === 1 && filters.roles[0] === "hedge_fund";
 }
 
@@ -111,4 +117,61 @@ async function fetchCountryCounts(supabase: SupabaseClient, filters: BaseTransac
     })
   );
   return counts.filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
+}
+
+// Same 3-entry locale map every other file in this codebase keeps locally
+// (see TransactionsTable.tsx) rather than a shared export — small enough
+// that a shared util would be more indirection than it saves.
+const INTL_LOCALES: Record<Locale, string> = { de: "de-DE", en: "en-US", es: "es-ES" };
+
+/** Distinct transaction dates, scan-and-dedupe like issuer_name/owner_name
+ * above (same "not exhaustive for huge result sets" caveat — there's no
+ * small fixed universe of dates the way there is for countries/hedge funds).
+ * Sorted newest-first rather than by count, since that's what's useful for a
+ * date filter. */
+async function fetchDateCounts(supabase: SupabaseClient, filters: BaseTransactionFilters, locale: Locale): Promise<ColumnFilterOption[]> {
+  const query = applyBaseFilters(supabase.from("transactions").select("transaction_date"), filters).range(0, 999);
+  const { data, error } = await query;
+  if (error || !data) return [];
+
+  const counts = new Map<string, number>();
+  for (const row of data as { transaction_date: string }[]) {
+    counts.set(row.transaction_date, (counts.get(row.transaction_date) ?? 0) + 1);
+  }
+
+  const formatter = new Intl.DateTimeFormat(INTL_LOCALES[locale], { year: "numeric", month: "short", day: "numeric" });
+  return [...counts.entries()]
+    .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+    .map(([value, count]) => ({ value, label: formatter.format(new Date(value)), count }));
+}
+
+const SIGNAL_TIERS = ["strong", "medium", "weak"] as const;
+export type SignalTier = (typeof SIGNAL_TIERS)[number];
+
+/** Exact per-tier counts for the buy-signal filter. Deliberately applies the
+ * same $500k/$100k thresholds directly to the stored total_value regardless
+ * of its currency, unlike the displayed badge (which converts to USD via
+ * live FX rates first) — an accepted simplification: exact at the currency
+ * boundary would need the same live-rate conversion pushed into the SQL
+ * filter, which isn't practical here. Small and fixed like COUNTRIES/
+ * HEDGE_FUNDS, so exact counts per tier rather than a scan. */
+export async function fetchSignalCounts(supabase: SupabaseClient, filters: BaseTransactionFilters): Promise<ColumnFilterOption[]> {
+  const counts = await Promise.all(
+    SIGNAL_TIERS.map(async (tier) => {
+      let q = applyBaseFilters(supabase.from("transactions").select("id", { count: "exact", head: true }), filters);
+      q = applySignalRange(q, tier);
+      const { count, error } = await q;
+      if (error) throw error;
+      return { value: tier, count: count ?? 0 };
+    })
+  );
+  return counts.filter((c) => c.count > 0);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- same query-builder typing issue as applyBaseFilters
+export function applySignalRange(query: any, tier: string) {
+  if (tier === "strong") return query.gte("total_value", 500_000);
+  if (tier === "medium") return query.gte("total_value", 100_000).lt("total_value", 500_000);
+  if (tier === "weak") return query.gt("total_value", 0).lt("total_value", 100_000);
+  return query;
 }

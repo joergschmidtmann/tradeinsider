@@ -7,7 +7,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { RoleToggle } from "@/components/RoleToggle";
 import { TransactionsTable, type TransactionRow, type StockQuote } from "@/components/TransactionsTable";
 import { PaywallCard } from "@/components/PaywallCard";
-import { applyBaseFilters, fetchDistinctValues } from "@/lib/columnFilters";
+import { applyBaseFilters, applySignalRange, fetchDistinctValues, fetchSignalCounts } from "@/lib/columnFilters";
 import { getEurRates } from "@/lib/fxRates";
 import type { Locale } from "@/i18n/routing";
 
@@ -41,6 +41,8 @@ interface PageProps {
     company?: string;
     insider?: string;
     country?: string;
+    date?: string;
+    signal?: string;
   }>;
 }
 
@@ -54,6 +56,8 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
   const company = (sp.company ?? "").trim().slice(0, 200) || undefined;
   const insider = (sp.insider ?? "").trim().slice(0, 200) || undefined;
   const country = (sp.country ?? "").trim().slice(0, 10) || undefined;
+  const date = (sp.date ?? "").trim().slice(0, 10) || undefined;
+  const signal = ["strong", "medium", "weak"].includes(sp.signal ?? "") ? sp.signal : undefined;
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   const roleKey = ROLE_KEYS[role];
@@ -104,14 +108,18 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
   if (company) query = query.eq("issuer_name", company);
   if (insider) query = query.eq("owner_name", insider);
   if (country) query = query.eq("source_country", country);
+  if (date) query = query.eq("transaction_date", date);
+  if (signal) query = applySignalRange(query, signal);
 
-  const [{ data, error, count }, companyOptions, insiderOptions, countryOptions, eurRates] = gated
-    ? [{ data: [], error: null, count: 0 }, [], [], [], {}]
+  const [{ data, error, count }, companyOptions, insiderOptions, countryOptions, dateOptions, signalOptions, eurRates] = gated
+    ? [{ data: [], error: null, count: 0 }, [], [], [], [], [], {}]
     : await Promise.all([
         query,
         fetchDistinctValues(supabase, "issuer_name", baseFilters, locale),
         fetchDistinctValues(supabase, "owner_name", baseFilters, locale),
         isVorstand ? fetchDistinctValues(supabase, "source_country", baseFilters, locale) : Promise.resolve([]),
+        fetchDistinctValues(supabase, "transaction_date", baseFilters, locale),
+        isVorstand ? fetchSignalCounts(supabase, baseFilters) : Promise.resolve([]),
         getEurRates(),
       ]);
   const rows = (data ?? []) as TransactionRow[];
@@ -160,7 +168,16 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
         ) : (
           <>
             <div className="mt-6">
-              <SearchBar initialQuery={q} role={role} company={company} insider={insider} country={country} locale={locale} />
+              <SearchBar
+                initialQuery={q}
+                role={role}
+                company={company}
+                insider={insider}
+                country={country}
+                date={date}
+                signal={signal}
+                locale={locale}
+              />
             </div>
 
             {error ? (
@@ -172,11 +189,15 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
                   companyOptions={companyOptions}
                   insiderOptions={insiderOptions}
                   countryOptions={countryOptions}
+                  dateOptions={dateOptions}
+                  signalOptions={signalOptions}
                   role={role}
                   q={q}
                   company={company}
                   insider={insider}
                   country={country}
+                  date={date}
+                  signal={signal}
                   showBuySignal={isVorstand}
                   showCountry={isVorstand}
                   eurRates={eurRates}
@@ -194,6 +215,8 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
                           ...(company ? { company } : {}),
                           ...(insider ? { insider } : {}),
                           ...(country ? { country } : {}),
+                          ...(date ? { date } : {}),
+                          ...(signal ? { signal } : {}),
                           page: page - 1,
                         },
                       }}
@@ -214,6 +237,8 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
                           ...(company ? { company } : {}),
                           ...(insider ? { insider } : {}),
                           ...(country ? { country } : {}),
+                          ...(date ? { date } : {}),
+                          ...(signal ? { signal } : {}),
                           page: page + 1,
                         },
                       }}

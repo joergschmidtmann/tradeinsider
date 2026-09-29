@@ -8,6 +8,8 @@ export function SearchBar({
   company,
   insider,
   country,
+  date,
+  signal,
   locale,
 }: {
   initialQuery: string;
@@ -15,6 +17,8 @@ export function SearchBar({
   company?: string;
   insider?: string;
   country?: string;
+  date?: string;
+  signal?: string;
   locale: Locale;
 }) {
   const t = useTranslations("insiderKaeufe");
@@ -26,6 +30,8 @@ export function SearchBar({
       {company && <input type="hidden" name="company" value={company} />}
       {insider && <input type="hidden" name="insider" value={insider} />}
       {country && <input type="hidden" name="country" value={country} />}
+      {date && <input type="hidden" name="date" value={date} />}
+      {signal && <input type="hidden" name="signal" value={signal} />}
       <div className="relative max-w-md">
         <svg
           viewBox="0 0 24 24"
