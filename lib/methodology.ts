@@ -1,41 +1,45 @@
-// TODO – Methodik vor Launch final festlegen. Diese Datei ist eine vorläufige,
-// leicht änderbare Konfiguration für die noch nicht gebaute TradeInsider-
-// Intelligence-Bewertungslogik (Scores, Ratings, Kursziele). Sie speist sowohl
-// die /methodik-Seite als auch (künftig) die echte Scoring-Implementierung.
+// Zentrale, leicht änderbare Konfiguration der automatisierten Aktienanalyse.
+// Speist sowohl die Berechnung (lib/analysis/engine.ts) als auch die
+// /methodik-Seite, damit dokumentierte und tatsächlich angewendete Methodik
+// nicht auseinanderlaufen. Jede Änderung an Gewichten/Schwellen => Version
+// hochzählen; die Version wird mit jeder Analyse gespeichert.
 //
 // TODO LEGAL REVIEW – Rating-System: Gewichtung, Score-Bänder und die
-// BUY/HOLD/SELL-Schwellen unten sind fachlich und rechtlich (Kapitalmarktrecht,
-// insb. MAR Art. 20 und die Delegierte Verordnung (EU) 2016/958 zur sachgerechten
-// Darstellung von Anlageempfehlungen) vor dem kommerziellen Launch zu prüfen.
+// Empfehlungs-Schwellen sind vor dem kommerziellen Launch rechtlich zu prüfen
+// (Kapitalmarktrecht, insb. MAR Art. 20 und Delegierte Verordnung (EU)
+// 2016/958 zur sachgerechten Darstellung von Anlageempfehlungen).
 
-export const SCORE_CATEGORIES = [
-  { key: "fundamental", label: "Fundamental", weight: 0.3 },
-  { key: "growth", label: "Growth", weight: 0.2 },
-  { key: "valuation", label: "Valuation", weight: 0.2 },
-  { key: "technical", label: "Technical", weight: 0.15 },
-  { key: "insiderActivity", label: "Insider Activity", weight: 0.15 },
-] as const;
+import type { CategoryKey, Recommendation } from "@/lib/analysis/model";
 
-export type ScoreCategoryKey = (typeof SCORE_CATEGORIES)[number]["key"];
-
-export const SCORE_BANDS = [
-  { min: 90, max: 100, label: "Exceptional" },
-  { min: 80, max: 89, label: "Strong" },
-  { min: 70, max: 79, label: "Positive" },
-  { min: 50, max: 69, label: "Neutral" },
-  { min: 30, max: 49, label: "Weak" },
-  { min: 0, max: 29, label: "Very Weak" },
-] as const;
-
-export type Rating = "BUY" | "HOLD" | "SELL";
-
-// Erwartetes Kurspotenzial über den Analyse-Horizont (Standard-Vorschlag: 12 Monate).
-export const RATING_THRESHOLDS: { rating: Rating; description: string }[] = [
-  { rating: "BUY", description: "erwartetes Kurspotenzial > +15 %" },
-  { rating: "HOLD", description: "zwischen -10 % und +15 %" },
-  { rating: "SELL", description: "unter -10 %" },
+export const SCORE_CATEGORIES: { key: CategoryKey; label: string; weight: number }[] = [
+  { key: "technical", label: "Technische Analyse", weight: 0.2 },
+  { key: "quality", label: "Fundamental: Qualität", weight: 0.2 },
+  { key: "growth", label: "Fundamental: Wachstum", weight: 0.15 },
+  { key: "valuation", label: "Fundamental: Bewertung", weight: 0.15 },
+  { key: "analysts", label: "Analysten-Konsens", weight: 0.2 },
+  { key: "insider", label: "Insider-Aktivität", weight: 0.1 },
 ];
+
+/** Gesamtscore-Schwellen für die Empfehlung (jeweils "mindestens"). */
+export const RECOMMENDATION_THRESHOLDS: { recommendation: Recommendation; minScore: number }[] = [
+  { recommendation: "STRONG_BUY", minScore: 72 },
+  { recommendation: "BUY", minScore: 60 },
+  { recommendation: "HOLD", minScore: 41 },
+  { recommendation: "SELL", minScore: 29 },
+  { recommendation: "STRONG_SELL", minScore: 0 },
+];
+
+/** Unterhalb dieses Datenabdeckungsgrads (Anteil der Kategoriegewichte mit
+ * Daten) wird keine Kauf-/Verkaufsempfehlung ausgesprochen, sondern HOLD. */
+export const MIN_COVERAGE_FOR_ACTION = 0.6;
+
+/** Konsistenzregel: Ein "STRONG_*"-Rating setzt voraus, dass Technik und
+ * Analysten nicht klar gegen die Richtung zeigen. */
+export const STRONG_CONFIRMATION_SCORE = 45;
+
+// Ältere, dreistufige Darstellung (u. a. lib/analysis/types.ts).
+export type Rating = "BUY" | "HOLD" | "SELL";
 
 export const DEFAULT_ANALYSIS_HORIZON_MONTHS = 12;
 
-export const METHODOLOGY_VERSION = "0.1.0-draft";
+export const METHODOLOGY_VERSION = "1.0.0";

@@ -276,3 +276,95 @@ alter table contract_requests enable row level security;
 --   on stock_analyses for select
 --   using (published_at is not null and published_at <= now());
 -- ============================================================================
+
+-- ============================================================================
+-- Automatisierte Aktienanalyse (S&P 500, Nasdaq-100, STOXX Europe 600)
+-- Befüllt täglich von scripts/ingest-analysis.ts (Service-Role-Key), gelesen
+-- von /aktien-analyse. Berechnungslogik: lib/analysis/*, Gewichte und
+-- Schwellen: lib/methodology.ts (Version wird je Zeile gespeichert).
+-- ============================================================================
+
+-- Aktueller Analysestand: eine Zeile pro Aktie, bei jedem Lauf überschrieben.
+create table if not exists stock_analysis (
+  -- Anbieter-Symbol inkl. Börse, z. B. 'AAPL.US', 'SAP.XETRA', 'NESN.SW'
+  symbol text primary key,
+  ticker text not null,
+  name text not null,
+  isin text,
+  exchange text,
+  country text,
+  currency text,
+  sector text,
+  industry text,
+  -- 'SP500' | 'NDX100' | 'STOXX600'
+  indices text[] not null default '{}',
+
+  recommendation text not null check (recommendation in ('STRONG_BUY', 'BUY', 'HOLD', 'SELL', 'STRONG_SELL')),
+  score_overall smallint not null check (score_overall between 0 and 100),
+  score_technical smallint,
+  score_quality smallint,
+  score_growth smallint,
+  score_valuation smallint,
+  score_analysts smallint,
+  score_insider smallint,
+  data_coverage numeric not null,
+
+  -- Vorherige Empfehlung, um Hoch-/Herabstufungen anzuzeigen.
+  previous_recommendation text,
+  recommendation_changed_at date,
+
+  price numeric,
+  price_date date,
+  return_1m numeric,
+  return_3m numeric,
+  return_12m numeric,
+
+  analyst_count smallint,
+  analyst_strong_buy smallint,
+  analyst_buy smallint,
+  analyst_hold smallint,
+  analyst_sell smallint,
+  analyst_strong_sell smallint,
+  analyst_target numeric,
+  analyst_upside numeric,
+
+  market_cap numeric,
+  -- Detaildaten für die Einzelseite (Kennzahlen, Befunde je Kategorie, Chart).
+  fundamentals jsonb,
+  technical jsonb,
+  signals jsonb not null default '{}',
+  chart jsonb,
+
+  methodology_version text not null,
+  analyzed_at timestamptz not null default now()
+);
+
+create index if not exists stock_analysis_score_idx on stock_analysis (score_overall desc);
+create index if not exists stock_analysis_recommendation_idx on stock_analysis (recommendation, score_overall desc);
+create index if not exists stock_analysis_indices_idx on stock_analysis using gin (indices);
+create index if not exists stock_analysis_name_idx on stock_analysis using gin (name gin_trgm_ops);
+
+alter table stock_analysis enable row level security;
+
+create policy "Public can read stock_analysis"
+  on stock_analysis for select
+  using (true);
+
+-- Historie: eine Zeile pro Aktie und Analysetag. Dokumentiert jede je
+-- veröffentlichte Empfehlung (Nachvollziehbarkeit, MAR-Aufzeichnung) und
+-- erlaubt später eine Erfolgsmessung der Empfehlungen.
+create table if not exists stock_analysis_history (
+  symbol text not null,
+  analysis_date date not null,
+  recommendation text not null,
+  score_overall smallint not null,
+  price numeric,
+  methodology_version text not null,
+  primary key (symbol, analysis_date)
+);
+
+alter table stock_analysis_history enable row level security;
+
+create policy "Public can read stock_analysis_history"
+  on stock_analysis_history for select
+  using (true);

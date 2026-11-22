@@ -11,6 +11,7 @@ on:
     - cron: "10 * * * *" # Netherlands (AFM) — low volume, one bulk export request per run, offset by 10min to spread load (avoids the US run's :00/:15/:30/:45 slots)
     - cron: "20 * * * *" # Belgium (FSMA) — low volume, but throttled at 30s/request (robots.txt Crawl-delay), offset by 20min to spread load
     - cron: "0 5 * * *" # US stock quotes (Twelve Data) — daily is enough for a "since purchase" performance figure
+    - cron: "40 22 * * 1-5" # Aktienanalyse (EODHD) — after the US close, so US and EU prices are final for the day
   workflow_dispatch: {}
 
 jobs:
@@ -96,3 +97,11 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+
+      - name: Stock analysis (EODHD)
+        if: always() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '40 22 * * 1-5')
+        run: npm run ingest:analysis
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          EODHD_API_TOKEN: ${{ secrets.EODHD_API_TOKEN }}
