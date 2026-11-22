@@ -2,7 +2,6 @@
   "nav": {
     "home": "Home",
     "insiderKaeufe": "Insider Käufe",
-    "stockAnalysis": "Aktien-Analyse",
     "tradingIntelligence": "Trading Intelligence",
     "tradingAcademy": "Trading Academy",
     "login": "Login",
@@ -141,12 +140,12 @@
   },
   "tradingIntelligence": {
     "title": "Trading Intelligence",
-    "badgeLive": "Live · FINRA Reg SHO",
+    "badgeLive": "Live · Täglich aktualisiert",
     "badgeSoon": "Bald verfügbar",
     "descriptions": {
       "etfs": "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
       "krypto": "Fundamentale und technische Analysen zu Kryptowährungen folgen in Kürze.",
-      "aktien": "Die 20 meistgehandelten und die 20 meist leerverkauften US-Aktien der letzten Handelswoche."
+      "aktien": "Technische Analyse, Fundamentaldaten und Analysten-Konsens für alle Aktien aus S&P 500, Nasdaq-100 und STOXX Europe 600 — täglich verdichtet zu klaren Kauf- und Verkaufssignalen."
     },
     "etfTypeDescriptions": {
       "etfs": "Fundamentale und technische Analysen zu ETFs folgen in Kürze.",
@@ -169,7 +168,8 @@
     "rankTitleShort": "Aktien mit dem höchsten Handelsvolumen (short) — letzte {days} Handelstage",
     "sharesUnit": "Stk.",
     "footnote": "Basiert auf den täglichen Reg-SHO-Leerverkaufsvolumen-Dateien der FINRA (US-Aktien, ETFs ausgeschlossen). Das ist das tatsächlich als Leerverkauf ausgeführte Handelsvolumen des Tages, nicht die offene Short-Interest-Position — ein hoher Anteil zeigt reges Handelsgeschehen, nicht automatisch eine bearishe Wette gegen die Aktie. Keine Anlageberatung.",
-    "loadError": "Marktdaten konnten gerade nicht geladen werden. Bitte später erneut versuchen."
+    "loadError": "Marktdaten konnten gerade nicht geladen werden. Bitte später erneut versuchen.",
+    "rankingsHeading": "Handelsvolumen & Leerverkäufe (USA)"
   },
   "tradingAcademy": {
     "badge": "Bald verfügbar",
@@ -314,10 +314,6 @@
     "stockDetailDescription": "Technische und fundamentale Analyse, Analysten-Konsens und Insider-Aktivität zur {name}-Aktie."
   },
   "stockAnalysis": {
-    "eyebrow": "S&P 500 · Nasdaq-100 · STOXX Europe 600",
-    "titlePrefix": "Aktien-Analyse mit",
-    "titleHighlight": "klaren Signalen",
-    "subtitle": "Technische Analyse, Fundamentaldaten, Analysten-Konsens und Insider-Käufe — täglich für über 1.000 Aktien zu einer eindeutigen Empfehlung verdichtet.",
     "recommendations": {
       "STRONG_BUY": "Starker Kauf",
       "BUY": "Kaufen",

@@ -106,9 +106,9 @@ function MethodikDE() {
     <>
       <h1 className="text-3xl font-semibold tracking-tight text-foreground">Methodik &amp; Transparenz</h1>
       <p className="mt-2 text-sm leading-relaxed text-muted">
-        Diese Seite beschreibt, wie die Empfehlungen der{" "}
-        <Link href="/aktien-analyse" className="underline hover:text-foreground">
-          Aktien-Analyse
+        Diese Seite beschreibt, wie die Aktien-Empfehlungen in{" "}
+        <Link href={{ pathname: "/trading-intelligence", query: { category: "aktien" } }} className="underline hover:text-foreground">
+          Trading Intelligence
         </Link>{" "}
         berechnet werden. Die Empfehlungen entstehen vollautomatisch und regelbasiert — ohne manuelle Eingriffe in
         einzelne Werte. Analysiert werden alle Aktien aus S&amp;P 500, Nasdaq-100 und STOXX Europe 600; die
@@ -231,9 +231,9 @@ function MethodikEN() {
         This is an English translation for convenience. The German version is legally binding.
       </p>
       <p className="mt-2 text-sm leading-relaxed text-muted">
-        This page describes how the ratings of the{" "}
-        <Link href="/aktien-analyse" className="underline hover:text-foreground">
-          stock analysis
+        This page describes how the stock ratings in{" "}
+        <Link href={{ pathname: "/trading-intelligence", query: { category: "aktien" } }} className="underline hover:text-foreground">
+          Trading Intelligence
         </Link>{" "}
         are calculated. Ratings are produced fully automatically and rule-based, without manual intervention in
         individual values. All stocks in the S&amp;P 500, Nasdaq-100 and STOXX Europe 600 are analyzed every trading
@@ -348,9 +348,9 @@ function MethodikES() {
         Esta es una traducción al español a título informativo. La versión en alemán es la legalmente vinculante.
       </p>
       <p className="mt-2 text-sm leading-relaxed text-muted">
-        Esta página describe cómo se calculan las recomendaciones del{" "}
-        <Link href="/aktien-analyse" className="underline hover:text-foreground">
-          análisis de acciones
+        Esta página describe cómo se calculan las recomendaciones de acciones en{" "}
+        <Link href={{ pathname: "/trading-intelligence", query: { category: "aktien" } }} className="underline hover:text-foreground">
+          Trading Intelligence
         </Link>
         . Se generan de forma totalmente automática y basada en reglas, sin intervención manual. Se analizan todas
         las acciones del S&amp;P 500, Nasdaq-100 y STOXX Europe 600 cada día hábil tras el cierre de EE. UU.

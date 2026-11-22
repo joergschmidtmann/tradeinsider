@@ -116,7 +116,7 @@ export default async function StockDetailPage({ params }: PageProps) {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-12 pb-24 sm:px-6">
-      <Link href="/aktien-analyse" className="text-sm text-muted hover:text-foreground">
+      <Link href={{ pathname: "/trading-intelligence", query: { category: "aktien" } }} className="text-sm text-muted hover:text-foreground">
         ← {t("backToList")}
       </Link>
 

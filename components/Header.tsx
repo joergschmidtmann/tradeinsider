@@ -49,7 +49,6 @@ export function Header() {
   const NAV_ITEMS = [
     { href: "/", label: t("home") },
     { href: "/insider-kaeufe", label: t("insiderKaeufe") },
-    { href: "/aktien-analyse", label: t("stockAnalysis") },
     { href: "/trading-intelligence", label: t("tradingIntelligence") },
     { href: "/trading-academy", label: t("tradingAcademy") },
   ];

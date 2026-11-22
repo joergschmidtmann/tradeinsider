@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { CategoryToggle } from "@/components/CategoryToggle";
 import { EtfTypeToggle } from "@/components/EtfTypeToggle";
 import { getWeeklyStockRankings, type RankedStock } from "@/lib/marketVolume";
+import { StockScreener, type ScreenerSearchParams } from "@/components/analysis/StockScreener";
 import type { Locale } from "@/i18n/routing";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
@@ -67,7 +68,7 @@ function RankTable({
 
 interface PageProps {
   params: Promise<{ locale: Locale }>;
-  searchParams: Promise<{ category?: string; etfType?: string }>;
+  searchParams: Promise<{ category?: string; etfType?: string } & ScreenerSearchParams>;
 }
 
 export default async function Page({ params, searchParams }: PageProps) {
@@ -84,42 +85,52 @@ export default async function Page({ params, searchParams }: PageProps) {
   const percentFormatter = new Intl.NumberFormat(uiLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col items-center px-4 py-24 text-center sm:px-6">
-      <span className="rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
-        {category === "aktien" ? t("badgeLive") : t("badgeSoon")}
-      </span>
-      <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">{t("title")}</h1>
-      <p className="mt-4 max-w-xl text-lg text-muted">{description}</p>
-      <div className="mt-8">
-        <CategoryToggle activeCode={category} />
+    <main className="flex-1">
+      <div className="mx-auto flex max-w-5xl flex-col items-center px-4 pt-24 pb-10 text-center sm:px-6">
+        <span className="rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
+          {category === "aktien" ? t("badgeLive") : t("badgeSoon")}
+        </span>
+        <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">{t("title")}</h1>
+        <p className="mt-4 max-w-xl text-lg text-muted">{description}</p>
+        <div className="mt-8">
+          <CategoryToggle activeCode={category} />
+        </div>
+
+        {category === "etfs" && (
+          <div className="mt-4">
+            <EtfTypeToggle activeCode={etfType} />
+          </div>
+        )}
       </div>
 
-      {category === "etfs" && (
-        <div className="mt-4">
-          <EtfTypeToggle activeCode={etfType} />
+      {category === "aktien" && (
+        <div className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+          <StockScreener locale={locale} sp={sp} />
+
+          <section className="mt-16">
+            <h2 className="text-xl font-semibold">{t("rankingsHeading")}</h2>
+            {rankings ? (
+              <>
+                <div className="mt-6 grid gap-8 lg:grid-cols-2">
+                  <RankTable
+                    title={t("rankTitleLong", { days: rankings.tradingDays })}
+                    rows={rankings.mostTraded}
+                    renderValue={(row) => `${numberFormatter.format(row.totalVolume)} ${t("sharesUnit")}`}
+                  />
+                  <RankTable
+                    title={t("rankTitleShort", { days: rankings.tradingDays })}
+                    rows={rankings.mostShorted}
+                    renderValue={(row) => `${percentFormatter.format(row.shortRatio)} %`}
+                  />
+                </div>
+                <p className="mt-6 max-w-3xl text-xs text-muted">{t("footnote")}</p>
+              </>
+            ) : (
+              <p className="mt-6 text-sm text-red-400">{t("loadError")}</p>
+            )}
+          </section>
         </div>
       )}
-
-      {category === "aktien" &&
-        (rankings ? (
-          <div className="mt-12 w-full text-left">
-            <div className="grid gap-8 lg:grid-cols-2">
-              <RankTable
-                title={t("rankTitleLong", { days: rankings.tradingDays })}
-                rows={rankings.mostTraded}
-                renderValue={(row) => `${numberFormatter.format(row.totalVolume)} ${t("sharesUnit")}`}
-              />
-              <RankTable
-                title={t("rankTitleShort", { days: rankings.tradingDays })}
-                rows={rankings.mostShorted}
-                renderValue={(row) => `${percentFormatter.format(row.shortRatio)} %`}
-              />
-            </div>
-            <p className="mx-auto mt-6 max-w-2xl text-xs text-muted">{t("footnote")}</p>
-          </div>
-        ) : (
-          <p className="mt-12 text-sm text-red-400">{t("loadError")}</p>
-        ))}
-    </div>
+    </main>
   );
 }

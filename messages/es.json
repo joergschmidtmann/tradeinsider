@@ -2,7 +2,6 @@
   "nav": {
     "home": "Inicio",
     "insiderKaeufe": "Compras de Insiders",
-    "stockAnalysis": "Análisis de acciones",
     "tradingIntelligence": "Trading Intelligence",
     "tradingAcademy": "Trading Academy",
     "login": "Acceder",
@@ -141,12 +140,12 @@
   },
   "tradingIntelligence": {
     "title": "Trading Intelligence",
-    "badgeLive": "En vivo · FINRA Reg SHO",
+    "badgeLive": "En directo · Actualizado a diario",
     "badgeSoon": "Próximamente",
     "descriptions": {
       "etfs": "Análisis fundamental y técnico de ETFs próximamente.",
       "krypto": "Análisis fundamental y técnico de criptomonedas próximamente.",
-      "aktien": "Las 20 acciones estadounidenses más negociadas y las 20 más vendidas en corto de la última semana de negociación."
+      "aktien": "Análisis técnico, fundamentales y consenso de analistas para todas las acciones del S&P 500, Nasdaq-100 y STOXX Europe 600, resumidos a diario en señales claras de compra y venta."
     },
     "etfTypeDescriptions": {
       "etfs": "Análisis fundamental y técnico de ETFs próximamente.",
@@ -169,7 +168,8 @@
     "rankTitleShort": "Acciones con mayor volumen de negociación (corto) — últimos {days} días de negociación",
     "sharesUnit": "acc.",
     "footnote": "Basado en los archivos diarios de volumen de ventas en corto Reg SHO de FINRA (acciones de EE.UU., ETFs excluidos). Se trata del volumen de ventas en corto realmente ejecutado ese día, no de la posición abierta de interés en corto — un porcentaje alto indica actividad de negociación intensa, no necesariamente una apuesta bajista contra la acción. No es asesoramiento de inversión.",
-    "loadError": "No se pudieron cargar los datos de mercado en este momento. Inténtalo de nuevo más tarde."
+    "loadError": "No se pudieron cargar los datos de mercado en este momento. Inténtalo de nuevo más tarde.",
+    "rankingsHeading": "Volumen de negociación y ventas en corto (EE. UU.)"
   },
   "tradingAcademy": {
     "badge": "Próximamente",
@@ -314,10 +314,6 @@
     "stockDetailDescription": "Análisis técnico y fundamental, consenso de analistas y actividad de insiders de la acción {name}."
   },
   "stockAnalysis": {
-    "eyebrow": "S&P 500 · Nasdaq-100 · STOXX Europe 600",
-    "titlePrefix": "Análisis de acciones con",
-    "titleHighlight": "señales claras",
-    "subtitle": "Análisis técnico, fundamentales, consenso de analistas y compras de insiders, resumidos a diario en una recomendación clara para más de 1.000 acciones.",
     "recommendations": {
       "STRONG_BUY": "Compra fuerte",
       "BUY": "Comprar",

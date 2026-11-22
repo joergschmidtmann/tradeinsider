@@ -2,7 +2,6 @@
   "nav": {
     "home": "Home",
     "insiderKaeufe": "Insider Trades",
-    "stockAnalysis": "Stock Analysis",
     "tradingIntelligence": "Trading Intelligence",
     "tradingAcademy": "Trading Academy",
     "login": "Login",
@@ -141,12 +140,12 @@
   },
   "tradingIntelligence": {
     "title": "Trading Intelligence",
-    "badgeLive": "Live · FINRA Reg SHO",
+    "badgeLive": "Live · Updated daily",
     "badgeSoon": "Coming soon",
     "descriptions": {
       "etfs": "Fundamental and technical ETF analysis coming soon.",
       "krypto": "Fundamental and technical crypto analysis coming soon.",
-      "aktien": "The 20 most-traded and 20 most-shorted US stocks of the past trading week."
+      "aktien": "Technical analysis, fundamentals and analyst consensus for every stock in the S&P 500, Nasdaq-100 and STOXX Europe 600 — condensed daily into clear buy and sell signals."
     },
     "etfTypeDescriptions": {
       "etfs": "Fundamental and technical ETF analysis coming soon.",
@@ -169,7 +168,8 @@
     "rankTitleShort": "Stocks with the highest trading volume (short) — last {days} trading days",
     "sharesUnit": "shares",
     "footnote": "Based on FINRA's daily Reg SHO short volume files (US stocks, ETFs excluded). This is the day's actual executed short-sale volume, not the open short-interest position — a high share indicates active trading, not automatically a bearish bet against the stock. Not investment advice.",
-    "loadError": "Market data couldn't be loaded right now. Please try again later."
+    "loadError": "Market data couldn't be loaded right now. Please try again later.",
+    "rankingsHeading": "Trading volume & short selling (US)"
   },
   "tradingAcademy": {
     "badge": "Coming soon",
@@ -314,10 +314,6 @@
     "stockDetailDescription": "Technical and fundamental analysis, analyst consensus and insider activity for {name} stock."
   },
   "stockAnalysis": {
-    "eyebrow": "S&P 500 · Nasdaq-100 · STOXX Europe 600",
-    "titlePrefix": "Stock analysis with",
-    "titleHighlight": "clear signals",
-    "subtitle": "Technical analysis, fundamentals, analyst consensus and insider buying — condensed daily into one clear rating for more than 1,000 stocks.",
     "recommendations": {
       "STRONG_BUY": "Strong Buy",
       "BUY": "Buy",

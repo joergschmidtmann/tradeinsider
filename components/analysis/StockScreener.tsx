@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createSupabaseReadClient } from "@/lib/supabaseClient";
@@ -19,28 +18,28 @@ import {
 import type { Recommendation } from "@/lib/analysis/model";
 import type { Locale } from "@/i18n/routing";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "metadata" });
-  return { title: t("stockAnalysisTitle"), description: t("stockAnalysisDescription") };
-}
-
 const PAGE_SIZE = 50;
-const PATHNAME = "/aktien-analyse";
 const INTL_LOCALES: Record<Locale, string> = { de: "de-DE", en: "en-US", es: "es-ES" };
 
-interface PageProps {
-  params: Promise<{ locale: Locale }>;
-  searchParams: Promise<{ index?: string; rec?: string; q?: string; sort?: string; page?: string }>;
+export interface ScreenerSearchParams {
+  index?: string;
+  rec?: string;
+  q?: string;
+  sort?: string;
+  page?: string;
 }
+
+/** Pfad, unter dem der Screener eingebunden ist (Filter-/Seitenlinks) und
+ * unter dem die Einzelanalysen liegen. */
+const PATHNAME = "/trading-intelligence";
+export const STOCK_DETAIL_BASE = "/trading-intelligence/aktien";
 
 function pick<T extends string>(value: string | undefined, allowed: readonly T[]): T | undefined {
   return allowed.includes(value as T) ? (value as T) : undefined;
 }
 
-export default async function StockAnalysisPage({ params, searchParams }: PageProps) {
-  const { locale } = await params;
-  const sp = await searchParams;
+/** Aktien-Screener mit Empfehlungen (Teil von Trading Intelligence → Aktien). */
+export async function StockScreener({ locale, sp }: { locale: Locale; sp: ScreenerSearchParams }) {
   const t = await getTranslations("stockAnalysis");
 
   const index = pick(sp.index, INDEX_CODES);
@@ -129,18 +128,7 @@ export default async function StockAnalysisPage({ params, searchParams }: PagePr
   const pageQuery = (p: number) => ({ ...baseQuery(), ...(rec ? { rec } : {}), ...(p > 1 ? { page: String(p) } : {}) });
 
   return (
-    <main className="flex-1">
-      <section className="mx-auto max-w-4xl px-4 pt-20 pb-10 text-center sm:px-6 sm:pt-28">
-        <span className="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium tracking-wide text-muted uppercase">
-          {t("eyebrow")}
-        </span>
-        <h1 className="mt-6 text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
-          {t("titlePrefix")} <span className="text-gradient">{t("titleHighlight")}</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-lg text-muted text-balance">{t("subtitle")}</p>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+    <div>
         {/* Verteilung der Empfehlungen */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {recs.map((r) => (
@@ -207,7 +195,7 @@ export default async function StockAnalysisPage({ params, searchParams }: PagePr
                 {rows.map((row) => (
                   <tr key={row.symbol} className="border-b border-border/60 last:border-0 hover:bg-surface-2">
                     <td className="max-w-64 px-4 py-3">
-                      <Link href={`${PATHNAME}/${symbolToSlug(row.symbol)}`} className="block min-w-0">
+                      <Link href={`${STOCK_DETAIL_BASE}/${symbolToSlug(row.symbol)}`} className="block min-w-0">
                         <div className="truncate font-medium text-foreground hover:underline">{row.name}</div>
                         <div className="truncate text-xs text-muted">
                           {row.ticker} · {row.exchange}
@@ -289,7 +277,6 @@ export default async function StockAnalysisPage({ params, searchParams }: PagePr
             </Link>
           </p>
         </div>
-      </section>
-    </main>
+    </div>
   );
 }
