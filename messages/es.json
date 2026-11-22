@@ -314,6 +314,7 @@
     "stockDetailDescription": "Análisis técnico y fundamental, consenso de analistas y actividad de insiders de la acción {name}."
   },
   "stockAnalysis": {
+    "paywallDescription": "El análisis de acciones con recomendaciones de compra y venta, análisis técnico y fundamental y consenso de analistas para el S&P 500, Nasdaq-100 y STOXX 600 forma parte de tradeinsider Pro. Las clasificaciones de volumen y ventas en corto siguen siendo gratuitas.",
     "recommendations": {
       "STRONG_BUY": "Compra fuerte",
       "BUY": "Comprar",

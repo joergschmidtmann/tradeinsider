@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { CategoryToggle } from "@/components/CategoryToggle";
 import { EtfTypeToggle } from "@/components/EtfTypeToggle";
 import { getWeeklyStockRankings, type RankedStock } from "@/lib/marketVolume";
+import { PaywallCard } from "@/components/PaywallCard";
+import { getViewerAccess } from "@/lib/supabase/viewer";
 import { StockScreener, type ScreenerSearchParams } from "@/components/analysis/StockScreener";
 import type { Locale } from "@/i18n/routing";
 
@@ -78,6 +80,10 @@ export default async function Page({ params, searchParams }: PageProps) {
   const category: Category = isCategory(sp.category ?? "") ? (sp.category as Category) : "aktien";
   const etfType: EtfType = isEtfType(sp.etfType ?? "") ? (sp.etfType as EtfType) : "etfs";
   const rankings = category === "aktien" ? await getWeeklyStockRankings() : null;
+  // Aktien-Empfehlungen sind Pro-only (wie der Vorstand-Tab bei Insider-Käufen);
+  // die FINRA-Ranglisten darunter bleiben kostenlos.
+  const access = category === "aktien" ? await getViewerAccess() : { isLoggedIn: false, isPro: false };
+  const tAnalysis = await getTranslations("stockAnalysis");
   const description = category === "etfs" ? t(`etfTypeDescriptions.${etfType}`) : t(`descriptions.${category}`);
 
   const uiLocale = INTL_LOCALES[locale];
@@ -105,7 +111,11 @@ export default async function Page({ params, searchParams }: PageProps) {
 
       {category === "aktien" && (
         <div className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-          <StockScreener locale={locale} sp={sp} />
+          {access.isPro ? (
+            <StockScreener locale={locale} sp={sp} />
+          ) : (
+            <PaywallCard isLoggedIn={access.isLoggedIn} description={tAnalysis("paywallDescription")} />
+          )}
 
           <section className="mt-16">
             <h2 className="text-xl font-semibold">{t("rankingsHeading")}</h2>

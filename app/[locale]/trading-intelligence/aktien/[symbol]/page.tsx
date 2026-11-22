@@ -8,6 +8,8 @@ import { ScoreBar } from "@/components/analysis/ScoreBar";
 import { SignalList } from "@/components/analysis/SignalList";
 import { PriceChart } from "@/components/analysis/PriceChart";
 import { AnalystDistribution } from "@/components/analysis/AnalystDistribution";
+import { PaywallCard } from "@/components/PaywallCard";
+import { getViewerAccess } from "@/lib/supabase/viewer";
 import { slugToSymbol, type StockDetailRow } from "@/lib/stockAnalysis";
 import { SCORE_CATEGORIES, DEFAULT_ANALYSIS_HORIZON_MONTHS } from "@/lib/methodology";
 import type { CategoryKey, Fundamentals } from "@/lib/analysis/model";
@@ -27,9 +29,18 @@ async function loadStock(slug: string): Promise<StockDetailRow | null> {
   return (data as StockDetailRow | null) ?? null;
 }
 
+/** Nur Name/Ticker — für Metadaten und die Paywall-Ansicht, ohne Analyseinhalte. */
+async function loadStockName(slug: string): Promise<{ name: string; ticker: string; exchange: string | null } | null> {
+  const symbol = slugToSymbol(slug);
+  if (!symbol) return null;
+  const supabase = createSupabaseReadClient();
+  const { data } = await supabase.from("stock_analysis").select("name, ticker, exchange").eq("symbol", symbol).maybeSingle();
+  return data ?? null;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, symbol } = await params;
-  const stock = await loadStock(symbol);
+  const stock = await loadStockName(symbol);
   const t = await getTranslations({ locale, namespace: "metadata" });
   if (!stock) return { title: t("stockAnalysisTitle") };
   return {
@@ -82,10 +93,30 @@ const FUNDAMENTAL_ROWS: { key: keyof Fundamentals; kind: "pct" | "x" | "cap" }[]
 
 export default async function StockDetailPage({ params }: PageProps) {
   const { locale, symbol } = await params;
+  const t = await getTranslations("stockAnalysis");
+
+  // Pro-Prüfung vor dem Laden der Analyse (siehe lib/supabase/viewer.ts).
+  const access = await getViewerAccess();
+  if (!access.isPro) {
+    const preview = await loadStockName(symbol);
+    if (!preview) notFound();
+    return (
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-12 pb-24 sm:px-6">
+        <Link href={{ pathname: "/trading-intelligence", query: { category: "aktien" } }} className="text-sm text-muted hover:text-foreground">
+          ← {t("backToList")}
+        </Link>
+        <p className="mt-6 text-sm text-muted">
+          {preview.ticker} · {preview.exchange}
+        </p>
+        <h1 className="mt-1 mb-8 text-4xl font-semibold tracking-tight text-balance">{preview.name}</h1>
+        <PaywallCard isLoggedIn={access.isLoggedIn} description={t("paywallDescription")} />
+      </main>
+    );
+  }
+
   const stock = await loadStock(symbol);
   if (!stock) notFound();
 
-  const t = await getTranslations("stockAnalysis");
   const uiLocale = INTL_LOCALES[locale];
   const priceFmt = new Intl.NumberFormat(uiLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const pctFmt = new Intl.NumberFormat(uiLocale, { style: "percent", maximumFractionDigits: 1, signDisplay: "exceptZero" });

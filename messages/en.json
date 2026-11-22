@@ -314,6 +314,7 @@
     "stockDetailDescription": "Technical and fundamental analysis, analyst consensus and insider activity for {name} stock."
   },
   "stockAnalysis": {
+    "paywallDescription": "The stock analysis with buy and sell ratings, technical and fundamental analysis and analyst consensus for the S&P 500, Nasdaq-100 and STOXX 600 is part of tradeinsider Pro. The trading volume and short selling rankings remain free.",
     "recommendations": {
       "STRONG_BUY": "Strong Buy",
       "BUY": "Buy",
