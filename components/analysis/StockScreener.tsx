@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { createSupabaseReadClient } from "@/lib/supabaseClient";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { RecommendationBadge } from "@/components/analysis/RecommendationBadge";
 import { ScoreBar } from "@/components/analysis/ScoreBar";
 import { FilterPills, type Pill } from "@/components/analysis/FilterPills";
@@ -56,7 +56,8 @@ export async function StockScreener({ locale, sp }: { locale: Locale; sp: Screen
     ...(sort !== "score" ? { sort } : {}),
   });
 
-  const supabase = createSupabaseReadClient();
+  // Nutzer-Session nötig: stock_analysis ist per RLS nur für Pro lesbar.
+  const supabase = await createSupabaseServerClient();
   // PostgREST-Filter-Sonderzeichen entfernen, damit die Suche den or()-Ausdruck nicht bricht.
   const safeQ = q.replace(/[%,().*:"\\]/g, " ").trim();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

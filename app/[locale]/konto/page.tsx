@@ -2,7 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect, Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { createSupabaseReadClient } from "@/lib/supabaseClient";
+import { createSupabaseAdminClient } from "@/lib/supabase/adminClient";
 import { stripe, PRO_MONTHLY_LOOKUP_KEY } from "@/lib/stripe";
 import { getEurRates, convertToEur, convertToUsd } from "@/lib/fxRates";
 import { buySignalTier } from "@/lib/buySignal";
@@ -125,7 +125,11 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
   const previousWeek = weekRangeInBerlin(1);
   const activityFrom = daysAgoInBerlin(ACTIVITY_WINDOW_DAYS - 1);
 
-  const supabase = createSupabaseReadClient();
+  // Vorstand-Transaktionen sind per RLS Pro-only. Das Dashboard zeigt sie
+  // bislang allen eingeloggten Nutzern (auch Free) — dieses Verhalten bleibt
+  // vorerst erhalten, daher serverseitig über den Service-Role-Client.
+  // TODO Produktentscheidung: Dashboard-Insiderdaten für Free-Nutzer begrenzen?
+  const supabase = createSupabaseAdminClient();
   const [{ data: twoWeekRows }, { data: activityRows }, eurRates] = await Promise.all([
     supabase
       .from("transactions")

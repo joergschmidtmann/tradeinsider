@@ -61,9 +61,8 @@ create index if not exists transactions_issuer_ticker_idx on transactions (issue
 -- which bypasses RLS entirely, so no INSERT/UPDATE policy is needed here.
 alter table transactions enable row level security;
 
-create policy "Public can read transactions"
-  on transactions for select
-  using (true);
+-- Lese-Policies für transactions folgen weiter unten nach public.is_pro()
+-- (Abschnitt `profiles`), weil sie darauf aufbauen.
 
 -- Latest known price per US ticker, used to show "performance since insider
 -- purchase" next to a transaction (price_per_share on that row is already
@@ -189,6 +188,32 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function handle_new_user();
+
+-- true, wenn der eingeloggte Nutzer ein Pro-Abo hat — Grundlage der
+-- Pro-Policies auf transactions und stock_analysis. SECURITY DEFINER, damit
+-- die Prüfung nicht von den RLS-Regeln auf `profiles` abhängt.
+create or replace function public.is_pro()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and tier = 'pro');
+$$;
+
+grant execute on function public.is_pro() to anon, authenticated;
+
+-- Vorstand/Aufsichtsrat ist Pro-Inhalt: öffentlich lesbar sind nur die
+-- übrigen Rollen (Politiker, Hedgefonds), Pro-Nutzer sehen alles.
+create policy "Public can read non-board transactions"
+  on transactions for select
+  using (role not in ('management_board', 'supervisory_board'));
+
+create policy "Pro can read board transactions"
+  on transactions for select
+  to authenticated
+  using ((select public.is_pro()));
 
 -- Backfill for accounts created before this trigger existed.
 insert into profiles (id)
@@ -346,9 +371,24 @@ create index if not exists stock_analysis_name_idx on stock_analysis using gin (
 
 alter table stock_analysis enable row level security;
 
-create policy "Public can read stock_analysis"
+-- Analysen sind Pro-Inhalt (Paywall auf Datenbankebene, nicht nur in der UI).
+create policy "Pro can read stock_analysis"
   on stock_analysis for select
-  using (true);
+  to authenticated
+  using ((select public.is_pro()));
+
+-- Öffentliche Vorschau für Seitentitel und Paywall-Kopf: nur Name/Ticker/Börse.
+create or replace function public.stock_analysis_preview(p_symbol text)
+returns table (name text, ticker text, exchange text)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select name, ticker, exchange from public.stock_analysis where symbol = p_symbol;
+$$;
+
+grant execute on function public.stock_analysis_preview(text) to anon, authenticated;
 
 -- Historie: eine Zeile pro Aktie und Analysetag. Dokumentiert jede je
 -- veröffentlichte Empfehlung (Nachvollziehbarkeit, MAR-Aufzeichnung) und
@@ -365,6 +405,7 @@ create table if not exists stock_analysis_history (
 
 alter table stock_analysis_history enable row level security;
 
-create policy "Public can read stock_analysis_history"
+create policy "Pro can read stock_analysis_history"
   on stock_analysis_history for select
-  using (true);
+  to authenticated
+  using ((select public.is_pro()));

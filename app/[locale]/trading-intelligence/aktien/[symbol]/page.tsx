@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createSupabaseReadClient } from "@/lib/supabaseClient";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { RecommendationBadge } from "@/components/analysis/RecommendationBadge";
 import { ScoreBar } from "@/components/analysis/ScoreBar";
 import { SignalList } from "@/components/analysis/SignalList";
@@ -24,7 +25,8 @@ interface PageProps {
 async function loadStock(slug: string): Promise<StockDetailRow | null> {
   const symbol = slugToSymbol(slug);
   if (!symbol) return null;
-  const supabase = createSupabaseReadClient();
+  // Nutzer-Session nötig: stock_analysis ist per RLS nur für Pro lesbar.
+  const supabase = await createSupabaseServerClient();
   const { data } = await supabase.from("stock_analysis").select("*").eq("symbol", symbol).maybeSingle();
   return (data as StockDetailRow | null) ?? null;
 }
@@ -33,9 +35,11 @@ async function loadStock(slug: string): Promise<StockDetailRow | null> {
 async function loadStockName(slug: string): Promise<{ name: string; ticker: string; exchange: string | null } | null> {
   const symbol = slugToSymbol(slug);
   if (!symbol) return null;
+  // Öffentliche Vorschau-Funktion (nur Name/Ticker/Börse), s. supabase/schema.sql.
   const supabase = createSupabaseReadClient();
-  const { data } = await supabase.from("stock_analysis").select("name, ticker, exchange").eq("symbol", symbol).maybeSingle();
-  return data ?? null;
+  const { data } = await supabase.rpc("stock_analysis_preview", { p_symbol: symbol });
+  const row = Array.isArray(data) ? data[0] : null;
+  return row ?? null;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

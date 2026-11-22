@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { createSupabaseReadClient } from "@/lib/supabaseClient";
+import { createSupabaseAdminClient } from "@/lib/supabase/adminClient";
 import { getEurRates, convertToEur } from "@/lib/fxRates";
 import { COUNTRIES } from "@/lib/countries";
 import { weekRangeInBerlin } from "@/lib/weekRange";
@@ -52,7 +52,10 @@ export default async function Home({ params }: PageProps) {
   const uiLocale = INTL_LOCALES[locale];
   const numberFormatter = new Intl.NumberFormat(uiLocale);
 
-  const supabase = createSupabaseReadClient();
+  // Vorstand-Transaktionen sind per RLS Pro-only. Die Startseite zeigt davon
+  // nur Anzahl und Volumen der Woche (keine Einzeldaten) — daher serverseitig
+  // über den Service-Role-Client gelesen; ausgeliefert werden nur die Summen.
+  const supabase = createSupabaseAdminClient();
   const { from: weekFrom, to: weekTo } = weekRangeInBerlin(0);
 
   const [{ data: weekRows }, eurRates] = await Promise.all([
