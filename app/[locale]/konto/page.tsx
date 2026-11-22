@@ -2,7 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect, Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/adminClient";
+import { fetchDashboardBoardTransactions } from "@/lib/boardTransactions";
 import { stripe, PRO_MONTHLY_LOOKUP_KEY } from "@/lib/stripe";
 import { getEurRates, convertToEur, convertToUsd } from "@/lib/fxRates";
 import { buySignalTier } from "@/lib/buySignal";
@@ -127,29 +127,15 @@ export default async function KontoPage({ searchParams }: { searchParams: Promis
 
   // Vorstand-Transaktionen sind per RLS Pro-only. Das Dashboard zeigt sie
   // bislang allen eingeloggten Nutzern (auch Free) — dieses Verhalten bleibt
-  // vorerst erhalten, daher serverseitig über den Service-Role-Client.
+  // vorerst erhalten, über eine nur für eingeloggte Nutzer freigegebene
+  // Datenbankfunktion (lib/boardTransactions.ts).
   // TODO Produktentscheidung: Dashboard-Insiderdaten für Free-Nutzer begrenzen?
-  const supabase = createSupabaseAdminClient();
-  const [{ data: twoWeekRows }, { data: activityRows }, eurRates] = await Promise.all([
-    supabase
-      .from("transactions")
-      .select(
-        "id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date, shares, price_per_share, total_value, currency"
-      )
-      .in("role", ["management_board", "supervisory_board"])
-      .eq("transaction_code", "P")
-      .gte("transaction_date", previousWeek.from)
-      .lte("transaction_date", currentWeek.to)
-      .order("transaction_date", { ascending: false })
-      .order("id", { ascending: false }),
-    supabase
-      .from("transactions")
-      .select("transaction_date, transaction_code")
-      .in("role", ["management_board", "supervisory_board"])
-      .in("transaction_code", ["P", "S"])
-      .gte("transaction_date", activityFrom),
-    getEurRates(),
-  ]);
+  const sinceDate = previousWeek.from < activityFrom ? previousWeek.from : activityFrom;
+  const [boardRows, eurRates] = await Promise.all([fetchDashboardBoardTransactions(supabaseAuth, sinceDate), getEurRates()]);
+  const twoWeekRows = boardRows.filter(
+    (row) => row.transaction_code === "P" && row.transaction_date >= previousWeek.from && row.transaction_date <= currentWeek.to
+  );
+  const activityRows = boardRows.filter((row) => row.transaction_date >= activityFrom);
 
   const rows = ((twoWeekRows ?? []) as BoardPurchaseRow[]).map((row) => ({
     ...row,

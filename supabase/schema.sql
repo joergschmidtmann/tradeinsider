@@ -215,6 +215,46 @@ create policy "Pro can read board transactions"
   to authenticated
   using ((select public.is_pro()));
 
+-- Eng begrenzte Ausnahmen für Startseite und Dashboard (lib/boardTransactions.ts):
+-- Startseite (öffentlich): nur Volumen und Währung der Vorstandskäufe im Zeitraum.
+create or replace function public.board_purchase_values(p_from date, p_to date)
+returns table (total_value numeric, currency text)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select total_value, currency from public.transactions
+  where role in ('management_board', 'supervisory_board') and transaction_code = 'P'
+    and transaction_date between p_from and p_to;
+$$;
+
+grant execute on function public.board_purchase_values(date, date) to anon, authenticated;
+
+-- Dashboard (nur eingeloggte Nutzer): Vorstandskäufe/-verkäufe der letzten
+-- Wochen, maximal 45 Tage zurück.
+create or replace function public.dashboard_board_transactions(p_from date)
+returns table (
+  id bigint, issuer_name text, issuer_ticker text, owner_name text, owner_title text,
+  source_country text, transaction_date date, transaction_code text, shares numeric,
+  price_per_share numeric, total_value numeric, currency text
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date,
+         transaction_code, shares, price_per_share, total_value, currency
+  from public.transactions
+  where role in ('management_board', 'supervisory_board') and transaction_code in ('P', 'S')
+    and transaction_date >= greatest(p_from, current_date - 45)
+  order by transaction_date desc, id desc;
+$$;
+
+revoke execute on function public.dashboard_board_transactions(date) from public, anon;
+grant execute on function public.dashboard_board_transactions(date) to authenticated;
+
 -- Backfill for accounts created before this trigger existed.
 insert into profiles (id)
 select id from auth.users

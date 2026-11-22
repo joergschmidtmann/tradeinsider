@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { createSupabaseAdminClient } from "@/lib/supabase/adminClient";
+import { createSupabaseReadClient } from "@/lib/supabaseClient";
+import { fetchBoardPurchaseValues } from "@/lib/boardTransactions";
 import { getEurRates, convertToEur } from "@/lib/fxRates";
 import { COUNTRIES } from "@/lib/countries";
 import { weekRangeInBerlin } from "@/lib/weekRange";
@@ -52,22 +53,13 @@ export default async function Home({ params }: PageProps) {
   const uiLocale = INTL_LOCALES[locale];
   const numberFormatter = new Intl.NumberFormat(uiLocale);
 
-  // Vorstand-Transaktionen sind per RLS Pro-only. Die Startseite zeigt davon
-  // nur Anzahl und Volumen der Woche (keine Einzeldaten) — daher serverseitig
-  // über den Service-Role-Client gelesen; ausgeliefert werden nur die Summen.
-  const supabase = createSupabaseAdminClient();
+  // Vorstand-Transaktionen sind per RLS Pro-only; die Startseite braucht nur
+  // Volumen/Währung der Woche (keine Namen) — über eine öffentliche, eng
+  // begrenzte Datenbankfunktion (lib/boardTransactions.ts).
+  const supabase = createSupabaseReadClient();
   const { from: weekFrom, to: weekTo } = weekRangeInBerlin(0);
 
-  const [{ data: weekRows }, eurRates] = await Promise.all([
-    supabase
-      .from("transactions")
-      .select("total_value, currency")
-      .in("role", ["management_board", "supervisory_board"])
-      .eq("transaction_code", "P")
-      .gte("transaction_date", weekFrom)
-      .lte("transaction_date", weekTo),
-    getEurRates(),
-  ]);
+  const [weekRows, eurRates] = await Promise.all([fetchBoardPurchaseValues(supabase, weekFrom, weekTo), getEurRates()]);
 
   // Some sources report structural reclassifications (e.g. a share block
   // moved between an insider and their holding company) as a "purchase" —
