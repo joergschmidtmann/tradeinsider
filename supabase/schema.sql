@@ -61,9 +61,8 @@ create index if not exists transactions_issuer_ticker_idx on transactions (issue
 -- which bypasses RLS entirely, so no INSERT/UPDATE policy is needed here.
 alter table transactions enable row level security;
 
-create policy "Public can read transactions"
-  on transactions for select
-  using (true);
+-- Lese-Policies für transactions folgen weiter unten nach public.is_pro()
+-- (Abschnitt `profiles`), weil sie darauf aufbauen.
 
 -- Latest known price per US ticker, used to show "performance since insider
 -- purchase" next to a transaction (price_per_share on that row is already
@@ -190,6 +189,72 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function handle_new_user();
 
+-- true, wenn der eingeloggte Nutzer ein Pro-Abo hat — Grundlage der
+-- Pro-Policies auf transactions und stock_analysis. SECURITY DEFINER, damit
+-- die Prüfung nicht von den RLS-Regeln auf `profiles` abhängt.
+create or replace function public.is_pro()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and tier = 'pro');
+$$;
+
+grant execute on function public.is_pro() to anon, authenticated;
+
+-- Vorstand/Aufsichtsrat ist Pro-Inhalt: öffentlich lesbar sind nur die
+-- übrigen Rollen (Politiker, Hedgefonds), Pro-Nutzer sehen alles.
+create policy "Public can read non-board transactions"
+  on transactions for select
+  using (role not in ('management_board', 'supervisory_board'));
+
+create policy "Pro can read board transactions"
+  on transactions for select
+  to authenticated
+  using ((select public.is_pro()));
+
+-- Eng begrenzte Ausnahmen für Startseite und Dashboard (lib/boardTransactions.ts):
+-- Startseite (öffentlich): nur Volumen und Währung der Vorstandskäufe im Zeitraum.
+create or replace function public.board_purchase_values(p_from date, p_to date)
+returns table (total_value numeric, currency text)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select total_value, currency from public.transactions
+  where role in ('management_board', 'supervisory_board') and transaction_code = 'P'
+    and transaction_date between p_from and p_to;
+$$;
+
+grant execute on function public.board_purchase_values(date, date) to anon, authenticated;
+
+-- Dashboard (nur eingeloggte Nutzer): Vorstandskäufe/-verkäufe der letzten
+-- Wochen, maximal 45 Tage zurück.
+create or replace function public.dashboard_board_transactions(p_from date)
+returns table (
+  id bigint, issuer_name text, issuer_ticker text, owner_name text, owner_title text,
+  source_country text, transaction_date date, transaction_code text, shares numeric,
+  price_per_share numeric, total_value numeric, currency text
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select id, issuer_name, issuer_ticker, owner_name, owner_title, source_country, transaction_date,
+         transaction_code, shares, price_per_share, total_value, currency
+  from public.transactions
+  where role in ('management_board', 'supervisory_board') and transaction_code in ('P', 'S')
+    and transaction_date >= greatest(p_from, current_date - 45)
+  order by transaction_date desc, id desc;
+$$;
+
+revoke execute on function public.dashboard_board_transactions(date) from public, anon;
+grant execute on function public.dashboard_board_transactions(date) to authenticated;
+
 -- Backfill for accounts created before this trigger existed.
 insert into profiles (id)
 select id from auth.users
@@ -276,3 +341,111 @@ alter table contract_requests enable row level security;
 --   on stock_analyses for select
 --   using (published_at is not null and published_at <= now());
 -- ============================================================================
+
+-- ============================================================================
+-- Automatisierte Aktienanalyse (S&P 500, Nasdaq-100, STOXX Europe 600)
+-- Befüllt täglich von scripts/ingest-analysis.ts (Service-Role-Key), gelesen
+-- von /aktien-analyse. Berechnungslogik: lib/analysis/*, Gewichte und
+-- Schwellen: lib/methodology.ts (Version wird je Zeile gespeichert).
+-- ============================================================================
+
+-- Aktueller Analysestand: eine Zeile pro Aktie, bei jedem Lauf überschrieben.
+create table if not exists stock_analysis (
+  -- Anbieter-Symbol inkl. Börse, z. B. 'AAPL.US', 'SAP.XETRA', 'NESN.SW'
+  symbol text primary key,
+  ticker text not null,
+  name text not null,
+  isin text,
+  exchange text,
+  country text,
+  currency text,
+  sector text,
+  industry text,
+  -- 'SP500' | 'NDX100' | 'STOXX600'
+  indices text[] not null default '{}',
+
+  recommendation text not null check (recommendation in ('STRONG_BUY', 'BUY', 'HOLD', 'SELL', 'STRONG_SELL')),
+  score_overall smallint not null check (score_overall between 0 and 100),
+  score_technical smallint,
+  score_quality smallint,
+  score_growth smallint,
+  score_valuation smallint,
+  score_analysts smallint,
+  score_insider smallint,
+  data_coverage numeric not null,
+
+  -- Vorherige Empfehlung, um Hoch-/Herabstufungen anzuzeigen.
+  previous_recommendation text,
+  recommendation_changed_at date,
+
+  price numeric,
+  price_date date,
+  return_1m numeric,
+  return_3m numeric,
+  return_12m numeric,
+
+  analyst_count smallint,
+  analyst_strong_buy smallint,
+  analyst_buy smallint,
+  analyst_hold smallint,
+  analyst_sell smallint,
+  analyst_strong_sell smallint,
+  analyst_target numeric,
+  analyst_upside numeric,
+
+  market_cap numeric,
+  -- Detaildaten für die Einzelseite (Kennzahlen, Befunde je Kategorie, Chart).
+  fundamentals jsonb,
+  technical jsonb,
+  signals jsonb not null default '{}',
+  chart jsonb,
+
+  methodology_version text not null,
+  analyzed_at timestamptz not null default now()
+);
+
+create index if not exists stock_analysis_score_idx on stock_analysis (score_overall desc);
+create index if not exists stock_analysis_recommendation_idx on stock_analysis (recommendation, score_overall desc);
+create index if not exists stock_analysis_indices_idx on stock_analysis using gin (indices);
+create index if not exists stock_analysis_name_idx on stock_analysis using gin (name gin_trgm_ops);
+
+alter table stock_analysis enable row level security;
+
+-- Analysen sind Pro-Inhalt (Paywall auf Datenbankebene, nicht nur in der UI).
+create policy "Pro can read stock_analysis"
+  on stock_analysis for select
+  to authenticated
+  using ((select public.is_pro()));
+
+-- Öffentliche Vorschau für Seitentitel und Paywall-Kopf: nur Name/Ticker/Börse.
+create or replace function public.stock_analysis_preview(p_symbol text)
+returns table (name text, ticker text, exchange text)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select name, ticker, exchange from public.stock_analysis where symbol = p_symbol;
+$$;
+
+grant execute on function public.stock_analysis_preview(text) to anon, authenticated;
+
+-- Historie: eine Zeile pro Aktie und Analysetag. Dokumentiert jede je
+-- veröffentlichte Empfehlung (Nachvollziehbarkeit, MAR-Aufzeichnung) und
+-- erlaubt später eine Erfolgsmessung der Empfehlungen.
+create table if not exists stock_analysis_history (
+  symbol text not null,
+  analysis_date date not null,
+  recommendation text not null,
+  score_overall smallint not null,
+  price numeric,
+  methodology_version text not null,
+  primary key (symbol, analysis_date)
+);
+
+alter table stock_analysis_history enable row level security;
+
+create policy "Pro can read stock_analysis_history"
+  on stock_analysis_history for select
+  to authenticated
+  using ((select public.is_pro()));

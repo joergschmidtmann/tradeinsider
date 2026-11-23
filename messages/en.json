@@ -140,12 +140,12 @@
   },
   "tradingIntelligence": {
     "title": "Trading Intelligence",
-    "badgeLive": "Live · FINRA Reg SHO",
+    "badgeLive": "Live · Updated daily",
     "badgeSoon": "Coming soon",
     "descriptions": {
       "etfs": "Fundamental and technical ETF analysis coming soon.",
       "krypto": "Fundamental and technical crypto analysis coming soon.",
-      "aktien": "The 20 most-traded and 20 most-shorted US stocks of the past trading week."
+      "aktien": "Technical analysis, fundamentals and analyst consensus for every stock in the S&P 500, Nasdaq-100 and STOXX Europe 600 — condensed daily into clear buy and sell signals."
     },
     "etfTypeDescriptions": {
       "etfs": "Fundamental and technical ETF analysis coming soon.",
@@ -168,7 +168,8 @@
     "rankTitleShort": "Stocks with the highest trading volume (short) — last {days} trading days",
     "sharesUnit": "shares",
     "footnote": "Based on FINRA's daily Reg SHO short volume files (US stocks, ETFs excluded). This is the day's actual executed short-sale volume, not the open short-interest position — a high share indicates active trading, not automatically a bearish bet against the stock. Not investment advice.",
-    "loadError": "Market data couldn't be loaded right now. Please try again later."
+    "loadError": "Market data couldn't be loaded right now. Please try again later.",
+    "rankingsHeading": "Trading volume & short selling (US)"
   },
   "tradingAcademy": {
     "badge": "Coming soon",
@@ -306,6 +307,195 @@
     "insiderKaeufeTitle": "Insider Trades — tradeinsider",
     "insiderKaeufeDescription": "Insider trades by executives, supervisory board members, and politicians in real time, based on official filings.",
     "tradingIntelligenceTitle": "Trading Intelligence — tradeinsider",
-    "tradingAcademyTitle": "Trading Academy — tradeinsider"
+    "tradingAcademyTitle": "Trading Academy — tradeinsider",
+    "stockAnalysisTitle": "Stock Analysis: Buy & Sell Signals — tradeinsider",
+    "stockAnalysisDescription": "Technical analysis, fundamental analysis and analyst consensus for every stock in the S&P 500, Nasdaq-100 and STOXX Europe 600 — condensed into clear buy and sell signals.",
+    "stockDetailTitle": "{name} ({ticker}) stock: analysis & rating — tradeinsider",
+    "stockDetailDescription": "Technical and fundamental analysis, analyst consensus and insider activity for {name} stock."
+  },
+  "stockAnalysis": {
+    "paywallDescription": "The stock analysis with buy and sell ratings, technical and fundamental analysis and analyst consensus for the S&P 500, Nasdaq-100 and STOXX 600 is part of tradeinsider Pro. The trading volume and short selling rankings remain free.",
+    "recommendations": {
+      "STRONG_BUY": "Strong Buy",
+      "BUY": "Buy",
+      "HOLD": "Hold",
+      "SELL": "Sell",
+      "STRONG_SELL": "Strong Sell"
+    },
+    "indices": {
+      "SP500": "S&P 500",
+      "NDX100": "Nasdaq-100",
+      "STOXX600": "STOXX 600"
+    },
+    "filters": {
+      "allIndices": "All indices",
+      "allRecommendations": "All",
+      "buy": "Buy",
+      "hold": "Hold",
+      "sell": "Sell"
+    },
+    "sort": {
+      "label": "Sort",
+      "score": "Highest score first",
+      "score_asc": "Lowest score first",
+      "upside": "Highest target upside",
+      "momentum": "Best 3-month performance",
+      "name": "Name A–Z"
+    },
+    "searchPlaceholder": "Search name, ticker or ISIN …",
+    "searchButton": "Apply",
+    "table": {
+      "stock": "Stock",
+      "recommendation": "Rating",
+      "score": "Overall score",
+      "technical": "Technical",
+      "fundamental": "Fundamental",
+      "analysts": "Analysts",
+      "price": "Price",
+      "perf3m": "3 months",
+      "upside": "Target upside",
+      "changedFrom": "previously: {rec}"
+    },
+    "resultCount": "{count, plural, =0 {No stocks} one {# stock} other {# stocks}}",
+    "prev": "Previous",
+    "next": "Next",
+    "empty": "No stocks found for these filters.",
+    "loadError": "The analyses could not be loaded. Please try again later.",
+    "dataAsOf": "Data as of {date}",
+    "methodologyLink": "Methodology",
+    "risksLink": "Risk disclosure",
+    "conflictsLink": "Conflicts of interest",
+    "disclaimer": "Ratings are calculated fully automatically from price, fundamental and analyst data using a published, rule-based methodology. They do not take your personal circumstances or investment objectives into account and do not constitute investment advice. Securities can lose substantial value; past performance is not a reliable indicator of future results.",
+    "backToList": "All stocks",
+    "closeOf": "Close of {date}",
+    "categories": {
+      "technical": "Technical analysis",
+      "quality": "Quality",
+      "growth": "Growth",
+      "valuation": "Valuation",
+      "analysts": "Analyst consensus",
+      "insider": "Insider activity"
+    },
+    "categoryHelp": {
+      "quality": "Profitability, return on capital, leverage and liquidity.",
+      "growth": "Revenue and earnings growth, reported and expected.",
+      "valuation": "Valuation multiples compared with the company's own sector.",
+      "insider": "Purchases and sales by executives and directors over the last 90 days."
+    },
+    "detail": {
+      "recommendation": "Our rating",
+      "breakdown": "Score by category (weight)",
+      "summary": {
+        "STRONG_BUY": "Almost every area of the analysis is clearly positive — technicals and analysts confirm the picture.",
+        "BUY": "The overall picture is positive: strengths clearly outweigh weaknesses.",
+        "HOLD": "Mixed picture with no clear balance of opportunities or risks.",
+        "SELL": "The overall picture is negative: weaknesses outweigh strengths.",
+        "STRONG_SELL": "Almost every area of the analysis is clearly negative — technicals and analysts confirm the picture."
+      },
+      "changed": "Changed from “{from}” on {date}",
+      "coverage": "Data coverage {pct}%",
+      "horizon": "Horizon {months} months",
+      "chartTitle": "Price chart (12 months)",
+      "fundamentalTitle": "Fundamentals",
+      "noFundamentals": "No fundamental data is available for this stock.",
+      "analystTitle": "Analyst ratings",
+      "insiderLink": "View insider transactions →"
+    },
+    "chart": {
+      "aria": "Price over the last 12 months with 50- and 200-day moving averages",
+      "price": "Price",
+      "sma50": "50-day MA",
+      "sma200": "200-day MA"
+    },
+    "analystRatings": {
+      "strongBuy": "Strong Buy",
+      "buy": "Buy",
+      "hold": "Hold",
+      "sell": "Sell",
+      "strongSell": "Strong Sell",
+      "none": "No analyst ratings available."
+    },
+    "metrics": {
+      "return1m": "1-month performance",
+      "return3m": "3-month performance",
+      "return12m": "12-month performance",
+      "rsi14": "RSI (14)",
+      "sma50": "50-day MA",
+      "sma200": "200-day MA",
+      "range52w": "52-week range",
+      "volatility": "Volatility (annualized)",
+      "marketCap": "Market cap",
+      "trailingPE": "P/E",
+      "forwardPE": "Forward P/E",
+      "pegRatio": "PEG ratio",
+      "evToEbitda": "EV/EBITDA",
+      "priceToSales": "Price/sales",
+      "priceToBook": "Price/book",
+      "fcfYield": "Free cash flow yield",
+      "dividendYield": "Dividend yield",
+      "operatingMargin": "Operating margin",
+      "profitMargin": "Net margin",
+      "returnOnEquity": "Return on equity",
+      "returnOnAssets": "Return on assets",
+      "debtToEquity": "Debt/equity",
+      "currentRatio": "Current ratio",
+      "revenueGrowthYoY": "Revenue growth (quarter YoY)",
+      "revenueCagr3y": "Revenue growth p.a. (3 years)",
+      "earningsGrowthYoY": "Earnings growth (quarter YoY)",
+      "epsGrowthNextYear": "Expected EPS growth (next FY)",
+      "analystCount": "Analysts",
+      "analystTarget": "Avg. price target",
+      "analystUpside": "Upside to target"
+    },
+    "signals": {
+      "aboveSma200": "Price is {pct, number}% above the 200-day MA (long-term uptrend)",
+      "belowSma200": "Price is {pct, number}% below the 200-day MA (long-term downtrend)",
+      "goldenCross": "Golden cross: 50-day MA crossed above the 200-day MA",
+      "deathCross": "Death cross: 50-day MA crossed below the 200-day MA",
+      "uptrend": "50-day MA above 200-day MA",
+      "downtrend": "50-day MA below 200-day MA",
+      "strongMomentum": "Strong momentum: +{pct, number}% over 12 months",
+      "weakMomentum": "Weak momentum: {pct, number}% over 12 months",
+      "macdBullishCross": "MACD crossed above its signal line (buy signal)",
+      "macdBearishCross": "MACD crossed below its signal line (sell signal)",
+      "rsiOverbought": "RSI {rsi, number}: overbought, elevated pullback risk",
+      "rsiOversold": "RSI {rsi, number}: oversold, rebound possible",
+      "rsiNeutral": "RSI {rsi, number}: neutral range",
+      "near52wHigh": "Trading near its 52-week high",
+      "near52wLow": "Trading near its 52-week low",
+      "highRoe": "High return on equity of {pct, number}%",
+      "lowRoe": "Low return on equity of {pct, number}%",
+      "highMargin": "High operating margin of {pct, number}%",
+      "negativeMargin": "Operating loss (margin {pct, number}%)",
+      "lowDebt": "Low leverage (D/E {ratio, number})",
+      "highDebt": "High leverage (D/E {ratio, number})",
+      "strongRevenueGrowth": "Strong revenue growth of {pct, number}%",
+      "revenueDecline": "Declining revenue ({pct, number}%)",
+      "strongEpsOutlook": "Analysts expect {pct, number}% earnings growth next year",
+      "weakEpsOutlook": "Analysts expect falling earnings ({pct, number}%)",
+      "cheapVsSector": "Attractively valued: forward P/E {pe, number} vs. sector median {median, number}",
+      "expensiveVsSector": "Richly valued: forward P/E {pe, number} vs. sector median {median, number}",
+      "fairVsSector": "Valued in line with the sector: forward P/E {pe, number} vs. median {median, number}",
+      "lossMaking": "Company is loss-making (negative P/E)",
+      "lowPeg": "PEG ratio of {peg, number}: growth is cheaply valued",
+      "highFcfYield": "High free cash flow yield of {pct, number}%",
+      "analystsBuy": "{pct, number}% of {n} analysts recommend buying",
+      "analystsHold": "Analysts mostly neutral ({pct, number}% buy ratings among {n} analysts)",
+      "analystsSell": "{pct, number}% of {n} analysts recommend selling",
+      "targetUpside": "Consensus price target implies {pct, number}% upside",
+      "targetDownside": "Consensus price target is {pct, number}% below the current price",
+      "targetLimited": "Limited upside to consensus target ({pct, number}%)",
+      "insiderBuying": "{n, plural, one {# insider purchase} other {# insider purchases}} in the last 90 days",
+      "insiderSelling": "{n, plural, one {# insider sale} other {# insider sales}} in the last 90 days",
+      "insiderNone": "No reported insider transactions in the last 90 days"
+    },
+    "disclosure": {
+      "title": "Transparency & disclosure",
+      "analyzedAt": "Analysis created",
+      "priceAtAnalysis": "Price at time of analysis",
+      "methodology": "Methodology version",
+      "sources": "Data sources",
+      "sourcesValue": "EODHD (prices, fundamentals, analyst consensus); insider filings: SEC, BaFin/EQS and others."
+    }
   }
 }

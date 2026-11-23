@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { createSupabaseReadClient } from "@/lib/supabaseClient";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SearchBar } from "@/components/SearchBar";
 import { RoleToggle } from "@/components/RoleToggle";
@@ -78,8 +77,10 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
   // so free/logged-out visitors never receive the underlying rows at all.
   let isLoggedIn = false;
   let isPro = false;
+  // Mit Nutzer-Session abfragen: Die RLS-Policies auf `transactions` geben
+  // Vorstand/Aufsichtsrat nur Pro-Nutzern frei (supabase/migrations/2026-11-22_paywall_rls.sql).
+  const authClient = await createSupabaseServerClient();
   if (isVorstand) {
-    const authClient = await createSupabaseServerClient();
     const {
       data: { user },
     } = await authClient.auth.getUser();
@@ -91,7 +92,7 @@ export default async function InsiderKaeufePage({ params, searchParams }: PagePr
   }
   const gated = isVorstand && !isPro;
 
-  const supabase = createSupabaseReadClient();
+  const supabase = authClient;
   let query = applyBaseFilters(
     supabase
       .from("transactions")
