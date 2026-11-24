@@ -65,7 +65,7 @@ export function DashboardSidebar({ onNavigate }: { onNavigate?: () => void }) {
     { key: "screener", label: t("screener"), soon: true },
     { key: "news", label: t("news"), soon: true },
     { key: "academy", href: "/trading-academy", label: t("academy"), soon: true },
-    { key: "intelligence", href: "/trading-intelligence", label: t("intelligence"), soon: true },
+    { key: "intelligence", href: "/trading-intelligence", label: t("intelligence") },
   ];
 
   return (
